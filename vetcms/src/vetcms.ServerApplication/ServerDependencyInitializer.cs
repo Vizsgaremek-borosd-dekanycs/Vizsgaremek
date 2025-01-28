@@ -16,6 +16,7 @@ using vetcms.ServerApplication.Common.Abstractions.IAM;
 using vetcms.ServerApplication.Common.Behaviour;
 using vetcms.ServerApplication.Features.IAM.SuperUser;
 using vetcms.ServerApplication.Domain.Entity;
+using vetcms.ServerApplication.Features.IAM.ResetPassword;
 
 namespace vetcms.ServerApplication
 {

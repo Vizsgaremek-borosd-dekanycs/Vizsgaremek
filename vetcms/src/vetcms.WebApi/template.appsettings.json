@@ -24,6 +24,9 @@
     "Email": "su@su.su",
     "Password": "32154"
   },
+  "Host" : {
+      "ApiBase" : "https://localhost:5042"
+  },
   "AllowedHosts": "*",
   "database_driver": "sqlite"
 }

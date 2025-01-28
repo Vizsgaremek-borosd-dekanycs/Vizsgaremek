@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ using vetcms.SharedModels.Common.ApiLogicExceptionHandling;
 [assembly: InternalsVisibleTo("vetcms.ServerApplication.Tests")]
 namespace vetcms.ServerApplication.Infrastructure.Communication.Mail
 {
-    internal class MailService(IMailDeliveryProviderWrapper mailServiceWrapper, IServiceScopeFactory serviceScopeFactory) : IMailService
+    internal class MailService(IMailDeliveryProviderWrapper mailServiceWrapper, IServiceScopeFactory serviceScopeFactory, IConfiguration configuration) : IMailService
     {
         public async Task<int> SendPasswordResetEmailAsync(PasswordReset passwordReset)
         {
@@ -71,7 +72,8 @@ namespace vetcms.ServerApplication.Infrastructure.Communication.Mail
 
         public string GetEmailPreviewRoute(int emailId)
         {
-            return $"/api/v1/misc/email-preview/{emailId}";
+            string apiBase = configuration.GetValue<string>("Host:ApiBase");
+            return $"{apiBase}/api/v1/misc/email-preview/{emailId}";
         }
     }
 }

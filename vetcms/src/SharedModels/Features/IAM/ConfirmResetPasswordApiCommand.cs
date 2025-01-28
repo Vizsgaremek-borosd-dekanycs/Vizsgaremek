@@ -49,9 +49,9 @@ namespace vetcms.SharedModels.Features.IAM
     {
         public ConfirmResetPasswordApiCommandValidator()
         {
-            RuleFor(x => x.Email).NotEmpty().EmailAddress();
-            RuleFor(x => x.ConfirmationCode).NotEmpty().Length(6);
-            RuleFor(x => x.NewPassword).NotEmpty();
+            RuleFor(x => x.Email).NotEmpty().EmailAddress().WithMessage("Email mező nem maradhat üresen, és email formátumban kell lennie, pl.: kallapal@example.hu");
+            RuleFor(x => x.ConfirmationCode).NotEmpty().Length(6).WithMessage("Kód mező nem lehet üres, és 6 karakteresnek kell lennie!");;
+            RuleFor(x => x.NewPassword).NotEmpty().WithMessage("Jelszó mező nem lehet üres!");;
         }
     }
 
