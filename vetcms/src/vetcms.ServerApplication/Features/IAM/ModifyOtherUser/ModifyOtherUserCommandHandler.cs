@@ -18,7 +18,6 @@ namespace vetcms.ServerApplication.Features.IAM.ModifyOtherUser
         string passwordChanged = "";
         public async Task<ModifyOtherUserApiCommandResponse> Handle(ModifyOtherUserApiCommand request, CancellationToken cancellationToken)
         {
-            User user;
             if(!await userRepository.ExistAsync(request.Id))
             {
                 return new ModifyOtherUserApiCommandResponse()
@@ -27,7 +26,7 @@ namespace vetcms.ServerApplication.Features.IAM.ModifyOtherUser
                     Message = "Nem létező felhasznló"
                 };
             }
-            user = await userRepository.GetByIdAsync(request.Id);
+            User user = await userRepository.GetByIdAsync(request.Id);
             user = ModifyUser(request, user);
             await userRepository.UpdateAsync(user);
 

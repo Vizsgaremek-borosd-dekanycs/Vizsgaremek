@@ -35,7 +35,7 @@ namespace vetcms.ServerApplicationTests.IntegrationTests.Features.IAM
             _userRepository = new UserRepository(_dbContext);
             _mailService = new Mock<IMailService>().Object;
             _confirmHandler = new ConfirmResetPasswordCommandHandler(_userRepository);
-            _beginHandler = new BeginResetPasswordCommandHandler(_userRepository, _mailService);
+            _beginHandler = new BeginResetPasswordCommandHandler(_userRepository,_mailService);
         }
 
         public async Task InitializeAsync()
