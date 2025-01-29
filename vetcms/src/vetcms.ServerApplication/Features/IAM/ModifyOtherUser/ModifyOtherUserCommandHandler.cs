@@ -48,6 +48,7 @@ namespace vetcms.ServerApplication.Features.IAM.ModifyOtherUser
                 user.Password = PasswordUtility.CreateUserPassword(user,request.Password);
                 passwordChanged = request.Password;
             }
+            user.OverwritePermissions(request.GetPermissions());
             //user.Address = request.Address;
             //user.DateOfBirth = request.DateOfBirth;
             //user.FirstName = request.FirstName;

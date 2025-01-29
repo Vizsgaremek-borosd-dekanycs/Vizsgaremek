@@ -33,6 +33,7 @@ namespace vetcms.SharedModels.Features.IAM
         /// A felhasználó neve.
         /// </summary>
         public string VisibleName { get; init; }
+        public string PermissionSet { get; set; }
         //public string Address { get; set; }
 
         //public string FirstName { get; set; }
@@ -52,6 +53,11 @@ namespace vetcms.SharedModels.Features.IAM
         public override PermissionFlags[] GetRequiredPermissions()
         {
             return [PermissionFlags.CAN_MODIFY_OTHER_USER];
+        }
+
+        public EntityPermissions GetPermissions()
+        {
+            return new EntityPermissions(PermissionSet);
         }
     }
 
