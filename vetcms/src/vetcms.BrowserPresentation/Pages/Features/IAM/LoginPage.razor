@@ -27,9 +27,15 @@
                     </FluentTextField>
                 </FluentGridItem>
 
-                <FluentGridItem xs="12" sm="12" md="12" lg="12" Justify="JustifyContent.Center">
-                    <FluentButton @onclick="PasswordResetStart" Appearance="Appearance.Accent">
-                        Elfelejtette a jelszavát?
+                <FluentGridItem xs="12" sm="12" md="6" lg="6"  Justify="JustifyContent.Center">
+                    <FluentButton @onclick="Login" Appearance="Appearance.Accent">
+                        Bejelentkezés
+                    </FluentButton>
+                </FluentGridItem>
+
+                <FluentGridItem xs="12" sm="12" md="6" lg="6" Justify="JustifyContent.Center">
+                    <FluentButton @onclick="NavigateToRegisterPage" Appearance="Appearance.Outline">
+                        Regisztráció
                     </FluentButton>
                 </FluentGridItem>
 
@@ -38,20 +44,11 @@
                     </FluentCheckbox>
                 </FluentGridItem>
 
-                <FluentGridItem xs="12" sm="12" md="6" lg="6"  Justify="JustifyContent.Center">
-                    <FluentButton @onclick="Login" Appearance="Appearance.Accent">
-                        Bejelentkezés
+                <FluentGridItem xs="12" sm="12" md="12" lg="12" Justify="JustifyContent.Center">
+                    <FluentButton @onclick="PasswordResetStart" Appearance="Appearance.Accent">
+                        Elfelejtette a jelszavát?
                     </FluentButton>
                 </FluentGridItem>
-
-                <FluentGridItem xs="12" sm="12" md="6" lg="6" Justify="JustifyContent.Center">
-                    <FluentButton @onclick="NavigateToRegisterPage" BackgroundColor="#EA4300" Color="#ffffff">
-                        Regisztráció
-                    </FluentButton>
-                </FluentGridItem>
-
-
-
             </FluentGrid>
 
         </FluentCard>
