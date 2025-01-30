@@ -27,17 +27,6 @@
                     </FluentTextField>
                 </FluentGridItem>
 
-                <FluentGridItem xs="12" sm="12" md="12" lg="12" Justify="JustifyContent.Center">
-                    <FluentButton @onclick="PasswordResetStart" Appearance="Appearance.Accent">
-                        Elfelejtette a jelszavát?
-                    </FluentButton>
-                </FluentGridItem>
-
-                <FluentGridItem xs="12" sm="12" md="12" lg="12" Justify="JustifyContent.Center">
-                    <FluentCheckbox Label="Jegyezzen meg">
-                    </FluentCheckbox>
-                </FluentGridItem>
-
                 <FluentGridItem xs="12" sm="12" md="6" lg="6"  Justify="JustifyContent.Center">
                     <FluentButton @onclick="Login" Appearance="Appearance.Accent">
                         Bejelentkezés
@@ -45,13 +34,16 @@
                 </FluentGridItem>
 
                 <FluentGridItem xs="12" sm="12" md="6" lg="6" Justify="JustifyContent.Center">
-                    <FluentButton @onclick="NavigateToRegisterPage" BackgroundColor="#EA4300" Color="#ffffff">
+                    <FluentButton @onclick="NavigateToRegisterPage" Appearance="Appearance.Outline">
                         Regisztráció
                     </FluentButton>
                 </FluentGridItem>
 
-
-
+                <FluentGridItem xs="12" sm="12" md="12" lg="12" Justify="JustifyContent.Center">
+                    <FluentButton @onclick="PasswordResetStart" Appearance="Appearance.Accent">
+                        Elfelejtette a jelszavát?
+                    </FluentButton>
+                </FluentGridItem>
             </FluentGrid>
 
         </FluentCard>
@@ -96,7 +88,11 @@
                 Username = username,
                 Password = password
         };
-        await Mediator.Send(userClienCommand);
+        bool result = await Mediator.Send(userClienCommand);
+        if(result)
+        {
+            Navigation.NavigateTo("/");
+        }
     }
 
     /// <summary>

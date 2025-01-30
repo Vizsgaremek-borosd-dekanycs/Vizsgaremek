@@ -90,6 +90,162 @@ namespace vetcms.Application.Migrations
                     b.ToTable("AnimalTypes");
                 });
 
+            modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.FirstTimeAuthenticationCode", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CreatedByUserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("LastModifiedByUserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("FirstTimeAuthenticationCodes");
+                });
+
+            modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.MedicalPillManagement.MedicalPill", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ActiveIngredient")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Dosage")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Form")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Manufacturer")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MedicalPills");
+                });
+
+            modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.MedicalPillManagement.MedicalPillStock", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PillId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("StorageLocation")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PillId");
+
+                    b.ToTable("MedicalPillStock");
+                });
+
+            modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.MedicalPillManagement.MedicalPillStockAlert", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("GeneratedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PillId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PillId");
+
+                    b.ToTable("MedicalPillStockAlerts");
+                });
+
+            modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.MedicalPillManagement.MedicalPillUsageLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("PillId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Purpose")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("QuantityUsed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("UsageDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("UsedById")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PillId");
+
+                    b.HasIndex("UsedById");
+
+                    b.ToTable("MedicalPillUsageLogs");
+                });
+
             modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.PasswordReset", b =>
                 {
                     b.Property<int>("Id")
@@ -129,7 +285,7 @@ namespace vetcms.Application.Migrations
                     b.ToTable("PasswordReset");
                 });
 
-            modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.User", b =>
+            modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.SentEmail", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -144,7 +300,11 @@ namespace vetcms.Application.Migrations
                     b.Property<bool>("Deleted")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Email")
+                    b.Property<string>("From")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("HtmlContent")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -153,6 +313,62 @@ namespace vetcms.Application.Migrations
 
                     b.Property<int>("LastModifiedByUserId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("To")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SentEmails");
+                });
+
+            modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CreatedByUserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("LastModifiedByUserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -186,6 +402,58 @@ namespace vetcms.Application.Migrations
                     b.Navigation("Type");
                 });
 
+            modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.FirstTimeAuthenticationCode", b =>
+                {
+                    b.HasOne("vetcms.ServerApplication.Domain.Entity.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.MedicalPillManagement.MedicalPillStock", b =>
+                {
+                    b.HasOne("vetcms.ServerApplication.Domain.Entity.MedicalPillManagement.MedicalPill", "Pill")
+                        .WithMany("Stocks")
+                        .HasForeignKey("PillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Pill");
+                });
+
+            modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.MedicalPillManagement.MedicalPillStockAlert", b =>
+                {
+                    b.HasOne("vetcms.ServerApplication.Domain.Entity.MedicalPillManagement.MedicalPill", "Pill")
+                        .WithMany("Alerts")
+                        .HasForeignKey("PillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Pill");
+                });
+
+            modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.MedicalPillManagement.MedicalPillUsageLog", b =>
+                {
+                    b.HasOne("vetcms.ServerApplication.Domain.Entity.MedicalPillManagement.MedicalPill", "Pill")
+                        .WithMany("UsageLogs")
+                        .HasForeignKey("PillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("vetcms.ServerApplication.Domain.Entity.User", "UsedBy")
+                        .WithMany()
+                        .HasForeignKey("UsedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Pill");
+
+                    b.Navigation("UsedBy");
+                });
+
             modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.PasswordReset", b =>
                 {
                     b.HasOne("vetcms.ServerApplication.Domain.Entity.User", "User")
@@ -195,6 +463,15 @@ namespace vetcms.Application.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.MedicalPillManagement.MedicalPill", b =>
+                {
+                    b.Navigation("Alerts");
+
+                    b.Navigation("Stocks");
+
+                    b.Navigation("UsageLogs");
                 });
 
             modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.User", b =>

@@ -11,6 +11,8 @@ namespace vetcms.ServerApplication.Common.Abstractions
 {
     internal interface IMailService
     {
-        public Task SendPasswordResetEmailAsync(PasswordReset passwordReset);
+        public string GetEmailPreviewRoute(int emailId);
+        public Task<int> SendPasswordResetEmailAsync(PasswordReset passwordReset);
+        public Task<int> SendFirstAuthenticationEmailAsync(FirstTimeAuthenticationCode authModel);
     }
 }

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.FluentUI.AspNetCore.Components;
 using vetcms.BrowserPresentation;
+using vetcms.BrowserPresentation.Utility;
 
 internal class Program
 {
