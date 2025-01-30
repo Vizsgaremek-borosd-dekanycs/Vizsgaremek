@@ -17,6 +17,79 @@ namespace vetcms.Application.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
 
+            modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.AnimalBreed", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("BreedName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Charachteristics")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CreatedByUserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("LastModifiedByUserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TypeId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TypeId");
+
+                    b.ToTable("AnimalBreeds");
+                });
+
+            modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.AnimalType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CreatedByUserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("LastModifiedByUserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("TypeName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AnimalTypes");
+                });
+
             modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.FirstTimeAuthenticationCode", b =>
                 {
                     b.Property<int>("Id")
@@ -316,6 +389,17 @@ namespace vetcms.Application.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.AnimalBreed", b =>
+                {
+                    b.HasOne("vetcms.ServerApplication.Domain.Entity.AnimalType", "Type")
+                        .WithMany()
+                        .HasForeignKey("TypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Type");
                 });
 
             modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.FirstTimeAuthenticationCode", b =>
