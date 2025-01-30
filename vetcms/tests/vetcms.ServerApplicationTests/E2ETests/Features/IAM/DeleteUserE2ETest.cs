@@ -118,7 +118,8 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
             {
                 Content = JsonContent.Create(deleteUserCommand), // Ensure correct serialization
                 Method = HttpMethod.Delete,
-                RequestUri = new Uri("/api/v1/iam/user")
+                RequestUri = new Uri($"/api/v1/iam/user", UriKind.Relative)
+
             };
 
             var response = await client.SendAsync(request);
@@ -170,7 +171,7 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
             await _dbContext.Database.EnsureDeletedAsync();
             // Arrange
             var adminGuid = SeedAdminUser();
-            var userIds = new List<int> { 1, 2, 3 };
+            var userIds = new List<int> { 2, 3, 4 };
             var client = _factory.CreateClient();
             foreach (var userId in userIds)
             {
