@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security;
 using System.Text;
+using System.Text.Unicode;
 using System.Threading.Tasks;
 using vetcms.ServerApplication.Domain.Entity;
 using vetcms.ServerApplication.Infrastructure.Presistence;
@@ -68,7 +69,13 @@ namespace vetcms.ServerApplication.Features.IAM.SuperUser
                 EntityPermissions permissions = new();
                 permissions.AddFlag(Enum.GetValues<PermissionFlags>());
                 superUserEntity.OverwritePermissions(permissions);
-                superUserEntity.Password = PasswordUtility.HashPassword(superUserPassword, superUserEmail);
+                byte[] salt = UTF8Encoding.UTF8.GetBytes(superUserEmail);
+                while (salt.Length < 16)
+                {
+                    salt = salt.Concat(UTF8Encoding.UTF8.GetBytes(superUserEmail)).ToArray();
+                }
+                salt = salt.Length > 16 ? salt.Take(16).ToArray() : salt;
+                superUserEntity.Password = PasswordUtility.HashPassword(superUserPassword, salt);
                 users.Update(superUserEntity);
                 await context.SaveChangesAsync();
 
