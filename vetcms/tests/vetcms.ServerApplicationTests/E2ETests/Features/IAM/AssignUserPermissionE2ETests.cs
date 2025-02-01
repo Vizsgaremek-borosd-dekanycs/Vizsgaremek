@@ -37,7 +37,7 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
                     // Replace the real database with an in-memory database for testing
                     services.AddDbContext<ApplicationDbContext>(options =>
                     {
-                        options.UseInMemoryDatabase("TestDb_AssignPermission");
+                        options.UseInMemoryDatabase(new Guid().ToString());
                     });
 
                     // Build the service provider
