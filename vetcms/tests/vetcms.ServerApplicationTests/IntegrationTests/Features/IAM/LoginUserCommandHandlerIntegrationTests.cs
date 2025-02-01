@@ -47,7 +47,7 @@ namespace vetcms.ServerApplicationTests.IntegrationTests.Features.IAM
                 Email = $"{guid}@example.com",
                 Password = PasswordUtility.HashPassword("hashedpassword"),
                 PhoneNumber = "1234567890",
-                VisibleName = guid
+                VisibleName = guid,
             };
             _dbContext.Set<User>().Add(user);
             _dbContext.SaveChanges();
@@ -88,7 +88,7 @@ namespace vetcms.ServerApplicationTests.IntegrationTests.Features.IAM
 
             // Assert
             Assert.False(result.Success);
-            Assert.Equal("Hibás bejelentkezési adatok.", result.Message);
+            Assert.Equal("Hibás jelszó", result.Message);
 
             ClearDatabase(guid);
         }

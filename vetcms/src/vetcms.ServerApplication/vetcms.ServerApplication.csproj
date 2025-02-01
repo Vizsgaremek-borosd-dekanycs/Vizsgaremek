@@ -13,12 +13,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Infrastructure\Communication\Mail\MailTemplates\ModifyOtherUserTemplate.html" />
     <None Remove="Features\Misc\AutomatedEmailPreview\Templates\EmailContainer.html" />
     <None Remove="Infrastructure\Communication\Mail\MailTemplates\CreatedUserChangePasswordTemplate.html" />
     <None Remove="Infrastructure\Communication\Mail\MailTemplates\PasswordResetTemplate.html" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Infrastructure\Communication\Mail\MailTemplates\ModifyOtherUserTemplate.html" />
     <EmbeddedResource Include="Features\Misc\AutomatedEmailPreview\Templates\EmailContainer.html" />
   </ItemGroup>
 
