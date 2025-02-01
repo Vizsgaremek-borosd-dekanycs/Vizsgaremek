@@ -1,28 +1,47 @@
 ﻿using MediatR;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.FluentUI.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using vetcms.ClientApplication.Common.Abstract;
+using vetcms.ClientApplication.Common.IAM;
 using vetcms.ClientApplication.Features.IAM.RegisterUser;
 using vetcms.ClientApplication.Features.IAM.UserList;
+using vetcms.SharedModels.Features.IAM;
 
 namespace vetcms.ClientApplication.Features.IAM.DeleteUser
 {
-    internal class DeleteUserClientCommandHandler : IRequestHandler<DeleteUserClientCommand, bool>
+    internal class DeleteUserClientCommandHandler(IMediator mediator) : IRequestHandler<DeleteUserClientCommand, bool>
     {
         public async Task<bool> Handle(DeleteUserClientCommand request, CancellationToken cancellationToken)
         {
-            request.UserIds.ForEach(userId =>
+            DeleteUserApiCommand deleteUserApiCommand = new DeleteUserApiCommand()
             {
-                var list = UserListClientQueryHandler.Users.ToList();
-                list.RemoveAll(x => x.Id == userId);
-                UserListClientQueryHandler.Users = list.AsQueryable();
-            });
+                Ids = request.UserIds
+            };
 
-            await Task.Delay(1000);
+            DeleteUserApiCommandResponse response = await mediator.Send(deleteUserApiCommand);
+            if(response.Success)
+            {
+                return true;
+            }
+            else
+            {
+                request.DialogService.ShowError(response.Message, "Hiba");
+                return false;
+            }
 
-            return true;
+        }
+    }
+
+    internal class DeleteUserApiCommandHandler : GenericApiCommandHandler<DeleteUserApiCommand, DeleteUserApiCommandResponse>
+    {
+        public DeleteUserApiCommandHandler(IServiceScopeFactory serviceScopeFactory)
+            : base(serviceScopeFactory)
+        {
         }
     }
 }

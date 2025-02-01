@@ -136,6 +136,8 @@
             await ToastService.ShowIndeterminateProgressToast(Mediator.Send(command), "Kérjük várjon...", "Felhasználók törlése folyamatban...");
         }
 
+        await Mediator.Send(command);
+
         isBusy = false;
     }
 

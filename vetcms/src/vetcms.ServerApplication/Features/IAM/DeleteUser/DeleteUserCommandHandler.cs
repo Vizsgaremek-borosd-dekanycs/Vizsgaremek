@@ -24,9 +24,8 @@ namespace vetcms.ServerApplication.Features.IAM.DeleteUser
 
             if (nonExistentIds.Any())
             {
-                return Task.FromResult(new DeleteUserApiCommandResponse()
+                return Task.FromResult(new DeleteUserApiCommandResponse(false)
                 {
-                    Success = false,
                     Message = $"Nem létező felhasználó ID(s): {string.Join(",", nonExistentIds)}"
                 });
             }

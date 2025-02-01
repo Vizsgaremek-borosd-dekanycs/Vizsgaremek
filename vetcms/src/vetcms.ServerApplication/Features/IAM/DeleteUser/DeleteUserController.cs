@@ -14,7 +14,7 @@ namespace vetcms.ServerApplication.Features.IAM.DeleteUser
     {
 
         [HttpDelete("user")]
-        public async Task<ICommandResult> DeleteSingleUser(DeleteUserApiCommand command)
+        public async Task<ICommandResult> DeleteUser(DeleteUserApiCommand command)
         {
             command.Prepare(Request);
             return await Mediator.Send(command);
