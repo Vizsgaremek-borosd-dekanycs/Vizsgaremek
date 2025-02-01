@@ -28,7 +28,7 @@ namespace vetcms.WebApi
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "vetcms API", Version = "v1" }));
 
-            builder.Services.AddProblemDetails();
+            //builder.Services.AddProblemDetails();
 
             // csekkolja hogy az ef add-migrationba futtatja, és akkor nem hajtja végre, mert magyarázni fog a mediatr
             if (!EF.IsDesignTime)
