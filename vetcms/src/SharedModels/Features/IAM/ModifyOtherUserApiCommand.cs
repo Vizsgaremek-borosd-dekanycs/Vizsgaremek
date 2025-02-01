@@ -17,23 +17,23 @@ namespace vetcms.SharedModels.Features.IAM
         /// <summary>
         /// A felhasználó e-mail címe.
         /// </summary>
-        public string Email { get; init; }
+        public string Email { get; init; } = string.Empty;
 
         /// <summary>
         /// A felhasználó jelszava.
         /// </summary>
-        public string Password { get; init; }
+        public string Password { get; init; } = string.Empty;
 
         /// <summary>
         /// A felhasználó telefonszáma.
         /// </summary>
-        public string PhoneNumber { get; init; }
+        public string PhoneNumber { get; init; } = string.Empty;
 
         /// <summary>
         /// A felhasználó neve.
         /// </summary>
-        public string VisibleName { get; init; }
-        public string PermissionSet { get; set; }
+        public string VisibleName { get; init; } = string.Empty;
+        public string PermissionSet { get; set; } = string.Empty;
         //public string Address { get; set; }
 
         //public string FirstName { get; set; }
@@ -47,7 +47,7 @@ namespace vetcms.SharedModels.Features.IAM
 
         public override HttpMethodEnum GetApiMethod()
         {
-            return HttpMethodEnum.Post;
+            return HttpMethodEnum.Put;
         }
 
         public override PermissionFlags[] GetRequiredPermissions()

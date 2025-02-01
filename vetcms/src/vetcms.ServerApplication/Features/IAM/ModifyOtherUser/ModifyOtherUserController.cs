@@ -12,7 +12,7 @@ namespace vetcms.ServerApplication.Features.IAM.ModifyOtherUser
 {
     public partial class IamController : ApiV1ControllerBase
     {
-        [HttpPost("modify-other-user")]
+        [HttpPut("modify-other-user")]
         public async Task<ICommandResult> ModifyOtherUser(ModifyOtherUserApiCommand command)
         {
             command.Prepare(Request);
