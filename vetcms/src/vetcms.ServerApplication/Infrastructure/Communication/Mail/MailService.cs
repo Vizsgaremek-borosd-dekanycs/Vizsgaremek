@@ -18,7 +18,7 @@ using vetcms.SharedModels.Common.ApiLogicExceptionHandling;
 [assembly: InternalsVisibleTo("vetcms.ServerApplication.Tests")]
 namespace vetcms.ServerApplication.Infrastructure.Communication.Mail
 {
-    internal class MailService(IMailDeliveryProviderWrapper mailServiceWrapper, IServiceScopeFactory serviceScopeFactory, IConfiguration configuration) : IMailService
+    internal class MailService(IMailDeliveryProviderWrapper mailServiceWrapper, IConfiguration configuration) : IMailService
     {
         public async Task<int> SendPasswordResetEmailAsync(PasswordReset passwordReset)
         {
@@ -31,7 +31,7 @@ namespace vetcms.ServerApplication.Infrastructure.Communication.Mail
             return await SendEmailAsync(passwordReset.User.Email, "VETCMS: Elfelejtett jelszó", TemplateCatalog.PasswordReset, fields);
         }
 
-        public async Task SendModifyOtherUserEmailAsync(User user, string changedPassword)
+        public async Task<int> SendModifyOtherUserEmailAsync(User user, string changedPassword)
         {
             var fields = new Dictionary<TemplateField, string>
             {
@@ -40,7 +40,7 @@ namespace vetcms.ServerApplication.Infrastructure.Communication.Mail
                 { TemplateField.changed_password, changedPassword == "" ? "A jelszava változatlan" : changedPassword.ToString() }
             };
 
-            await SendEmailAsync(user.Email, "VETCMS: Felhasználó módosítás", TemplateCatalog.ModifyOtherUser, fields);
+            return await SendEmailAsync(user.Email, "VETCMS: Felhasználó módosítás", TemplateCatalog.ModifyOtherUser, fields);
         }
 
 

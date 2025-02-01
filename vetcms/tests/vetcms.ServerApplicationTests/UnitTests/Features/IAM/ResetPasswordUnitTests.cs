@@ -116,7 +116,7 @@ namespace vetcms.ServerApplicationTests.UnitTests.Features.IAM
         {
             // Arrange
             var mockMailServiceWrapper = new Mock<IMailDeliveryProviderWrapper>();
-            var mailService = new MailService(mockMailServiceWrapper.Object);
+            var mailService = new MailService(mockMailServiceWrapper.Object, null);
             const string code = "123456";
             var passwordReset = new PasswordReset
             {

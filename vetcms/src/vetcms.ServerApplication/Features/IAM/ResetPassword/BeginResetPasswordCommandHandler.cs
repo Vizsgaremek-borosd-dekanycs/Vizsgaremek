@@ -14,7 +14,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace vetcms.ServerApplication.Features.IAM.ResetPassword
 {
-    internal class BeginResetPasswordCommandHandler(IUserRepository userRepository, IMailService mailService, IConfiguration config) : IRequestHandler<BeginResetPasswordApiCommand, BeginResetPasswordApiCommandResponse>
+    internal class BeginResetPasswordCommandHandler(IUserRepository userRepository, IMailService mailService) : IRequestHandler<BeginResetPasswordApiCommand, BeginResetPasswordApiCommandResponse>
     {
         public async Task<BeginResetPasswordApiCommandResponse> Handle(BeginResetPasswordApiCommand request, CancellationToken cancellationToken)
         {
@@ -34,15 +34,10 @@ namespace vetcms.ServerApplication.Features.IAM.ResetPassword
             PasswordReset resetPasswordEntity = await CreatePasswordResetEntity(request);
             int id = await SendResetEmail(request, resetPasswordEntity);
 
-            if(config.GetValue<bool>("MailServices:UseOnlyLocal"))
+            return new BeginResetPasswordApiCommandResponse(true)
             {
-                return new BeginResetPasswordApiCommandResponse(true)
-                {
-                    Message = $"[BEMUTATÓ MÓD] Az email elküldése sikeres volt. A bemutató céljából az alábbi linken nyitható meg: {mailService.GetEmailPreviewRoute(id)}"
-                };
-
-            }
-            return new BeginResetPasswordApiCommandResponse(true);
+                Message = $"[BEMUTATÓ MÓD] Az email elküldése sikeres volt. A bemutató céljából az alábbi linken nyitható meg: {mailService.GetEmailPreviewRoute(id)}"
+            };
         }
 
         private async Task<PasswordReset> CreatePasswordResetEntity(BeginResetPasswordApiCommand request)

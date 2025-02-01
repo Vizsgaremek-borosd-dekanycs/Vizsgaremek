@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -30,12 +31,14 @@ namespace vetcms.ServerApplication.Features.IAM.ModifyOtherUser
             user = ModifyUser(request, user);
             await userRepository.UpdateAsync(user);
 
-            await mailService.SendModifyOtherUserEmailAsync(user, passwordChanged);
-            return new ModifyOtherUserApiCommandResponse()
+            int mailId = await mailService.SendModifyOtherUserEmailAsync(user, passwordChanged);
+
+            return new ModifyOtherUserApiCommandResponse(true)
             {
-                Success = true,
-                Message = "Felhasználó módosítva."
+                Message = $"[BEMUTATÓ MÓD] Felhasználó módosítva. Az email elküldése sikeres volt. A bemutató céljából az alábbi linken nyitható meg: {mailService.GetEmailPreviewRoute(mailId)}"
             };
+
+
         }
 
         private User ModifyUser(ModifyOtherUserApiCommand request, User user)

@@ -52,7 +52,7 @@
                 <PropertyColumn Property="@(p => p.DateOfBirth)" Format="yyyy-MM-dd" Sortable="true" />
 
                 <TemplateColumn Title="Actions" Align="@Align.End">
-                    <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_EDIT_OTHER_USERS]">
+                    <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_MODIFY_OTHER_USER]">
                         <FluentButton Disabled="isBusy" aria-label="Szerkesztés" OnClick="@(async ()=> await OpenEditUserDialog(context))" IconStart="@(new Icons.Regular.Size16.Edit())" />
                     </PermissionWrapper>
                     <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_VIEW_OTHERS_ANIMALS]">
