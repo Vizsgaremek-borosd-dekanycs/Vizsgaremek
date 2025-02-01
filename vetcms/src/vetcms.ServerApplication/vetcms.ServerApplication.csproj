@@ -14,15 +14,23 @@
 
   <ItemGroup>
     <None Remove="Infrastructure\Communication\Mail\MailTemplates\ModifyOtherUserTemplate.html" />
+    <None Remove="Features\Misc\AutomatedEmailPreview\Templates\EmailContainer.html" />
+    <None Remove="Infrastructure\Communication\Mail\MailTemplates\CreatedUserChangePasswordTemplate.html" />
     <None Remove="Infrastructure\Communication\Mail\MailTemplates\PasswordResetTemplate.html" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Infrastructure\Communication\Mail\MailTemplates\ModifyOtherUserTemplate.html" />
+    <EmbeddedResource Include="Features\Misc\AutomatedEmailPreview\Templates\EmailContainer.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Infrastructure\Communication\Mail\MailTemplates\CreatedUserChangePasswordTemplate.html" />
     <EmbeddedResource Include="Infrastructure\Communication\Mail\MailTemplates\PasswordResetTemplate.html" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="FluentValidation" Version="11.11.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
     <PackageReference Include="MediatR" Version="12.4.1" />

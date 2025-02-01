@@ -14,5 +14,6 @@ namespace vetcms.ServerApplication.Infrastructure.Communication.Mail
         code,
         email,
         changed_password,
+        URL,
     }
 }
