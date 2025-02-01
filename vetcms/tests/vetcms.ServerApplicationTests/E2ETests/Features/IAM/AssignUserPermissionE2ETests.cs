@@ -177,7 +177,6 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
 
             // Act
             var response = await client.PostAsJsonAsync("/api/v1/iam/assign-permission", command);
-
             // Assert
             var result = await response.Content.ReadFromJsonAsync<AssignUserPermissionApiCommandResponse>();
             Assert.False(result.Success);

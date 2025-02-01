@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using vetcms.SharedModels.Common;
@@ -69,6 +70,7 @@ namespace vetcms.SharedModels.Features.IAM
             RuleFor(x => x.Email).NotEmpty().EmailAddress();
             RuleFor(x => x.VisibleName).NotEmpty();
             RuleFor(x => x.PhoneNumber).Length(11);
+            RuleFor(x => x.PermissionSet).NotEmpty().Must(x => BigInteger.TryParse(x, out BigInteger result));
         }
     }
 

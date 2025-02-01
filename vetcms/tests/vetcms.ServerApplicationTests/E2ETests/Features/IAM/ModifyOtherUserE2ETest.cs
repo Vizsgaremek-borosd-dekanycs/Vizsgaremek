@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using vetcms.ServerApplication;
+using vetcms.ServerApplication.Common.Abstractions;
 using vetcms.ServerApplication.Common.Abstractions.IAM;
 using vetcms.ServerApplication.Common.IAM;
 using vetcms.ServerApplication.Domain.Entity;
@@ -25,6 +27,7 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
         private IServiceScope _scope;
         private ApplicationDbContext _dbContext;
         private IAuthenticationCommon _authenticationCommon;
+        private Mock<IMailService> _mockMailService;
 
         public ModifyOtherUserE2ETest(WebApplicationFactory<WebApi.Program> factory)
         {
@@ -35,8 +38,11 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
                     // Replace the real database with an in-memory database for testing
                     services.AddDbContext<ApplicationDbContext>(options =>
                     {
-                        options.UseInMemoryDatabase("TestDb_ModifyOtherUser");
+                        options.UseInMemoryDatabase(new Guid().ToString());
                     });
+
+                    _mockMailService = new Mock<IMailService>();
+                    services.AddSingleton(_mockMailService.Object);
 
                     // Build the service provider
                     var serviceProvider = services.BuildServiceProvider();
@@ -55,15 +61,13 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
 
         private string SeedAdminUser()
         {
-            var adminUserId = 10000;
             var guid = Guid.NewGuid().ToString();
             var adminUser = new User
             {
-                Id = adminUserId,
                 Email = $"{guid}@admin.com",
                 Password = PasswordUtility.HashPassword("AdminPassword123"),
                 PhoneNumber = "06111111111",
-                VisibleName = "Admin User",
+                VisibleName = guid,
             };
 
             adminUser.OverwritePermissions(new EntityPermissions().AddFlag(PermissionFlags.CAN_MODIFY_OTHER_USER));
@@ -78,26 +82,26 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
             return _authenticationCommon.GenerateAccessToken(user);
         }
 
-        private EntityPermissions AddPermission()
+        private EntityPermissions GetDefaultPermissions()
         {
             var permission = new EntityPermissions().AddFlag(PermissionFlags.CAN_LOGIN);
             return permission;
         }
 
-        private int CreateTestUser()
+        private string CreateTestUser()
         {
+            var guid = Guid.NewGuid().ToString();
             var user = new User
             {
-                Id = 1,
-                Email = $"test1@test.com",
+                Email = $"test{guid}@test.com",
                 Password = PasswordUtility.HashPassword("oldPassword123"),
                 PhoneNumber = "06111111111",
-                VisibleName = "Test User"
+                VisibleName = guid
             };
-            user.OverwritePermissions(AddPermission());
+            user.OverwritePermissions(GetDefaultPermissions());
             _dbContext.Set<User>().Add(user);
             _dbContext.SaveChangesAsync();
-            return user.Id;
+            return guid;
         }
 
         [Fact]
@@ -109,16 +113,17 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
             // Arrange
             var adminUserGuid = SeedAdminUser(); // Create an admin user
             var client = _factory.CreateClient();
-            int userId = CreateTestUser(); // ID of the user to be modified
+            string userGuid = CreateTestUser(); // Create a user to be modified
+            int id = _dbContext.Set<User>().First(u => u.Email.Contains(userGuid)).Id;
 
             var modifyUserCommand = new ModifyOtherUserApiCommand
             {
-                Id = userId,
-                Email = $"test{userId}@test.com",
+                Id = id,
+                Email = $"test{userGuid}@test.com",
                 PhoneNumber = "06111111111",
                 VisibleName = "Modified User",
                 Password = "newPassword123",
-                PermissionSet = AddPermission().ToString()
+                PermissionSet = GetDefaultPermissions().ToString()
             };
 
             // Add authorization
@@ -128,6 +133,9 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
             // Act
             var response = await client.PutAsJsonAsync("/api/v1/iam/modify-other-user", modifyUserCommand);
             //response.EnsureSuccessStatusCode(); // Ensure the request was successful
+            var ANYÁD = await response.Content.ReadAsStringAsync();
+            Console.WriteLine(ANYÁD);
+
 
             var result = await response.Content.ReadFromJsonAsync<ModifyOtherUserApiCommandResponse>();
 
@@ -136,8 +144,12 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
             Assert.True(result.Success);
             Assert.Equal("Felhasználó módosítva.", result.Message);
 
+            _mockMailService.Verify(m => m.SendModifyOtherUserEmailAsync(It.IsAny<User>(),It.IsAny<string>()), Times.Once);
+
             // Verify the user is modified
-            var modifiedUser = await _dbContext.Set<User>().FindAsync(userId);
+            _dbContext = _scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var modifiedUser = await _dbContext.Set<User>().FindAsync(id);
+            await _dbContext.Entry(modifiedUser).ReloadAsync();
             Assert.NotNull(modifiedUser);
             Assert.Equal("Modified User", modifiedUser.VisibleName);
             Assert.True(PasswordUtility.VerifyPassword("newPassword123", modifiedUser.Password));
@@ -158,7 +170,7 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
                 PhoneNumber = "06111111111",
                 VisibleName = "Modified User",
                 Password = "newPassword123",
-                PermissionSet = AddPermission().ToString()
+                PermissionSet = GetDefaultPermissions().ToString()
             };
 
             // Add authorization
@@ -175,28 +187,23 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
         }
 
         [Fact]
-        public async Task ModifyOtherUser_Unauthorized()
+        public async Task ModifyOtherUser_Forbidden()
         {
             // Arrange
-            await _dbContext.Database.EnsureDeletedAsync();
+            string adminUserGuid = CreateTestUser(); // Create an admin user
             var client = _factory.CreateClient();
-            var adminUserGuid = SeedAdminUser();
-            var admin = _dbContext.Set<User>().First(u => u.Email.Contains(adminUserGuid));
+            string userGuid = CreateTestUser(); // Create a user to be modified
+            int id = _dbContext.Set<User>().First(u => u.Email.Contains(userGuid)).Id;
 
-            // Remove the required permission
-            admin.OverwritePermissions(new EntityPermissions().RemoveFlag(PermissionFlags.CAN_MODIFY_OTHER_USER));
-            await _dbContext.SaveChangesAsync(); // Ensure changes persist
-
-            int userId = 1; // ID of the user to be modified
 
             var modifyUserCommand = new ModifyOtherUserApiCommand
             {
-                Id = userId,
-                Email = $"test{userId}@test.com",
+                Id = id,
+                Email = $"test{id}@test.com",
                 PhoneNumber = "06111111111",
                 VisibleName = "Modified User",
                 Password = "newPassword123",
-                PermissionSet = AddPermission().ToString()
+                PermissionSet = GetDefaultPermissions().ToString()
             };
 
             // Act

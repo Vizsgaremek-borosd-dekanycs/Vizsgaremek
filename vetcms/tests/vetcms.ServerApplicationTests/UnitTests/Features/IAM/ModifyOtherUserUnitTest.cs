@@ -10,6 +10,7 @@ using MediatR;
 using vetcms.ServerApplication.Common.Abstractions.Data;
 using vetcms.SharedModels.Common.Abstract;
 using vetcms.SharedModels.Features.IAM;
+using vetcms.SharedModels.Common.IAM.Authorization;
 
 namespace vetcms.ServerApplicationTests.UnitTests.Features.IAM
 {
@@ -29,6 +30,7 @@ namespace vetcms.ServerApplicationTests.UnitTests.Features.IAM
         [Fact]
         public async Task ModifyOtherUser_ShouldReturnSuccess_WhenUserIsModified()
         {
+            var permission = new EntityPermissions().AddFlag(PermissionFlags.CAN_LOGIN);
             // Arrange
             var user = new User
             {
@@ -38,6 +40,7 @@ namespace vetcms.ServerApplicationTests.UnitTests.Features.IAM
                 VisibleName = "Test User",
                 Password = "oldPassword123",
             };
+            user.OverwritePermissions(permission);
             _userRepositoryMock.Setup(repo => repo.GetByIdAsync(It.IsAny<int>(), false)).ReturnsAsync(user);
             _userRepositoryMock.Setup(repo => repo.ExistAsync(It.IsAny<int>())).ReturnsAsync(true);
 
@@ -48,7 +51,9 @@ namespace vetcms.ServerApplicationTests.UnitTests.Features.IAM
                 PhoneNumber = "1234567890",
                 VisibleName = "Test User",
                 Password = "newPassword123",
+                PermissionSet = permission.ToString()
             };
+            
 
             // Act
             var result = await _modifyHandler.Handle(request, CancellationToken.None);
@@ -71,7 +76,6 @@ namespace vetcms.ServerApplicationTests.UnitTests.Features.IAM
                 PhoneNumber = "1234567890",
                 VisibleName = "Test User",
                 Password = "oldPassword123",
-                PasswordResets = new List<PasswordReset>()
             };
             _userRepositoryMock.Setup(repo => repo.GetByIdAsync(It.IsAny<int>(), false)).ReturnsAsync(user);
 
