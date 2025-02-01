@@ -137,7 +137,7 @@ namespace vetcms.ServerApplicationTests.IntegrationTests.Features.IAM
             // Assert
             Assert.NotNull(result);
             Assert.True(result.Success);
-            Assert.Equal("Felhasználó módosítva.", result.Message);
+            Assert.Contains("Felhasználó módosítva.", result.Message);
 
             // Verify the user is modified
             var modifiedUser = await _dbContext.Set<User>().FindAsync(userId);

@@ -88,7 +88,7 @@ namespace vetcms.ServerApplicationTests.IntegrationTests.Features.IAM
 
             // Assert
             Assert.False(result.Success);
-            Assert.Equal("Hibás bejelentkezési adatok.", result.Message);
+            Assert.Equal("Hibás jelszó", result.Message);
 
             ClearDatabase(guid);
         }

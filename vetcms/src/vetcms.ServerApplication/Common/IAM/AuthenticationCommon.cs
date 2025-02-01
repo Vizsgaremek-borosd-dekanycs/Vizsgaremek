@@ -87,7 +87,9 @@ namespace vetcms.ServerApplication.Common.IAM
                 string trackingId = jwtToken.Claims.First(x => x.Type == CLAIM_KEY_TRACKING_ID).Value;
                 string permissionSet = jwtToken.Claims.First(x => x.Type == CLAIM_KEY_PERMISSION_SET).Value;
 
-                if(CreateTrackingId(user.Password) != trackingId || user.PermissionSet != permissionSet)
+                string currentTrackingId = CreateTrackingId(user.Password);
+
+                if (currentTrackingId != trackingId || user.PermissionSet != permissionSet)
                 {
                     return false;
                 }

@@ -13,8 +13,8 @@ namespace vetcms.WebApi
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            //options => options.Filters.Add<ApiExceptionFilterAttribute>()
-            builder.Services.AddControllers()
+            //
+            builder.Services.AddControllers(options => options.Filters.Add<ApiExceptionFilterAttribute>())
                 .AddApplicationPart(typeof(ServerDependencyInitializer).Assembly)
                 .AddControllersAsServices();
 

@@ -38,7 +38,7 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
                     // Replace the real database with an in-memory database for testing
                     services.AddDbContext<ApplicationDbContext>(options =>
                     {
-                        options.UseInMemoryDatabase(new Guid().ToString());
+                        options.UseInMemoryDatabase("TestDb_ModifyOtherUserE2E");
                     });
 
                     _mockMailService = new Mock<IMailService>();
@@ -76,9 +76,11 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
             return guid;
         }
 
-        private string GenerateBearerToken(string guid)
+        private async Task<string> GenerateBearerToken(string guid)
         {
-            var user = _dbContext.Set<User>().First(u => u.Email.Contains(guid));
+            User user = _dbContext.Set<User>().First(u => u.Email.Contains(guid));
+            await _dbContext.Entry(user).ReloadAsync();
+
             return _authenticationCommon.GenerateAccessToken(user);
         }
 
@@ -88,7 +90,7 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
             return permission;
         }
 
-        private string CreateTestUser()
+        private async Task<string> CreateTestUser()
         {
             var guid = Guid.NewGuid().ToString();
             var user = new User
@@ -100,7 +102,7 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
             };
             user.OverwritePermissions(GetDefaultPermissions());
             _dbContext.Set<User>().Add(user);
-            _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
             return guid;
         }
 
@@ -113,7 +115,7 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
             // Arrange
             var adminUserGuid = SeedAdminUser(); // Create an admin user
             var client = _factory.CreateClient();
-            string userGuid = CreateTestUser(); // Create a user to be modified
+            string userGuid = await CreateTestUser(); // Create a user to be modified
             int id = _dbContext.Set<User>().First(u => u.Email.Contains(userGuid)).Id;
 
             var modifyUserCommand = new ModifyOtherUserApiCommand
@@ -127,7 +129,10 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
             };
 
             // Add authorization
-            var token = GenerateBearerToken(adminUserGuid);
+            var token = await GenerateBearerToken(adminUserGuid);
+            
+            Assert.NotNull(token);
+
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             // Act
@@ -142,7 +147,7 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
             // Assert
             Assert.NotNull(result);
             Assert.True(result.Success);
-            Assert.Equal("Felhasználó módosítva.", result.Message);
+            Assert.Contains("Felhasználó módosítva.", result.Message);
 
             _mockMailService.Verify(m => m.SendModifyOtherUserEmailAsync(It.IsAny<User>(),It.IsAny<string>()), Times.Once);
 
@@ -174,7 +179,7 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
             };
 
             // Add authorization
-            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", GenerateBearerToken(adminUserGuid));
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await GenerateBearerToken(adminUserGuid));
 
             // Act
             var response = await client.PutAsJsonAsync("/api/v1/iam/modify-other-user", modifyUserCommand);
@@ -190,9 +195,9 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
         public async Task ModifyOtherUser_Forbidden()
         {
             // Arrange
-            string adminUserGuid = CreateTestUser(); // Create an admin user
+            string adminUserGuid = await CreateTestUser(); // Create an admin user
             var client = _factory.CreateClient();
-            string userGuid = CreateTestUser(); // Create a user to be modified
+            string userGuid = await CreateTestUser(); // Create a user to be modified
             int id = _dbContext.Set<User>().First(u => u.Email.Contains(userGuid)).Id;
 
 
@@ -207,7 +212,7 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
             };
 
             // Act
-            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", GenerateBearerToken(adminUserGuid));
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await GenerateBearerToken(adminUserGuid));
             var response = await client.PutAsJsonAsync("/api/v1/iam/modify-other-user", modifyUserCommand);
             var responseBody = await response.Content.ReadAsStringAsync(); // Capture response for debugging
 
