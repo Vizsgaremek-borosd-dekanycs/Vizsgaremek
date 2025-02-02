@@ -32,14 +32,21 @@ namespace vetcms.ServerApplication.Features.IAM.CreateUser
             }
             else
             {
-                await userRepository.AddAsync(newUser);
-                await SendEmail(newUser);
-
-                return await Task.FromResult(new CreateUserApiCommandResponse(true));
+                return await ProcessCreateUser(newUser);
             }
         }
 
-        private async Task SendEmail(User newUser)
+        private async Task<CreateUserApiCommandResponse> ProcessCreateUser(User newUser)
+        {
+            await userRepository.AddAsync(newUser);
+            int id = await SendEmail(newUser);
+            return new CreateUserApiCommandResponse(true)
+            {
+                Message = $"A felhasználó sikeresen létrehozva. [BEMUTATÓ MÓD]: Az email sikeresen elküldve, a bemutató érdekében itt megtekinthető: {mailService.GetEmailPreviewRoute(id)}"
+            };
+        }
+
+        private async Task<int> SendEmail(User newUser)
         {
             string token = GenerateCode();
             FirstTimeAuthenticationCode firstTimeAuthModel = new FirstTimeAuthenticationCode()
@@ -48,7 +55,7 @@ namespace vetcms.ServerApplication.Features.IAM.CreateUser
                 Code = token
             };
             await firstTimeAuthenticationCodeRepository.AddAsync(firstTimeAuthModel);
-            await mailService.SendFirstAuthenticationEmailAsync(firstTimeAuthModel);
+            return await mailService.SendFirstAuthenticationEmailAsync(firstTimeAuthModel);
         }
 
         private string GenerateCode()
