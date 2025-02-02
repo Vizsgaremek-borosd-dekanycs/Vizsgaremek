@@ -16,11 +16,7 @@ namespace vetcms.ServerApplication.Features.IAM.CreateUser
     {
         public async Task<CreateUserApiCommandResponse> Handle(CreateUserApiCommand request, CancellationToken cancellationToken)
         { 
-            User newUser = new User();
-            newUser.PhoneNumber = request.PhoneNumber;
-            newUser.Email = request.Email;
-            newUser.VisibleName = request.Name;
-            newUser.OverwritePermissions(new EntityPermissions(request.PermissionSet).RemoveFlag(PermissionFlags.CAN_LOGIN));
+            User newUser = CreateUser(request);
 
             if (userRepository.HasUserByEmail(newUser.Email))
             {
@@ -45,6 +41,28 @@ namespace vetcms.ServerApplication.Features.IAM.CreateUser
                 Message = $"A felhasználó sikeresen létrehozva. [BEMUTATÓ MÓD]: Az email sikeresen elküldve, a bemutató érdekében itt megtekinthető: {mailService.GetEmailPreviewRoute(id)}"
             };
         }
+
+        private User CreateUser(CreateUserApiCommand request)
+        {
+            User newUser = new User();
+            newUser.PhoneNumber = request.NewUser.PhoneNumber;
+            newUser.Email = request.NewUser.Email;
+            newUser.VisibleName = request.NewUser.VisibleName;
+            newUser.Address = request.NewUser.Address;
+            if (request.NewUser.DateOfBirth == null) 
+            {
+                newUser.DateOfBirth = DateTime.MinValue;
+            }
+            else
+            {
+                newUser.DateOfBirth = request.NewUser.DateOfBirth.Value;
+            }
+            newUser.FirstName = request.NewUser.FirstName;
+            newUser.LastName = request.NewUser.LastName;
+            newUser.OverwritePermissions(new EntityPermissions(request.NewUser.PermissionSet).RemoveFlag(PermissionFlags.CAN_LOGIN));
+            return newUser;
+        }
+
 
         private async Task<int> SendEmail(User newUser)
         {

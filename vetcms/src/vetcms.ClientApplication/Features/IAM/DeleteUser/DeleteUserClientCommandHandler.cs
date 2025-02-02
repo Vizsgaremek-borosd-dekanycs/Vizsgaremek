@@ -26,6 +26,7 @@ namespace vetcms.ClientApplication.Features.IAM.DeleteUser
             DeleteUserApiCommandResponse response = await mediator.Send(deleteUserApiCommand);
             if(response.Success)
             {
+                await request.DialogService.ShowSuccessAsync("Felhasználó(k) sikeresen törölve", "Siker");
                 return true;
             }
             else

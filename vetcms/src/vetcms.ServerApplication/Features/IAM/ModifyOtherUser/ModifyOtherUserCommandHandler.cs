@@ -10,6 +10,7 @@ using vetcms.ServerApplication.Common.Abstractions;
 using vetcms.ServerApplication.Common.Abstractions.Data;
 using vetcms.ServerApplication.Common.Exceptions;
 using vetcms.ServerApplication.Domain.Entity;
+using vetcms.SharedModels.Common.Dto;
 using vetcms.SharedModels.Features.IAM;
 
 namespace vetcms.ServerApplication.Features.IAM.ModifyOtherUser
@@ -43,19 +44,28 @@ namespace vetcms.ServerApplication.Features.IAM.ModifyOtherUser
 
         private User ModifyUser(ModifyOtherUserApiCommand request, User user)
         {
-            user.PhoneNumber = request.PhoneNumber;
-            user.Email = request.Email;
-            user.VisibleName = request.VisibleName;
-            if (!request.Password.IsNullOrEmpty())
+            UserDto userDto = request.ModifiedUser;
+            user.PhoneNumber = userDto.PhoneNumber;
+            user.Email = userDto.Email;
+            user.VisibleName = userDto.VisibleName;
+            if (!userDto.Password.IsNullOrEmpty())
             {
-                user.Password = PasswordUtility.CreateUserPassword(user,request.Password);
-                passwordChanged = request.Password;
+                user.Password = PasswordUtility.CreateUserPassword(user, userDto.Password);
+                passwordChanged = userDto.Password;
             }
-            user.OverwritePermissions(request.GetPermissions());
-            //user.Address = request.Address;
-            //user.DateOfBirth = request.DateOfBirth;
-            //user.FirstName = request.FirstName;
-            //user.LastName = request.LastName;
+            user.OverwritePermissions(userDto.GetPermissions());
+            user.Address = userDto.Address;
+            if(userDto.DateOfBirth == null)
+            {
+                user.DateOfBirth = DateTime.MinValue;
+            }
+            else
+            {
+                user.DateOfBirth = userDto.DateOfBirth.Value;
+            }
+            
+            user.FirstName = userDto.FirstName;
+            user.LastName = userDto.LastName;
             return user;
         }
     }

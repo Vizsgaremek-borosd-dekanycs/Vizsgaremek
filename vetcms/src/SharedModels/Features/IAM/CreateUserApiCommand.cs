@@ -2,11 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using vetcms.SharedModels.Common;
 using vetcms.SharedModels.Common.Abstract;
+using vetcms.SharedModels.Common.Dto;
 using vetcms.SharedModels.Common.IAM.Authorization;
 using static vetcms.SharedModels.Features.IAM.CreateUserApiCommandValidator;
 
@@ -14,22 +16,8 @@ namespace vetcms.SharedModels.Features.IAM
 {
     public record CreateUserApiCommand : AuthenticatedApiCommandBase<CreateUserApiCommandResponse>
     {
-        /// <summary>
-        /// A felhasználó e-mail címe.
-        /// </summary>
-        public string Email { get; init; }
 
-        /// <summary>
-        /// A felhasználó telefonszáma.
-        /// </summary>
-        public string PhoneNumber { get; init; }
-
-        /// <summary>
-        /// A felhasználó neve.
-        /// </summary>
-        public string Name { get; init; }
-
-        public string PermissionSet { get; set; }
+        public UserDto NewUser { get; set; }
 
         public override string GetApiEndpoint()
         {
@@ -38,7 +26,7 @@ namespace vetcms.SharedModels.Features.IAM
 
         public EntityPermissions GetPermissions()
         {
-            return new EntityPermissions(PermissionSet);
+            return new EntityPermissions(NewUser.PermissionSet);
         }
 
         public override HttpMethodEnum GetApiMethod()
@@ -56,9 +44,13 @@ namespace vetcms.SharedModels.Features.IAM
     {
         public CreateUserApiCommandValidator()
         {
-            RuleFor(x => x.Email).NotEmpty().EmailAddress();
-            RuleFor(x => x.Name).NotEmpty();
-            RuleFor(x => x.PhoneNumber).Length(11);
+            RuleFor(x => x.NewUser.Email).NotEmpty().EmailAddress();
+            RuleFor(x => x.NewUser.FirstName).NotEmpty();
+            RuleFor(x => x.NewUser.LastName).Length(11);
+            RuleFor(x => x.NewUser.PermissionSet).NotEmpty().Must(x => BigInteger.TryParse(x, out BigInteger result));
+            RuleFor(x => x.NewUser.VisibleName).NotEmpty();
+            RuleFor(x => x.NewUser.PhoneNumber).Length(11);
+            RuleFor(x => x.NewUser.Address).NotEmpty();
         }
     }
 
