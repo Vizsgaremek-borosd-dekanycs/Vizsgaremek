@@ -20,7 +20,7 @@ namespace vetcms.SharedModels.Features.IAM
 
         public override string GetApiEndpoint()
         {
-            return "/api/v1/iam/users";
+            return Path.Join(ApiBaseUrl, $"/api/v1/iam/users?skip={Skip}&take={Take}&query={SearchTerm}");
         }
 
         public override HttpMethodEnum GetApiMethod()
