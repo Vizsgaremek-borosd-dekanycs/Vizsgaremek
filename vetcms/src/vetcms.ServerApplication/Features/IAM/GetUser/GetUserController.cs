@@ -12,14 +12,12 @@ namespace vetcms.ServerApplication.Features.IAM.GetUser
 {
     public partial class IamController : ApiV1ControllerBase
     {
-        [HttpGet("user")]
-        public async Task<ICommandResult> GetUsers([FromQuery(Name = "skip")] int skip = 0, [FromQuery(Name = "take")] int take = 10, [FromQuery(Name = "query")] string searchTerm = "")
+        [HttpGet("users/{id}")]
+        public async Task<ICommandResult> GetUsers(int id)
         {
-            ListUsersApiCommand command = new ListUsersApiCommand
+            GetUserApiQuery command = new GetUserApiQuery()
             {
-                Skip = skip,
-                Take = take,
-                SearchTerm = searchTerm
+                UserId = id
             };
             command.Prepare(Request);
             return await Mediator.Send(command);

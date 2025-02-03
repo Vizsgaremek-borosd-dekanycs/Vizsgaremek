@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.FluentUI.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ using vetcms.SharedModels.Features.IAM;
 
 namespace vetcms.ClientApplication.Features.IAM.CreateNewUser
 {
-    internal class CreateNewUserClientCommandHandler(IMediator mediator) : IRequestHandler<CreateNewUserClientCommand, bool>
+    internal class CreateNewUserClientCommandHandler(IMediator mediator, IDialogService dialogService) : IRequestHandler<CreateNewUserClientCommand, bool>
     {
         public async Task<bool> Handle(CreateNewUserClientCommand request, CancellationToken cancellationToken)
         {
@@ -23,12 +24,12 @@ namespace vetcms.ClientApplication.Features.IAM.CreateNewUser
             CreateUserApiCommandResponse response = await mediator.Send(createUserApiCommand);
             if(response.Success)
             {
-                await request.DialogService.ShowSuccessAsync("Felhasználó sikeresen létrehozva", "Siker");
+                await dialogService.ShowSuccessAsync("Felhasználó sikeresen létrehozva", "Siker");
                 return true;
             }
             else
             {
-                request.DialogService.ShowError(response.Message, "Hiba");
+                dialogService.ShowError(response.Message, "Hiba");
                 return false;
             }
         }

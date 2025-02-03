@@ -13,7 +13,7 @@ namespace vetcms.ServerApplication.Features.IAM.DeleteUser
     public partial class IamController : ApiV1ControllerBase
     {
 
-        [HttpDelete("user")]
+        [HttpPost("user/batch-delete")]
         public async Task<ICommandResult> DeleteUser(DeleteUserApiCommand command)
         {
             command.Prepare(Request);

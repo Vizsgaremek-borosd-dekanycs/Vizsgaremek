@@ -14,7 +14,10 @@ namespace vetcms.WebApi
 
             // Add services to the container.
             //
-            builder.Services.AddControllers(options => options.Filters.Add<ApiExceptionFilterAttribute>())
+            builder.Services.AddControllers((o) => {
+                o.ModelValidatorProviders.Clear();
+                o.Filters.Add<ApiExceptionFilterAttribute>();
+            })
                 .AddApplicationPart(typeof(ServerDependencyInitializer).Assembly)
                 .AddControllersAsServices();
 
@@ -31,7 +34,7 @@ namespace vetcms.WebApi
 
             //builder.Services.AddProblemDetails();
 
-            // csekkolja hogy az ef add-migrationba futtatja, és akkor nem hajtja végre, mert magyarázni fog a mediatr
+            // csekkolja hogy az ef add-migrationba futtatja, ï¿½s akkor nem hajtja vï¿½gre, mert magyarï¿½zni fog a mediatr
             if (!EF.IsDesignTime)
                 builder.Services.AddServerApp();
 

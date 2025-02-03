@@ -17,7 +17,7 @@ namespace vetcms.SharedModels.Features.IAM
 
         public override string GetApiEndpoint()
         {
-            return Path.Join(ApiBaseUrl, $"/api/v1/iam/user/{UserId}");
+            return Path.Join(ApiBaseUrl, $"/api/v1/iam/users/{UserId}");
         }
 
         public override HttpMethodEnum GetApiMethod()
@@ -25,7 +25,7 @@ namespace vetcms.SharedModels.Features.IAM
 
         public override PermissionFlags[] GetRequiredPermissions()
         {
-            throw new NotImplementedException();
+            return [PermissionFlags.CAN_VIEW_OTHER_USER];
         }
 
         public override bool ProcessSpecialPermissionQuery(UserDto executorUser)

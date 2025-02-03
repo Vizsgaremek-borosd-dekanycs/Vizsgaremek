@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +13,10 @@ namespace vetcms.ServerApplication.Features.IAM.ModifyOtherUser
 {
     public partial class IamController : ApiV1ControllerBase
     {
-        [HttpPut("modify-other-user")]
-        public async Task<ICommandResult> ModifyOtherUser(ModifyOtherUserApiCommand command)
+        [HttpPut("users/{id}")]
+        public async Task<ICommandResult> ModifyOtherUser(int id, ModifyOtherUserApiCommand command)
         {
+            command.Id = id;
             command.Prepare(Request);
             return await Mediator.Send(command);
         }

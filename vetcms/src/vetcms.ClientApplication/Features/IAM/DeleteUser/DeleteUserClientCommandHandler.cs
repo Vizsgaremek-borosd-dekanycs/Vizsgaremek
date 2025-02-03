@@ -14,7 +14,7 @@ using vetcms.SharedModels.Features.IAM;
 
 namespace vetcms.ClientApplication.Features.IAM.DeleteUser
 {
-    internal class DeleteUserClientCommandHandler(IMediator mediator) : IRequestHandler<DeleteUserClientCommand, bool>
+    internal class DeleteUserClientCommandHandler(IMediator mediator, IDialogService dialogService) : IRequestHandler<DeleteUserClientCommand, bool>
     {
         public async Task<bool> Handle(DeleteUserClientCommand request, CancellationToken cancellationToken)
         {
@@ -26,12 +26,12 @@ namespace vetcms.ClientApplication.Features.IAM.DeleteUser
             DeleteUserApiCommandResponse response = await mediator.Send(deleteUserApiCommand);
             if(response.Success)
             {
-                await request.DialogService.ShowSuccessAsync("Felhasználó(k) sikeresen törölve", "Siker");
+                await dialogService.ShowSuccessAsync(response.Message, "Siker");
                 return true;
             }
             else
             {
-                request.DialogService.ShowError(response.Message, "Hiba");
+                dialogService.ShowError(response.Message, "Hiba");
                 return false;
             }
 

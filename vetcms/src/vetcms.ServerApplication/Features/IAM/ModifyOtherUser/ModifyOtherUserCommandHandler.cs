@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using vetcms.ServerApplication.Common.Abstractions;
 using vetcms.ServerApplication.Common.Abstractions.Data;
@@ -38,34 +39,49 @@ namespace vetcms.ServerApplication.Features.IAM.ModifyOtherUser
             {
                 Message = $"[BEMUTATÓ MÓD] Felhasználó módosítva. Az email elküldése sikeres volt. A bemutató céljából az alábbi linken nyitható meg: {mailService.GetEmailPreviewRoute(mailId)}"
             };
-
-
         }
 
         private User ModifyUser(ModifyOtherUserApiCommand request, User user)
         {
             UserDto userDto = request.ModifiedUser;
-            user.PhoneNumber = userDto.PhoneNumber;
-            user.Email = userDto.Email;
-            user.VisibleName = userDto.VisibleName;
+            Console.WriteLine(JsonSerializer.Serialize(userDto));
+            Console.WriteLine(JsonSerializer.Serialize(user));
+
+            if (user.PhoneNumber != userDto.PhoneNumber)
+            {
+                user.PhoneNumber = userDto.PhoneNumber;
+            }
+            if (user.Email != userDto.Email)
+            {
+                user.Email = userDto.Email;
+            }
+            if (user.VisibleName != userDto.VisibleName)
+            {
+                user.VisibleName = userDto.VisibleName;
+            }
             if (!userDto.Password.IsNullOrEmpty())
             {
                 user.Password = PasswordUtility.CreateUserPassword(user, userDto.Password);
                 passwordChanged = userDto.Password;
             }
+            if (user.Address != userDto.Address)
+            {
+                user.Address = userDto.Address;
+            }
+            if (user.DateOfBirth != userDto.DateOfBirth)
+            {
+                user.DateOfBirth = userDto.DateOfBirth ?? DateTime.MinValue;
+            }
+            if (user.FirstName != userDto.FirstName)
+            {
+                user.FirstName = userDto.FirstName;
+            }
+            if (user.LastName != userDto.LastName)
+            {
+                user.LastName = userDto.LastName;
+            }
             user.OverwritePermissions(userDto.GetPermissions());
-            user.Address = userDto.Address;
-            if(userDto.DateOfBirth == null)
-            {
-                user.DateOfBirth = DateTime.MinValue;
-            }
-            else
-            {
-                user.DateOfBirth = userDto.DateOfBirth.Value;
-            }
-            
-            user.FirstName = userDto.FirstName;
-            user.LastName = userDto.LastName;
+
             return user;
         }
     }

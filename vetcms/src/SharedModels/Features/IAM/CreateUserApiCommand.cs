@@ -45,8 +45,7 @@ namespace vetcms.SharedModels.Features.IAM
         public CreateUserApiCommandValidator()
         {
             RuleFor(x => x.NewUser.Email).NotEmpty().EmailAddress();
-            RuleFor(x => x.NewUser.FirstName).NotEmpty();
-            RuleFor(x => x.NewUser.LastName).Length(11);
+            RuleFor(x => x.NewUser.LastName).NotEmpty();
             RuleFor(x => x.NewUser.PermissionSet).NotEmpty().Must(x => BigInteger.TryParse(x, out BigInteger result));
             RuleFor(x => x.NewUser.VisibleName).NotEmpty();
             RuleFor(x => x.NewUser.PhoneNumber).Length(11);

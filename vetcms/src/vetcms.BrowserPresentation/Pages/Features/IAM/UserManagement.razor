@@ -4,6 +4,7 @@
 @using vetcms.ClientApplication.Common.CommandAbstraction
 @using vetcms.ClientApplication.Features.IAM.CreateNewUser
 @using vetcms.ClientApplication.Features.IAM.DeleteUser
+@using vetcms.ClientApplication.Features.IAM.GetUser
 @using vetcms.ClientApplication.Features.IAM.ModifyUser
 @using vetcms.ClientApplication.Features.IAM.UserList
 @using vetcms.SharedModels.Common.Dto
@@ -142,9 +143,8 @@
         {
             await ToastService.ShowIndeterminateProgressToast(Mediator.Send(command), "Kérjük várjon...", "Felhasználók törlése folyamatban...");
         }
-
-        await Mediator.Send(command);
-
+        
+        await dataGrid.RefreshDataAsync();
         isBusy = false;
     }
 
@@ -223,14 +223,14 @@
     private async Task<UserDto> LoadEditUserData(int id)
     {
 		// TODO: Load user data
-        var query = new UserListClientQuery()
+        var query = new GetUserClientQuery()
         {
-            Take = 1
+            UserId = id
         };
 
         var data = await Mediator.Send(query);
 
-        return data.Users.FirstOrDefault();
+        return data.User;
     }
 
     private async Task SubmitNewUserData(UserDto newUser)
@@ -241,6 +241,7 @@
         };
 
         await Mediator.Send(command);
+        await dataGrid.RefreshDataAsync();
     }
 
     private async Task SubmitEditUserData(UserDto editedUser)
@@ -252,6 +253,7 @@
         };
 
         await Mediator.Send(command);
+        await dataGrid.RefreshDataAsync();
     }
 
     

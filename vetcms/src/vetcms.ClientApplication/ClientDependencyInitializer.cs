@@ -24,6 +24,7 @@ namespace vetcms.ClientApplication
                 options.AddOpenBehavior(typeof(UnhandledExceptionBehaviour<,>));
                 options.RegisterGenericHandlers = true;
             });
+            services.AddAutoMapper(typeof(ClientDependencyInitializer));
 
             services.AddScoped<AuthenticationManger, AuthenticationManger>();
 
