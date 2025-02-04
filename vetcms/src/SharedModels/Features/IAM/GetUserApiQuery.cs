@@ -38,7 +38,7 @@ namespace vetcms.SharedModels.Features.IAM
     {
         public GetUserApiQueryValidator()
         {
-            RuleFor(x => x.UserId).NotEmpty();
+            RuleFor(x => x.UserId).NotEmpty().WithMessage("Id nem maradhat üresen");
         }
     }
 
