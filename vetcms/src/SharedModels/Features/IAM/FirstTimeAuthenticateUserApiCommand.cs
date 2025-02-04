@@ -28,7 +28,7 @@ namespace vetcms.SharedModels.Features.IAM
     {
         public FirtTimeAuthenticateUserApiCommandValidator()
         {
-            RuleFor(x => x.Password).NotEmpty();
+            RuleFor(x => x.Password).NotEmpty().WithMessage("Jelszó nem maradhat üresen");
         }
     }
 

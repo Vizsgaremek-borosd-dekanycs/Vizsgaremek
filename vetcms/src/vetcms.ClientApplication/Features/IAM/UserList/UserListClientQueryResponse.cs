@@ -9,7 +9,7 @@ namespace vetcms.ClientApplication.Features.IAM.UserList
 {
     public class UserListClientQueryResponse
     {
-        public List<UserDto> UserQueryResult { get; set; }
+        public List<UserDto> Users { get; set; }
         public int ResultCount { get; set; }
     }
 }

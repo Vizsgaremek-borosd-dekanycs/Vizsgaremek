@@ -60,7 +60,7 @@ namespace vetcms.SharedModels.Features.IAM
     {
         public AssignUserPermissionApiCommandValidator()
         {
-            RuleFor(x => x.Id).NotEmpty();
+            RuleFor(x => x.Id).NotEmpty().WithMessage("Id nem maradhat üresen");
         }
     }
 

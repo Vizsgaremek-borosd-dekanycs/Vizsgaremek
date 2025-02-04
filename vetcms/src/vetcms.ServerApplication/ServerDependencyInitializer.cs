@@ -17,6 +17,7 @@ using vetcms.ServerApplication.Common.Behaviour;
 using vetcms.ServerApplication.Features.IAM.SuperUser;
 using vetcms.ServerApplication.Domain.Entity;
 using vetcms.ServerApplication.Features.IAM.ResetPassword;
+using Microsoft.AspNetCore.Hosting;
 
 namespace vetcms.ServerApplication
 {
@@ -28,13 +29,8 @@ namespace vetcms.ServerApplication
         {
             services.AddValidatorsFromAssembly(typeof(ServerDependencyInitializer).Assembly);
 
-            services.AddMediatR(options =>
-            {
-                options.RegisterServicesFromAssembly(typeof(ServerDependencyInitializer).Assembly);
-                options.AddOpenBehavior(typeof(ValidationBehaviour<,>));
-                options.AddOpenBehavior(typeof(UserValidationBehavior<,>));
-                options.AddOpenBehavior(typeof(PermissionRequirementBehaviour<,>));
-            });
+            InitMediatR(services);
+            InitAutoMapper(services);
 
             services.Configure<RouteOptions>(o =>
             {
@@ -47,6 +43,8 @@ namespace vetcms.ServerApplication
             return services;
         }
 
+        
+
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration baseConfiguration)
         {
             var configuration = SecuredConfiguration.FromPlainConfiguration(baseConfiguration);
@@ -58,6 +56,24 @@ namespace vetcms.ServerApplication
             services.AddCommunicationServices(configuration);
             services.AddScoped<IAuthenticationCommon, AuthenticationCommon>();
             services.AddHostedService<SuperUserInitializer>();
+            return services;
+        }
+
+        private static IServiceCollection InitMediatR(IServiceCollection services)
+        {
+            services.AddMediatR(options =>
+            {
+                options.RegisterServicesFromAssembly(typeof(ServerDependencyInitializer).Assembly);
+                options.AddOpenBehavior(typeof(ValidationBehaviour<,>));
+                options.AddOpenBehavior(typeof(UserValidationBehavior<,>));
+                options.AddOpenBehavior(typeof(PermissionRequirementBehaviour<,>));
+            });
+            return services;
+        }
+
+        private static IServiceCollection InitAutoMapper(IServiceCollection services)
+        {
+            services.AddAutoMapper(typeof(ServerDependencyInitializer));
             return services;
         }
 

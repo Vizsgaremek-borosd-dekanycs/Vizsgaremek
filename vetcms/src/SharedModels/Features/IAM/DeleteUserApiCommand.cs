@@ -39,12 +39,12 @@ namespace vetcms.SharedModels.Features.IAM
 
         public override string GetApiEndpoint()
         {
-            return Path.Join(ApiBaseUrl, "/api/v1/iam/user");
+            return Path.Join(ApiBaseUrl, "/api/v1/iam/user/batch-delete");
         }
 
         public override HttpMethodEnum GetApiMethod()
         {
-            return HttpMethodEnum.Delete;
+            return HttpMethodEnum.Post;
         }
 
         public override PermissionFlags[] GetRequiredPermissions()
@@ -57,7 +57,7 @@ namespace vetcms.SharedModels.Features.IAM
     {
         public DeleteUserApiCommandValidator()
         {
-            RuleFor(x => x.Ids).NotEmpty();
+            RuleFor(x => x.Ids).NotEmpty().WithMessage("Id(k) nem maradhat(nak) üresen");
         }
     }
 

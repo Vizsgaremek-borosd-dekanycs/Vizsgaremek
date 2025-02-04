@@ -11,7 +11,7 @@ namespace vetcms.ServerApplication.Features.IAM.DeleteUser
 {
     internal class DeleteUserCommandHandler(IUserRepository userRepository) : IRequestHandler<DeleteUserApiCommand, DeleteUserApiCommandResponse>
     {
-        public Task<DeleteUserApiCommandResponse> Handle(DeleteUserApiCommand request, CancellationToken cancellationToken)
+        public async Task<DeleteUserApiCommandResponse> Handle(DeleteUserApiCommand request, CancellationToken cancellationToken)
         {
             List<int> nonExistentIds = new();
             request.Ids.ForEach(async id =>
@@ -24,25 +24,21 @@ namespace vetcms.ServerApplication.Features.IAM.DeleteUser
 
             if (nonExistentIds.Any())
             {
-                return Task.FromResult(new DeleteUserApiCommandResponse()
+                return new DeleteUserApiCommandResponse(false)
                 {
-                    Success = false,
                     Message = $"Nem létező felhasználó ID(s): {string.Join(",", nonExistentIds)}"
-                });
+                };
             }
 
-
-            request.Ids.ForEach(async id =>
+            foreach (int id in request.Ids)
             {
                 await userRepository.DeleteAsync(id);
-            });
+            }
 
-
-            return Task.FromResult(new DeleteUserApiCommandResponse()
+            return new DeleteUserApiCommandResponse()
             {
                 Success = true
-            });
-
+            };
 
         }
     }

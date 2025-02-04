@@ -38,7 +38,7 @@ namespace vetcms.SharedModels.Features.IAM
     {
         public BeginResetPasswordApiCommandValidator()
         {
-            RuleFor(x => x.Email).NotEmpty().EmailAddress();
+            RuleFor(x => x.Email).NotEmpty().EmailAddress().WithMessage("Email mező nem maradhat üresen, és email formátumban kell lennie, pl.: kallapal@example.hu");
         }
     }
 

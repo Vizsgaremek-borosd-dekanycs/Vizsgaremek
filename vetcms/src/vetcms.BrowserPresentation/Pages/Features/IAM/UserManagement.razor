@@ -4,6 +4,7 @@
 @using vetcms.ClientApplication.Common.CommandAbstraction
 @using vetcms.ClientApplication.Features.IAM.CreateNewUser
 @using vetcms.ClientApplication.Features.IAM.DeleteUser
+@using vetcms.ClientApplication.Features.IAM.GetUser
 @using vetcms.ClientApplication.Features.IAM.ModifyUser
 @using vetcms.ClientApplication.Features.IAM.UserList
 @using vetcms.SharedModels.Common.Dto
@@ -25,17 +26,18 @@
                     <FluentButton Disabled="isBusy" @onclick="@DeleteUsers" style="padding-bottom: 5px;" IconStart="@(new Icons.Regular.Size16.PersonDelete())" Appearance="Appearance.Accent">Törlés</FluentButton>
                 </PermissionWrapper>
                 <div slot="end">
-                    <FluentSearch Disabled="isBusy" @bind-Value=searchValue AutoComplete="off"/>
+                    <FluentSearch Disabled="isBusy" @bind-Value="searchValue" Immediate="true" ImmediateDelay="300" @bind-Value:after="SearchValueChanged" AutoComplete="off" />
                 </div>
             </FluentToolbar>
         </FluentGridItem>
         <FluentGridItem xs="12">
             <FluentDataGrid
-            Virtualize="true"
-            ItemsProvider="personProvider"
-            GenerateHeader="GenerateHeaderOption.Sticky"
-            Style="min-width: max-content;"
-            Pagination="@pagination"
+                Virtualize="true"
+                ItemsProvider="personProvider"
+                GenerateHeader="GenerateHeaderOption.Sticky"
+                Style="min-width: max-content;"
+                Pagination="@pagination"
+                @ref="dataGrid"
             >
                 <SelectColumn TGridItem="SelectableUserDto"
                                 SelectMode="DataGridSelectMode.Multiple"
@@ -68,11 +70,12 @@
 </FluentCard>
 
 @code {
-    private string searchValue = "one";
+    private string searchValue = "";
     GridItemsProvider<SelectableUserDto> personProvider = default!;
     bool isBusy = false;
-    PaginationState pagination = new PaginationState { ItemsPerPage = 25 };
+    PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
     IEnumerable<SelectableUserDto>? selectedUsers = new List<SelectableUserDto>();
+    private FluentDataGrid<SelectableUserDto> dataGrid;
 
     private class SelectableUserDto : UserDto
     {
@@ -85,18 +88,23 @@
 
     }
 
+    private async Task SearchValueChanged()
+    {
+        await dataGrid.RefreshDataAsync();
+    }
+
     private async ValueTask<GridItemsProviderResult<SelectableUserDto>> gridItemsProviderResult(GridItemsProviderRequest<SelectableUserDto> req)
     {
         var query = new UserListClientQuery()
             {
-                SearchQuery = searchValue,
+                SearchTerm = searchValue,
                 Skip = req.StartIndex,
                 Take = req.Count.HasValue ? req.Count.Value : 10
             };
 
         var data = await ToastService.ShowIndeterminateProgressToast(Mediator.Send(query), "Kérjük várjon...", "Felhasználók betöltése folyamatban...");
 
-        List<SelectableUserDto> users = data.UserQueryResult.Select(u => new SelectableUserDto
+        List<SelectableUserDto> users = data.Users.Select(u => new SelectableUserDto
             {
                 Id = u.Id,
                 VisibleName = u.VisibleName,
@@ -135,7 +143,8 @@
         {
             await ToastService.ShowIndeterminateProgressToast(Mediator.Send(command), "Kérjük várjon...", "Felhasználók törlése folyamatban...");
         }
-
+        
+        await dataGrid.RefreshDataAsync();
         isBusy = false;
     }
 
@@ -213,15 +222,15 @@
 
     private async Task<UserDto> LoadEditUserData(int id)
     {
-        var query = new UserListClientQuery()
+		// TODO: Load user data
+        var query = new GetUserClientQuery()
         {
-            UserId = id,
-            Take = 1
+            UserId = id
         };
 
         var data = await Mediator.Send(query);
 
-        return data.UserQueryResult.FirstOrDefault();
+        return data.User;
     }
 
     private async Task SubmitNewUserData(UserDto newUser)
@@ -232,6 +241,7 @@
         };
 
         await Mediator.Send(command);
+        await dataGrid.RefreshDataAsync();
     }
 
     private async Task SubmitEditUserData(UserDto editedUser)
@@ -243,6 +253,7 @@
         };
 
         await Mediator.Send(command);
+        await dataGrid.RefreshDataAsync();
     }
 
     
