@@ -44,8 +44,8 @@ namespace vetcms.SharedModels.Features.IAM
     {
         public LoginUserCommandValidator()
         {
-            RuleFor(x => x.Email).NotEmpty().EmailAddress();
-            RuleFor(x => x.Password).NotEmpty();
+            RuleFor(x => x.Email).NotEmpty().EmailAddress().WithMessage("Email mező nem maradhat üresen, és email formátumban kell lennie, pl.: kallapal@example.hu");
+            RuleFor(x => x.Password).NotEmpty().WithMessage("Jelszó mező nem lehet üres!");
         }
     }
 

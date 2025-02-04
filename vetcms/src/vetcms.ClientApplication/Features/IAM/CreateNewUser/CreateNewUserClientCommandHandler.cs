@@ -24,7 +24,7 @@ namespace vetcms.ClientApplication.Features.IAM.CreateNewUser
             CreateUserApiCommandResponse response = await mediator.Send(createUserApiCommand);
             if(response.Success)
             {
-                await dialogService.ShowSuccessAsync("Felhasználó sikeresen létrehozva", "Siker");
+                await dialogService.ShowSuccessAsync($"{response.Message}", "Siker");
                 return true;
             }
             else

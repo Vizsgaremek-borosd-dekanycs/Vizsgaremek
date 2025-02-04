@@ -48,8 +48,13 @@ namespace vetcms.SharedModels.Features.IAM
     {
         public ModifyOtherUserApiCommandValidator()
         {
-            RuleFor(x => x.Id).NotEmpty();
-            RuleFor(x => x.ModifiedUser).NotEmpty();
+            RuleFor(x => x.ModifiedUser.Email).NotEmpty().EmailAddress().WithMessage("Email mező nem maradhat üresen, és email formátumban kell lennie, pl.: kallapal@example.hu");
+            RuleFor(x => x.ModifiedUser.FirstName).NotEmpty().WithMessage("Keresznév nem maradhat üresen");
+            RuleFor(x => x.ModifiedUser.LastName).NotEmpty().WithMessage("Vezetéknév nem maradhat üresen");
+            RuleFor(x => x.ModifiedUser.PermissionSet).NotEmpty().Must(x => BigInteger.TryParse(x, out BigInteger result)).WithMessage("Hozzáférési engedély nem maradhat üresen");
+            RuleFor(x => x.ModifiedUser.VisibleName).NotEmpty().WithMessage("Megjelenített név nem maradhat üresen");
+            RuleFor(x => x.ModifiedUser.PhoneNumber).Length(11).WithMessage("Telefonszám nem megfelelő hosszúságú");
+            RuleFor(x => x.ModifiedUser.Address).NotEmpty().WithMessage("Lakcím nem maradhat üresen");
         }
     }
 

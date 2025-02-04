@@ -33,7 +33,7 @@ namespace vetcms.SharedModels.Features.IAM
     {
         public ListUsersApiCommandValidator()
         {
-            RuleFor(x => x.Take).NotEmpty();
+            RuleFor(x => x.Take).NotEmpty().WithMessage("Felhasználók száma nem maradhat üresen");
         }
     }
 

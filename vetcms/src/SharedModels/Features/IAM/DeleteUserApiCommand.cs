@@ -57,7 +57,7 @@ namespace vetcms.SharedModels.Features.IAM
     {
         public DeleteUserApiCommandValidator()
         {
-            RuleFor(x => x.Ids).NotEmpty();
+            RuleFor(x => x.Ids).NotEmpty().WithMessage("Id(k) nem maradhat(nak) üresen");
         }
     }
 

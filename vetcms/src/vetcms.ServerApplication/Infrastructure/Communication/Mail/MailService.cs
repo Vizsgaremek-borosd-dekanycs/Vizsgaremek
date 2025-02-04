@@ -48,7 +48,7 @@ namespace vetcms.ServerApplication.Infrastructure.Communication.Mail
         {
             var fields = new Dictionary<TemplateField, string>
             {
-                { TemplateField.URL, $"https://localhost/iam/first-time-login/{authModel.Code}" },
+                { TemplateField.URL, $"https://localhost:44317/iam/first-time-login/{authModel.Code}" },
                 { TemplateField.visible_name, authModel.User.VisibleName }
             };
             return await SendEmailAsync(authModel.User.Email, "VETCMS: Első belépés", TemplateCatalog.AdminCreateUser, fields);
