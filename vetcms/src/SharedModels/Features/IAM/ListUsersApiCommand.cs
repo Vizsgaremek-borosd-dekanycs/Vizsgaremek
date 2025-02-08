@@ -27,7 +27,7 @@ namespace vetcms.SharedModels.Features.IAM
             => HttpMethodEnum.Get;
 
         public override PermissionFlags[] GetRequiredPermissions()
-            => [PermissionFlags.CAN_LIST_USERS];
+            => [PermissionFlags.CAN_VIEW_OTHER_USER];
     }
     public class ListUsersApiCommandValidator : AbstractValidator<ListUsersApiCommand>
     {

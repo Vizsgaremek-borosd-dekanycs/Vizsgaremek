@@ -6,7 +6,7 @@
     <nav class="sitenav" aria-labelledby="main-menu">
         <FluentNavMenu Id="main-menu" Width="250" Collapsible="true" Title="Navigation menu" @bind-Expanded="expanded" CustomToggle="true">
              <FluentNavLink Href="/" Match="NavLinkMatch.All" Icon="@(new Icons.Regular.Size20.Home())" IconColor="Color.Accent">Home</FluentNavLink>
-            <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_LIST_USERS]">
+            <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_VIEW_OTHER_USER]">
                 <FluentNavLink Href="/iam/user-management" Icon="@(new Icons.Regular.Size20.PersonBoard())" IconColor="Color.Accent">Felhasználók kezelése</FluentNavLink>
              </PermissionWrapper>
         </FluentNavMenu>

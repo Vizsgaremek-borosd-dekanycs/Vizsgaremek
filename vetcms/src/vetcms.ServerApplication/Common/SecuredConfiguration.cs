@@ -13,7 +13,7 @@ namespace vetcms.ServerApplication.Common
     public class SecuredConfiguration : IConfiguration, IApplicationConfiguration
     {
         private readonly IConfiguration baseConfig;
-        private SecuredConfiguration(IConfiguration _baseConfig)
+        public SecuredConfiguration(IConfiguration _baseConfig)
         {
             baseConfig = _baseConfig;
         }

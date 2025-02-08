@@ -9,6 +9,6 @@ namespace vetcms.ClientApplication.Features.IAM.GetUser
 {
     public class GetUserClientQueryResponse
     {
-        public UserDto User { get; set; }
+        public UserDto User { get; set; } = new();
     }
 }

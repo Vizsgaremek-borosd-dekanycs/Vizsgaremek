@@ -48,7 +48,7 @@ namespace vetcms.ServerApplication
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration baseConfiguration)
         {
             var configuration = SecuredConfiguration.FromPlainConfiguration(baseConfiguration);
-            if(!IsTestEnviroment)
+            if (!IsTestEnviroment)
             {
                 services.InitializeDatabaseDriver(configuration);
                 services.AddScoped<IApplicationConfiguration, SecuredConfiguration>();

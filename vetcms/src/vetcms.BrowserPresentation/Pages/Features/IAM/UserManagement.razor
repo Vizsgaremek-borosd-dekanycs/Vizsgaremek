@@ -19,10 +19,10 @@
     <FluentGrid >
         <FluentGridItem xs="12">
             <FluentToolbar id="toolbar-fluent-components" style="width:100%">
-                <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_ASSIGN_PERMISSIONS]">
+                <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_ADD_NEW_USERS]">
                     <FluentButton Disabled="isBusy" @onclick="@OpenCreateUserDialog" style="padding-bottom: 5px;" IconStart="@(new Icons.Regular.Size16.PersonAdd())" Appearance="Appearance.Accent">Új felhasználó</FluentButton>
                 </PermissionWrapper>
-                <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_ASSIGN_PERMISSIONS]">
+                <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_DELETE_USERS]">
                     <FluentButton Disabled="isBusy" @onclick="@DeleteUsers" style="padding-bottom: 5px;" IconStart="@(new Icons.Regular.Size16.PersonDelete())" Appearance="Appearance.Accent">Törlés</FluentButton>
                 </PermissionWrapper>
                 <div slot="end">
@@ -45,15 +45,15 @@
                                 OnSelect="@(e => e.Item.Selected = e.Selected)"
                                 SelectAllDisabled="true"
                                 @bind-SelectedItems="selectedUsers" />
-                <PropertyColumn Property="@(p => p.Id)" Sortable="true" />
-                <PropertyColumn Property="@(p => p.VisibleName)" Sortable="true" />
-                <PropertyColumn Property="@(p => p.Email)" Sortable="true" />
-                <PropertyColumn Property="@(p => p.Address)" Sortable="true" />
-                <PropertyColumn Property="@(p => p.FirstName)" Sortable="true" />
-                <PropertyColumn Property="@(p => p.LastName)" Sortable="true" />
-                <PropertyColumn Property="@(p => p.DateOfBirth)" Format="yyyy-MM-dd" Sortable="true" />
+                <PropertyColumn Title="Azonosító" Property="@(p => p.Id)" Sortable="true" />
+                <PropertyColumn Title="Látható név" Property="@(p => p.VisibleName)" Sortable="true" />
+                <PropertyColumn Title="Email" Property="@(p => p.Email)" Sortable="true" />
+                <PropertyColumn Title="Cím" Property="@(p => p.Address)" Sortable="true" />
+                <PropertyColumn Title="Vezetéknév" Property="@(p => p.LastName)" Sortable="true" />
+                <PropertyColumn Title="Keresztnév" Property="@(p => p.FirstName)" Sortable="true" />
+                <PropertyColumn Title="Születési dátum" Property="@(p => p.DateOfBirth)" Format="yyyy-MM-dd" Sortable="true" />
 
-                <TemplateColumn Title="Actions" Align="@Align.End">
+                <TemplateColumn Title="Művelet" Align="@Align.End">
                     <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_MODIFY_OTHER_USER]">
                         <FluentButton Disabled="isBusy" aria-label="Szerkesztés" OnClick="@(async ()=> await OpenEditUserDialog(context))" IconStart="@(new Icons.Regular.Size16.Edit())" />
                     </PermissionWrapper>
@@ -103,6 +103,11 @@
             };
 
         var data = await ToastService.ShowIndeterminateProgressToast(Mediator.Send(query), "Kérjük várjon...", "Felhasználók betöltése folyamatban...");
+
+        if(data == null)
+        {
+            data = new UserListClientQueryResponse();
+        }
 
         List<SelectableUserDto> users = data.Users.Select(u => new SelectableUserDto
             {

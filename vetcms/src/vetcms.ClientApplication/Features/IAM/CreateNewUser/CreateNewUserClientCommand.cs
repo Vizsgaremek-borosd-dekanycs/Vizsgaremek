@@ -10,6 +10,6 @@ namespace vetcms.ClientApplication.Features.IAM.CreateNewUser
 {
     public class CreateNewUserClientCommand : IClientCommand<bool>
     {
-        public UserDto NewUserModel { get; set; }
+        public UserDto NewUserModel { get; set; } = new();
     }
 }

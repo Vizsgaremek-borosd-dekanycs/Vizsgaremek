@@ -21,6 +21,7 @@
     {
         var query = new CheckPermissionQuery(RequiredPermissions);
         QueryResult = await Mediator.Send(query);
+        Console.WriteLine(QueryResult);
     }
 
     protected override async Task OnInitializedAsync()

@@ -18,6 +18,7 @@ namespace vetcms.ClientApplication.Common.Behaviours
 {
     public class UnhandledExceptionBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IClientCommand<TResponse>
+    where TResponse : new()
     {
         private readonly IDialogService dialogService;
         private readonly NavigationManager navigationManager;
@@ -50,7 +51,7 @@ namespace vetcms.ClientApplication.Common.Behaviours
             }
             catch(ApiCommandExecutionUnknownException ex)
             {
-                dialogService.ShowError(ex.Problem.detail, $"Váratlan hiba történt: {ex.Problem.title}");
+                dialogService.ShowError(ex.Problem.detail, $"Váratlan (API végrehajtási) hiba történt: {ex.Problem.title}");
                 return default;
             }
             catch (Exception ex)
@@ -85,7 +86,7 @@ namespace vetcms.ClientApplication.Common.Behaviours
                     break;
             }
 
-            return default!;
+            return new TResponse();
         }
 
     }

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using vetcms.ClientApplication.Common.Abstract;
 using vetcms.ClientApplication.Features.IAM.ResetPassword;
@@ -23,15 +24,13 @@ namespace vetcms.ClientApplication.Features.IAM.UserList
                 Take = request.Take,
                 SearchTerm = request.SearchTerm
             };
-            ListUsersApiCommandResponse response = await mediator.Send(command);
+            ListUsersApiCommandResponse? response = await mediator.Send(command);
 
-            UserListClientQueryResponse result = new UserListClientQueryResponse
+            return new UserListClientQueryResponse
             {
                 Users = response.Users,
                 ResultCount = response.ResultCount
             };
-
-            return result;
         }
     }
 

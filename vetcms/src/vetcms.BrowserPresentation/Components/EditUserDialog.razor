@@ -33,18 +33,18 @@
             </FluentGridItem>
         </FluentGrid>
     </FluentGridItem>
-    <FluentGridItem xs="12" md="6">
-        <MyListboxComponent TOption="PermissionFlags"
-            Label="Egyéni jogosultságok:"
-            Items="AvaliableFlags"
-            Multiple="true"
-            OptionText="@(p => Enum.GetName(typeof(PermissionFlags), p))"
-            OptionValue="@(p => p.ToString())"
-            SelectedOptions="AssignedFlags"
-                            SelectedOptionsChanged="SelectionChanged" />
-    </FluentGridItem>
-
-
+    <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_ASSIGN_PERMISSIONS]">
+        <FluentGridItem xs="12" md="6">
+            <MyListboxComponent TOption="PermissionFlags"
+                Label="Egyéni jogosultságok:"
+                Items="AvaliableFlags"
+                Multiple="true"
+                OptionText="@(p => Enum.GetName(typeof(PermissionFlags), p))"
+                OptionValue="@(p => p.ToString())"
+                SelectedOptions="AssignedFlags"
+                                SelectedOptionsChanged="SelectionChanged" />
+        </FluentGridItem>
+    </PermissionWrapper>
 </FluentGrid>
 
 

@@ -9,19 +9,22 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using vetcms.ServerApplication.Common.Abstractions;
 using vetcms.ServerApplication.Common.Abstractions.Data;
+using vetcms.ServerApplication.Common.Abstractions.IAM;
 using vetcms.ServerApplication.Common.Exceptions;
 using vetcms.ServerApplication.Domain.Entity;
 using vetcms.SharedModels.Common.Dto;
+using vetcms.SharedModels.Common.IAM.Authorization;
 using vetcms.SharedModels.Features.IAM;
 
 namespace vetcms.ServerApplication.Features.IAM.ModifyOtherUser
 {
-    internal class ModifyOtherUserCommandHandler(IUserRepository userRepository, IMailService mailService) : IRequestHandler<ModifyOtherUserApiCommand, ModifyOtherUserApiCommandResponse>
+    internal class ModifyOtherUserCommandHandler(IUserRepository userRepository, IMailService mailService, IAuthenticationCommon authenticationCommon) : IRequestHandler<ModifyOtherUserApiCommand, ModifyOtherUserApiCommandResponse>
     {
         string passwordChanged = "";
         public async Task<ModifyOtherUserApiCommandResponse> Handle(ModifyOtherUserApiCommand request, CancellationToken cancellationToken)
         {
-            if(!await userRepository.ExistAsync(request.Id))
+            User executorUser = await authenticationCommon.GetUser(request.BearerToken);
+            if (!await userRepository.ExistAsync(request.Id))
             {
                 return new ModifyOtherUserApiCommandResponse()
                 {
@@ -30,7 +33,7 @@ namespace vetcms.ServerApplication.Features.IAM.ModifyOtherUser
                 };
             }
             User user = await userRepository.GetByIdAsync(request.Id);
-            user = ModifyUser(request, user);
+            user = ModifyUser(request, user, executorUser);
             await userRepository.UpdateAsync(user);
 
             int mailId = await mailService.SendModifyOtherUserEmailAsync(user, passwordChanged);
@@ -41,48 +44,52 @@ namespace vetcms.ServerApplication.Features.IAM.ModifyOtherUser
             };
         }
 
-        private User ModifyUser(ModifyOtherUserApiCommand request, User user)
+        private User ModifyUser(ModifyOtherUserApiCommand request, User targetUser, User executorUser)
         {
             UserDto userDto = request.ModifiedUser;
             Console.WriteLine(JsonSerializer.Serialize(userDto));
-            Console.WriteLine(JsonSerializer.Serialize(user));
+            Console.WriteLine(JsonSerializer.Serialize(targetUser));
 
-            if (user.PhoneNumber != userDto.PhoneNumber)
+            if (targetUser.PhoneNumber != userDto.PhoneNumber)
             {
-                user.PhoneNumber = userDto.PhoneNumber;
+                targetUser.PhoneNumber = userDto.PhoneNumber;
             }
-            if (user.Email != userDto.Email)
+            if (targetUser.Email != userDto.Email)
             {
-                user.Email = userDto.Email;
+                targetUser.Email = userDto.Email;
             }
-            if (user.VisibleName != userDto.VisibleName)
+            if (targetUser.VisibleName != userDto.VisibleName)
             {
-                user.VisibleName = userDto.VisibleName;
+                targetUser.VisibleName = userDto.VisibleName;
             }
-            if (!userDto.Password.IsNullOrEmpty())
+            if (!userDto.Password.IsNullOrEmpty() && executorUser.GetPermissions().HasPermissionFlag(PermissionFlags.CAN_MODIFY_OTHER_USER_PASSWORD))
             {
-                user.Password = PasswordUtility.CreateUserPassword(user, userDto.Password);
+                targetUser.Password = PasswordUtility.CreateUserPassword(targetUser, userDto.Password);
                 passwordChanged = userDto.Password;
             }
-            if (user.Address != userDto.Address)
+            if (targetUser.Address != userDto.Address)
             {
-                user.Address = userDto.Address;
+                targetUser.Address = userDto.Address;
             }
-            if (user.DateOfBirth != userDto.DateOfBirth)
+            if (targetUser.DateOfBirth != userDto.DateOfBirth)
             {
-                user.DateOfBirth = userDto.DateOfBirth ?? DateTime.MinValue;
+                targetUser.DateOfBirth = userDto.DateOfBirth ?? DateTime.MinValue;
             }
-            if (user.FirstName != userDto.FirstName)
+            if (targetUser.FirstName != userDto.FirstName)
             {
-                user.FirstName = userDto.FirstName;
+                targetUser.FirstName = userDto.FirstName;
             }
-            if (user.LastName != userDto.LastName)
+            if (targetUser.LastName != userDto.LastName)
             {
-                user.LastName = userDto.LastName;
+                targetUser.LastName = userDto.LastName;
             }
-            user.OverwritePermissions(userDto.GetPermissions());
 
-            return user;
+            if(executorUser.GetPermissions().HasPermissionFlag(PermissionFlags.CAN_ASSIGN_PERMISSIONS))
+            {
+                targetUser.OverwritePermissions(userDto.GetPermissions());
+            }
+
+            return targetUser;
         }
     }
 }

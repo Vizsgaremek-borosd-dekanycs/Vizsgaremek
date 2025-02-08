@@ -5,6 +5,6 @@ namespace vetcms.ClientApplication.Features.IAM.GetUser
 {
     public class GetUserClientQuery : IClientCommand<GetUserClientQueryResponse>
     {
-        public int UserId { get; set; }
+        public int UserId { get; set; } = 0;
     }
 }
