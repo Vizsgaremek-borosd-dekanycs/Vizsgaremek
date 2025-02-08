@@ -12,7 +12,7 @@ namespace vetcms.ServerApplication.Features.IAM.CreateUser
 {
     public partial class IamController : ApiV1ControllerBase
     {
-        [HttpPost("create-user")]
+        [HttpPost("user")]
         public async Task<ICommandResult> CreateUser(CreateUserApiCommand command)
         {
             command.Prepare(Request);
