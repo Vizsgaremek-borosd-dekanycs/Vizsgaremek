@@ -17,13 +17,13 @@ namespace vetcms.ServerApplicationTests.UnitTests.Common
 {
     public class AuthenticationCommonUnitTest
     {
-        private readonly Mock<IConfiguration> _mockConfiguration;
+        private readonly Mock<IApplicationConfiguration> _mockConfiguration;
         private readonly Mock<IUserRepository> _mockUserRepository;
         private readonly AuthenticationCommon _authenticationCommon;
 
         public AuthenticationCommonUnitTest()
         {
-            _mockConfiguration = new Mock<IConfiguration>();
+            _mockConfiguration = new Mock<IApplicationConfiguration>();
             _mockUserRepository = new Mock<IUserRepository>();
             _authenticationCommon = new AuthenticationCommon(_mockConfiguration.Object, _mockUserRepository.Object);
         }
@@ -33,9 +33,9 @@ namespace vetcms.ServerApplicationTests.UnitTests.Common
         {
             // Arrange
             var user = new User { Id = 1, Password = "password"};
-            _mockConfiguration.Setup(c => c["Jwt:Key"]).Returns("TAstCtBi3RzzcCiPxHl15gG6uSdBokKatTOcQW48YIkKssbr6x");
-            _mockConfiguration.Setup(c => c["Jwt:Issuer"]).Returns("issuer");
-            _mockConfiguration.Setup(c => c["Jwt:WebAPIAudience"]).Returns("audience");
+            _mockConfiguration.Setup(c => c.GetJwtSecret()).Returns("TAstCtBi3RzzcCiPxHl15gG6uSdBokKatTOcQW48YIkKssbr6x");
+            _mockConfiguration.Setup(c => c.GetJwtIssuer()).Returns("issuer");
+            _mockConfiguration.Setup(c => c.GetJwtAudience()).Returns("audience");
 
             // Act
             var token = _authenticationCommon.GenerateAccessToken(user);
@@ -49,9 +49,9 @@ namespace vetcms.ServerApplicationTests.UnitTests.Common
         {
             // Arrange
             var user = new User { Id = 1, Password = "password" };
-            _mockConfiguration.Setup(c => c["Jwt:Key"]).Returns("TAstCtBi3RzzcCiPxHl15gG6uSdBokKatTOcQW48YIkKssbr6x");
-            _mockConfiguration.Setup(c => c["Jwt:Issuer"]).Returns("issuer");
-            _mockConfiguration.Setup(c => c["Jwt:WebAPIAudience"]).Returns("audience");
+            _mockConfiguration.Setup(c => c.GetJwtSecret()).Returns("TAstCtBi3RzzcCiPxHl15gG6uSdBokKatTOcQW48YIkKssbr6x");
+            _mockConfiguration.Setup(c => c.GetJwtIssuer()).Returns("issuer");
+            _mockConfiguration.Setup(c => c.GetJwtAudience()).Returns("audience");
             _mockUserRepository.Setup(r => r.GetByIdAsync(It.IsAny<int>(), false)).ReturnsAsync(user);
 
             var token = _authenticationCommon.GenerateAccessToken(user);
@@ -81,9 +81,9 @@ namespace vetcms.ServerApplicationTests.UnitTests.Common
         {
             // Arrange
             var user = new User { Id = 1, Password = "password" };
-            _mockConfiguration.Setup(c => c["Jwt:Key"]).Returns("TAstCtBi3RzzcCiPxHl15gG6uSdBokKatTOcQW48YIkKssbr6x");
-            _mockConfiguration.Setup(c => c["Jwt:Issuer"]).Returns("issuer");
-            _mockConfiguration.Setup(c => c["Jwt:WebAPIAudience"]).Returns("audience");
+            _mockConfiguration.Setup(c => c.GetJwtSecret()).Returns("TAstCtBi3RzzcCiPxHl15gG6uSdBokKatTOcQW48YIkKssbr6x");
+            _mockConfiguration.Setup(c => c.GetJwtIssuer()).Returns("issuer");
+            _mockConfiguration.Setup(c => c.GetJwtAudience()).Returns("audience");
             _mockUserRepository.Setup(r => r.GetByIdAsync(It.IsAny<int>(), false)).ReturnsAsync(user);
 
             var token = _authenticationCommon.GenerateAccessToken(user, DateTime.UtcNow.AddSeconds(-1)); // Expired token
@@ -100,9 +100,9 @@ namespace vetcms.ServerApplicationTests.UnitTests.Common
         {
             // Arrange
             var user = new User { Id = 1, Password = "password" };
-            _mockConfiguration.Setup(c => c["Jwt:Key"]).Returns("TAstCtBi3RzzcCiPxHl15gG6uSdBokKatTOcQW48YIkKssbr6x");
-            _mockConfiguration.Setup(c => c["Jwt:Issuer"]).Returns("issuer");
-            _mockConfiguration.Setup(c => c["Jwt:WebAPIAudience"]).Returns("audience");
+            _mockConfiguration.Setup(c => c.GetJwtSecret()).Returns("TAstCtBi3RzzcCiPxHl15gG6uSdBokKatTOcQW48YIkKssbr6x");
+            _mockConfiguration.Setup(c => c.GetJwtIssuer()).Returns("issuer");
+            _mockConfiguration.Setup(c => c.GetJwtAudience()).Returns("audience");
             _mockUserRepository.Setup(r => r.GetByIdAsync(It.IsAny<int>(), false)).ReturnsAsync(user);
 
             var token = _authenticationCommon.GenerateAccessToken(user);
@@ -120,9 +120,9 @@ namespace vetcms.ServerApplicationTests.UnitTests.Common
         {
             // Arrange
             var user = new User { Id = 1, Password = "password" };
-            _mockConfiguration.Setup(c => c["Jwt:Key"]).Returns("TAstCtBi3RzzcCiPxHl15gG6uSdBokKatTOcQW48YIkKssbr6x");
-            _mockConfiguration.Setup(c => c["Jwt:Issuer"]).Returns("issuer");
-            _mockConfiguration.Setup(c => c["Jwt:WebAPIAudience"]).Returns("audience");
+            _mockConfiguration.Setup(c => c.GetJwtSecret()).Returns("TAstCtBi3RzzcCiPxHl15gG6uSdBokKatTOcQW48YIkKssbr6x");
+            _mockConfiguration.Setup(c => c.GetJwtIssuer()).Returns("issuer");
+            _mockConfiguration.Setup(c => c.GetJwtAudience()).Returns("audience");
             _mockUserRepository.Setup(r => r.GetByIdAsync(It.IsAny<int>(), false)).ReturnsAsync(user);
 
             var token = _authenticationCommon.GenerateAccessToken(user);
@@ -148,9 +148,9 @@ namespace vetcms.ServerApplicationTests.UnitTests.Common
         {
             // Arrange
             var user = new User { Id = 1, Password = "password" };
-            _mockConfiguration.Setup(c => c["Jwt:Key"]).Returns("TAstCtBi3RzzcCiPxHl15gG6uSdBokKatTOcQW48YIkKssbr6x");
-            _mockConfiguration.Setup(c => c["Jwt:Issuer"]).Returns("issuer");
-            _mockConfiguration.Setup(c => c["Jwt:WebAPIAudience"]).Returns("audience");
+            _mockConfiguration.Setup(c => c.GetJwtSecret()).Returns("TAstCtBi3RzzcCiPxHl15gG6uSdBokKatTOcQW48YIkKssbr6x");
+            _mockConfiguration.Setup(c => c.GetJwtIssuer()).Returns("issuer");
+            _mockConfiguration.Setup(c => c.GetJwtAudience()).Returns("audience");
             _mockUserRepository.Setup(r => r.GetByIdAsync(It.IsAny<int>(), false)).ReturnsAsync(user);
 
             var token = _authenticationCommon.GenerateAccessToken(user);
@@ -186,9 +186,9 @@ namespace vetcms.ServerApplicationTests.UnitTests.Common
         {
             // Arrange
             var user = new User { Id = 1, Password = "password"};
-            _mockConfiguration.Setup(c => c["Jwt:Key"]).Returns("TAstCtBi3RzzcCiPxHl15gG6uSdBokKatTOcQW48YIkKssbr6x");
-            _mockConfiguration.Setup(c => c["Jwt:Issuer"]).Returns("issuer");
-            _mockConfiguration.Setup(c => c["Jwt:WebAPIAudience"]).Returns("audience");
+            _mockConfiguration.Setup(c => c.GetJwtSecret()).Returns("TAstCtBi3RzzcCiPxHl15gG6uSdBokKatTOcQW48YIkKssbr6x");
+            _mockConfiguration.Setup(c => c.GetJwtIssuer()).Returns("issuer");
+            _mockConfiguration.Setup(c => c.GetJwtAudience()).Returns("audience");
             _mockUserRepository.Setup(r => r.GetByIdAsync(It.IsAny<int>(), false)).ReturnsAsync(user);
 
             var token = _authenticationCommon.GenerateAccessToken(user);

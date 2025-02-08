@@ -12,7 +12,9 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Moq;
 using vetcms.ServerApplication;
+using vetcms.ServerApplication.Common.Abstractions.Data;
 using vetcms.ServerApplication.Common.Abstractions.IAM;
 using vetcms.ServerApplication.Common.IAM;
 using vetcms.ServerApplication.Domain.Entity;
@@ -43,11 +45,19 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
                         options.UseInMemoryDatabase("TestDb_AssignPermission");
                     });
 
+                    var mockAppConfig = new Mock<IApplicationConfiguration>();
+                    mockAppConfig.Setup(c => c.GetJwtSecret()).Returns("TAstCtBi3RzzcCiPxHl15gG6uSdBokKatTOcQW48YIkKssbr6x");
+                    mockAppConfig.Setup(c => c.GetJwtAudience()).Returns(Guid.NewGuid().ToString());
+                    mockAppConfig.Setup(c => c.GetJwtIssuer()).Returns(Guid.NewGuid().ToString());
+                    services.AddSingleton(mockAppConfig.Object);
+
                     // Build the service provider
                     var serviceProvider = services.BuildServiceProvider();
                     _scope = serviceProvider.CreateScope();
                     _dbContext = _scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                     _authenticationCommon = _scope.ServiceProvider.GetRequiredService<IAuthenticationCommon>();
+
+                    
 
                     // Ensure the database is created
                     _dbContext.Database.EnsureCreated();
@@ -117,8 +127,8 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
             var request = new HttpRequestMessage
             {
                 Content = JsonContent.Create(deleteUserCommand), // Ensure correct serialization
-                Method = HttpMethod.Delete,
-                RequestUri = new Uri($"/api/v1/iam/user", UriKind.Relative)
+                Method = HttpMethod.Post,
+                RequestUri = new Uri($"/api/v1/iam/user/batch-delete", UriKind.Relative)
 
             };
 
@@ -152,7 +162,7 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", GenerateBearerToken(adminUser));
 
             // Act
-            var request = new HttpRequestMessage(HttpMethod.Delete, "/api/v1/iam/user")
+            var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/iam/user/batch-delete")
             {
                 Content = JsonContent.Create(deleteUserCommand), // Ensure correct serialization
             };
@@ -190,7 +200,7 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
 
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", GenerateBearerToken(adminGuid));
 
-            var request = new HttpRequestMessage(HttpMethod.Delete, "/api/v1/iam/user")
+            var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/iam/user/batch-delete")
             {
                 Content = JsonContent.Create(deleteUserCommand), // Ensure correct serialization
             };
@@ -225,7 +235,7 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", GenerateBearerToken(adminGuid));
 
             // Act
-            var request = new HttpRequestMessage(HttpMethod.Delete, "/api/v1/iam/user")
+            var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/iam/user/batch-delete")
             {
                 Content = JsonContent.Create(deleteUserCommand), // Ensure correct serialization
             };

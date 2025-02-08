@@ -51,6 +51,7 @@ namespace vetcms.ServerApplication
             if(!IsTestEnviroment)
             {
                 services.InitializeDatabaseDriver(configuration);
+                services.AddScoped<IApplicationConfiguration, SecuredConfiguration>();
             }
             services.InitializeRepositoryComponents(configuration);
             services.AddCommunicationServices(configuration);
@@ -79,7 +80,7 @@ namespace vetcms.ServerApplication
 
         private static void AddCommunicationServices(this IServiceCollection services, SecuredConfiguration configuration)
         {
-            if(configuration.GetValue<bool>("MailServices:UseOnlyLocal"))
+            if(IsOnlyLocalMailServiceAvaliable(configuration))
             {
                 services.AddScoped<IMailDeliveryProviderWrapper, LocalMailDeliveryServiceWrapper>();
             }
@@ -91,6 +92,18 @@ namespace vetcms.ServerApplication
             }
             
             services.AddScoped<IMailService, MailService>();
+        }
+
+        private static bool IsOnlyLocalMailServiceAvaliable(SecuredConfiguration configuration)
+        {
+            try
+            {
+                return configuration.GetValue<bool>("MailServices:UseOnlyLocal");
+            }
+            catch(Exception e)
+            {
+                return true;
+            }
         }
 
         private static void InitializeDatabaseDriver(this IServiceCollection services, SecuredConfiguration configuration)

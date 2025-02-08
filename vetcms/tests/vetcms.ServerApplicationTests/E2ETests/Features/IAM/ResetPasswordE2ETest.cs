@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using vetcms.ServerApplication.Common.Abstractions;
+using vetcms.ServerApplication.Common.Abstractions.Data;
 using vetcms.ServerApplication.Domain.Entity;
 using vetcms.ServerApplication.Features.IAM;
 using vetcms.ServerApplication.Infrastructure.Presistence;
@@ -35,6 +36,9 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
 
                     _mockMailService = new Mock<IMailService>();
                     services.AddSingleton(_mockMailService.Object);
+
+                    var mockAppConfig = new Mock<IApplicationConfiguration>();
+                    services.AddSingleton(mockAppConfig.Object);
 
                     var serviceProvider = services.BuildServiceProvider();
                     _scope = serviceProvider.CreateScope();

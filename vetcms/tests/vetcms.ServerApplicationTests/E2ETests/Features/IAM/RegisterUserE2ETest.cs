@@ -16,6 +16,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using vetcms.ServerApplication.Features.IAM;
 using Microsoft.Extensions.Configuration;
+using Moq;
+using vetcms.ServerApplication.Common.Abstractions.Data;
 
 namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
 {
@@ -39,6 +41,9 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
 
                     // Build the service provider
                     var serviceProvider = services.BuildServiceProvider();
+
+                    var mockAppConfig = new Mock<IApplicationConfiguration>();
+                    services.AddSingleton(mockAppConfig.Object);
 
                     // Create a scope to obtain a reference to the database context
                     _scope = serviceProvider.CreateScope();

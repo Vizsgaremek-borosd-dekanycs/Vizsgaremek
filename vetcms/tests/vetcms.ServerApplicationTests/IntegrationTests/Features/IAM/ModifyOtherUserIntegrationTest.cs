@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using vetcms.ServerApplication.Common.Abstractions;
+using vetcms.ServerApplication.Common.Abstractions.Data;
 using vetcms.ServerApplication.Common.Abstractions.IAM;
 using vetcms.ServerApplication.Common.IAM;
 using vetcms.ServerApplication.Domain.Entity;
@@ -52,6 +53,9 @@ namespace vetcms.ServerApplicationTests.IntegrationTests.Features.IAM
                     });
 
                     services.AddScoped<IAuthenticationCommon, AuthenticationCommon>();
+
+                    var mockAppConfig = new Mock<IApplicationConfiguration>();
+                    services.AddSingleton(mockAppConfig.Object);
 
                     var sp = services.BuildServiceProvider();
 

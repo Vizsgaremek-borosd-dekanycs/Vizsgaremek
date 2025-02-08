@@ -21,7 +21,7 @@ namespace vetcms.ServerApplicationTests.IntegrationTests.Common
         private readonly AuthenticationCommon _authenticationCommon;
         private readonly DbContextOptions<ApplicationDbContext> _dbContextOptions;
         private readonly ApplicationDbContext _dbContext;
-        private readonly Mock<IConfiguration> _mockConfiguration;
+        private readonly Mock<IApplicationConfiguration> _mockConfiguration;
 
         public AuthenticationCommonIntegrationTest()
         {
@@ -30,10 +30,10 @@ namespace vetcms.ServerApplicationTests.IntegrationTests.Common
                 .UseInMemoryDatabase(databaseName: "TestDatabase")
                 .Options;
 
-            _mockConfiguration = new Mock<IConfiguration>();
-            _mockConfiguration.Setup(c => c["Jwt:Key"]).Returns("TAstCtBi3RzzcCiPxHl15gG6uSdBokKatTOcQW48YIkKssbr6x");
-            _mockConfiguration.Setup(c => c["Jwt:Issuer"]).Returns("issuer");
-            _mockConfiguration.Setup(c => c["Jwt:WebAPIAudience"]).Returns("audience");
+            _mockConfiguration = new Mock<IApplicationConfiguration>();
+            _mockConfiguration.Setup(c => c.GetJwtSecret()).Returns("TAstCtBi3RzzcCiPxHl15gG6uSdBokKatTOcQW48YIkKssbr6x");
+            _mockConfiguration.Setup(c => c.GetJwtIssuer()).Returns("issuer");
+            _mockConfiguration.Setup(c => c.GetJwtAudience()).Returns("audience");
 
             _dbContext = new ApplicationDbContext(_dbContextOptions);
             _userRepository = new UserRepository(_dbContext);
