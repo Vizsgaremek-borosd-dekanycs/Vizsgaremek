@@ -29,7 +29,7 @@ namespace vetcms.ServerApplicationTests.UnitTests.Features.IAM
             var userId = 1;
             var command = new DeleteUserApiCommand(new List<int> { userId });
 
-            _userRepositoryMock.Setup(repo => repo.ExistAsync(userId)).ReturnsAsync(true);
+            _userRepositoryMock.Setup(repo => repo.ExistAsync(userId, false)).ReturnsAsync(true);
             _userRepositoryMock.Setup(repo => repo.DeleteAsync(userId)).ReturnsAsync(new User { Id = userId });
 
             // Act
@@ -50,7 +50,7 @@ namespace vetcms.ServerApplicationTests.UnitTests.Features.IAM
 
             foreach (var userId in userIds)
             {
-                _userRepositoryMock.Setup(repo => repo.ExistAsync(userId)).ReturnsAsync(true);
+                _userRepositoryMock.Setup(repo => repo.ExistAsync(userId, false)).ReturnsAsync(true);
                 _userRepositoryMock.Setup(repo => repo.DeleteAsync(userId)).ReturnsAsync(new User { Id = userId });
             }
 

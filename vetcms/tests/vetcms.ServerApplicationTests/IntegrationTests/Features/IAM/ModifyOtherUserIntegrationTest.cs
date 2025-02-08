@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Security;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -16,6 +17,7 @@ using vetcms.ServerApplication.Features.IAM.ModifyOtherUser;
 using vetcms.ServerApplication.Infrastructure.Communication.Mail;
 using vetcms.ServerApplication.Infrastructure.Presistence;
 using vetcms.ServerApplication.Infrastructure.Presistence.Repository;
+using vetcms.SharedModels.Common.Dto;
 using vetcms.SharedModels.Common.IAM.Authorization;
 using vetcms.SharedModels.Features.IAM;
 using Xunit;
@@ -123,13 +125,16 @@ namespace vetcms.ServerApplicationTests.IntegrationTests.Features.IAM
             var modifyUserCommand = new ModifyOtherUserApiCommand
             {
                 Id = userId,
-                Email = $"test{userId}@test.com",
-                PhoneNumber = "06111111111",
-                VisibleName = "Modified User",
-                Password = "newPassword123",
-                PermissionSet = permission.ToString()
+                ModifiedUser = new UserDto()
+                {
+                    Id = userId,
+                    Email = $"test{userId}@test.com",
+                    PhoneNumber = "06111111111",
+                    VisibleName = "Modified User",
+                    Password = "newPassword123",
+                }
             };
-
+            modifyUserCommand.ModifiedUser.OverwritePermissions(permission);
 
             // Act
             var result = await _handler.Handle(modifyUserCommand, CancellationToken.None);
@@ -153,13 +158,18 @@ namespace vetcms.ServerApplicationTests.IntegrationTests.Features.IAM
             var adminUserGuid = SeedAdminUser(); // Create an admin user
             int userId = 999; // Assuming this user does not exist
 
+
             var modifyUserCommand = new ModifyOtherUserApiCommand
             {
                 Id = userId,
-                Email = $"test{userId}@test.com",
-                PhoneNumber = "06111111111",
-                VisibleName = "Modified User",
-                Password = "newPassword123"
+                ModifiedUser = new UserDto()
+                {
+                    Id = userId,
+                    Email = $"test{userId}@test.com",
+                    PhoneNumber = "06111111111",
+                    VisibleName = "Modified User",
+                    Password = "newPassword123",
+                }
             };
 
             // Act

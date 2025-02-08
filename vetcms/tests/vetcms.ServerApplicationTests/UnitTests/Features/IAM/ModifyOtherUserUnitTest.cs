@@ -11,6 +11,8 @@ using vetcms.ServerApplication.Common.Abstractions.Data;
 using vetcms.SharedModels.Common.Abstract;
 using vetcms.SharedModels.Features.IAM;
 using vetcms.SharedModels.Common.IAM.Authorization;
+using vetcms.SharedModels.Common.Dto;
+using System.Security;
 
 namespace vetcms.ServerApplicationTests.UnitTests.Features.IAM
 {
@@ -42,21 +44,25 @@ namespace vetcms.ServerApplicationTests.UnitTests.Features.IAM
             };
             user.OverwritePermissions(permission);
             _userRepositoryMock.Setup(repo => repo.GetByIdAsync(It.IsAny<int>(), false)).ReturnsAsync(user);
-            _userRepositoryMock.Setup(repo => repo.ExistAsync(It.IsAny<int>())).ReturnsAsync(true);
+            _userRepositoryMock.Setup(repo => repo.ExistAsync(It.IsAny<int>(), false)).ReturnsAsync(true);
 
-            var request = new ModifyOtherUserApiCommand
+            var modifyUserCommand = new ModifyOtherUserApiCommand
             {
                 Id = 1,
-                Email = "test@example.com",
-                PhoneNumber = "1234567890",
-                VisibleName = "Test User",
-                Password = "newPassword123",
-                PermissionSet = permission.ToString()
+                ModifiedUser = new UserDto()
+                {
+                    Id = 1,
+                    Email = "test@example.com",
+                    PhoneNumber = "1234567890",
+                    VisibleName = "Test User",
+                    Password = "newPassword123",
+                }
             };
-            
+            modifyUserCommand.ModifiedUser.OverwritePermissions(permission);
+
 
             // Act
-            var result = await _modifyHandler.Handle(request, CancellationToken.None);
+            var result = await _modifyHandler.Handle(modifyUserCommand, CancellationToken.None);
 
             // Assert
             Assert.True(result.Success);
@@ -79,14 +85,22 @@ namespace vetcms.ServerApplicationTests.UnitTests.Features.IAM
             };
             _userRepositoryMock.Setup(repo => repo.GetByIdAsync(It.IsAny<int>(), false)).ReturnsAsync(user);
 
-            var request = new ModifyOtherUserApiCommand
+            var modifyUserCommand = new ModifyOtherUserApiCommand
             {
-                Id = 100, // Requested ID that does not match the returned user's ID
-                Password = "newPassword123"
+                Id = 100,
+                ModifiedUser = new UserDto()
+                {
+                    Id = 100,
+                    Email = "test@example.com",
+                    PhoneNumber = "1234567890",
+                    VisibleName = "Test User",
+                    Password = "newPassword123",
+                }
             };
+            modifyUserCommand.ModifiedUser.OverwritePermissions(new EntityPermissions());
 
             // Act
-            var result = await _modifyHandler.Handle(request, CancellationToken.None);
+            var result = await _modifyHandler.Handle(modifyUserCommand, CancellationToken.None);
 
             // Assert
             Assert.False(result.Success);

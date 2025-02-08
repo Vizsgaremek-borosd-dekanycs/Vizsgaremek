@@ -15,6 +15,7 @@ using vetcms.ServerApplication.Common.IAM;
 using vetcms.ServerApplication.Domain.Entity;
 using vetcms.ServerApplication.Features.IAM;
 using vetcms.ServerApplication.Infrastructure.Presistence;
+using vetcms.SharedModels.Common.Dto;
 using vetcms.SharedModels.Common.IAM.Authorization;
 using vetcms.SharedModels.Features.IAM;
 using Xunit;
@@ -121,12 +122,15 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
             var modifyUserCommand = new ModifyOtherUserApiCommand
             {
                 Id = id,
-                Email = $"test{userGuid}@test.com",
-                PhoneNumber = "06111111111",
-                VisibleName = "Modified User",
-                Password = "newPassword123",
-                PermissionSet = GetDefaultPermissions().ToString()
+                ModifiedUser = new UserDto()
+                {
+                    Email = $"test{userGuid}@test.com",
+                    PhoneNumber = "06111111111",
+                    VisibleName = "Modified User",
+                    Password = "newPassword123"
+                }
             };
+            modifyUserCommand.ModifiedUser.OverwritePermissions(GetDefaultPermissions());
 
             // Add authorization
             var token = await GenerateBearerToken(adminUserGuid);
@@ -164,19 +168,22 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
         public async Task ModifyOtherUser_NotFound()
         {
 
-        var adminUserGuid = SeedAdminUser();
+            var adminUserGuid = SeedAdminUser();
             var client = _factory.CreateClient();
             int userId = 999; // A user ID that does not exist
 
-            var modifyUserCommand = new ModifyOtherUserApiCommand()
+            var modifyUserCommand = new ModifyOtherUserApiCommand
             {
                 Id = userId,
-                Email = $"test{userId}@test.com",
-                PhoneNumber = "06111111111",
-                VisibleName = "Modified User",
-                Password = "newPassword123",
-                PermissionSet = GetDefaultPermissions().ToString()
+                ModifiedUser = new UserDto()
+                {
+                    Email = $"test{userId}@test.com",
+                    PhoneNumber = "06111111111",
+                    VisibleName = "Modified User",
+                    Password = "newPassword123",
+                }
             };
+            modifyUserCommand.ModifiedUser.OverwritePermissions(GetDefaultPermissions());
 
             // Add authorization
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await GenerateBearerToken(adminUserGuid));
@@ -200,16 +207,19 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
             string userGuid = await CreateTestUser(); // Create a user to be modified
             int id = _dbContext.Set<User>().First(u => u.Email.Contains(userGuid)).Id;
 
-
             var modifyUserCommand = new ModifyOtherUserApiCommand
             {
                 Id = id,
-                Email = $"test{id}@test.com",
-                PhoneNumber = "06111111111",
-                VisibleName = "Modified User",
-                Password = "newPassword123",
-                PermissionSet = GetDefaultPermissions().ToString()
+                ModifiedUser = new UserDto()
+                {
+                    Id = id,
+                    Email = $"test{id}@test.com",
+                    PhoneNumber = "06111111111",
+                    VisibleName = "Modified User",
+                    Password = "newPassword123",
+                }
             };
+            modifyUserCommand.ModifiedUser.OverwritePermissions(GetDefaultPermissions());
 
             // Act
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await GenerateBearerToken(adminUserGuid));
