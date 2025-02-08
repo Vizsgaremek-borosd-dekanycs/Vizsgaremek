@@ -9,7 +9,7 @@ namespace vetcms.ServerApplication.Common.Abstractions.Data
 {
     public interface IFirstTimeAuthenticationCodeRepository : IRepositoryBase<FirstTimeAuthenticationCode>
     {
-        User GetUserByCode(string code);
-        string GetCodeByUser(User user);
+        User? GetUserByCode(string code);
+        string? GetCodeByUser(User user);
     }
 }

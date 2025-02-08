@@ -16,17 +16,24 @@ namespace vetcms.ServerApplication.Features.IAM.FirstTimeAuthenticateUser
     {
         public async Task<FirstTimeAuthenticateUserApiCommandResponse> Handle(FirstTimeAuthenticateUserApiCommand request, CancellationToken cancellationToken)
         {
-            User user = firstTimeAuthenticationCodeRepository.GetUserByCode(request.AuthenticationCode);
+            User? user = firstTimeAuthenticationCodeRepository.GetUserByCode(request.AuthenticationCode);
+            if(user == null)
+            {
+                return await Task.FromResult(new FirstTimeAuthenticateUserApiCommandResponse(true)
+                {
+                    Message = "Érvénytelen kód"
+                });
+            }
+            else
+            {
+                user.Password = PasswordUtility.CreateUserPassword(user, request.Password);
+                user.OverwritePermissions(new EntityPermissions().AddFlag(PermissionFlags.CAN_LOGIN));
+                await userRepository.UpdateAsync(user);
 
+                await DeleteAuthCode(user);
 
-            user.Password = PasswordUtility.CreateUserPassword(user, request.Password);
-            user.OverwritePermissions(new EntityPermissions().AddFlag(PermissionFlags.CAN_LOGIN));
-            await userRepository.UpdateAsync(user);
-
-            await DeleteAuthCode(user);
-
-            return await Task.FromResult(new FirstTimeAuthenticateUserApiCommandResponse(true));
-
+                return await Task.FromResult(new FirstTimeAuthenticateUserApiCommandResponse(true));
+            }
         }
 
         private async Task DeleteAuthCode(User user)
