@@ -52,7 +52,8 @@ namespace vetcms.ServerApplicationTests.IntegrationTests.Features.IAM
                         options.UseInMemoryDatabase("TestDatabase");
                     });
 
-                    services.AddScoped<IAuthenticationCommon, AuthenticationCommon>();
+                    var mockAuthenticationCommon = new Mock<IAuthenticationCommon>();
+                    services.AddSingleton(mockAuthenticationCommon.Object);
 
                     var mockAppConfig = new Mock<IApplicationConfiguration>();
                     services.AddSingleton(mockAppConfig.Object);
@@ -80,23 +81,21 @@ namespace vetcms.ServerApplicationTests.IntegrationTests.Features.IAM
                 _authenticationCommon = scope.ServiceProvider.GetRequiredService<IAuthenticationCommon>();
             }
 
-            _handler = new ModifyOtherUserCommandHandler(new UserRepository(_dbContext), _mailService);
+            _handler = new ModifyOtherUserCommandHandler(new UserRepository(_dbContext), _mailService, _authenticationCommon);
         }
 
         private string SeedAdminUser()
         {
-            var adminUserId = 10000;
             var guid = Guid.NewGuid().ToString();
             var adminUser = new User
             {
-                Id = adminUserId,
                 Email = $"{guid}@admin.com",
-                Password = PasswordUtility.HashPassword("AdminPassword123"),
-                PhoneNumber = "06111111111",
-                VisibleName = "Admin User",
+                Password = PasswordUtility.HashPassword(guid),
+                PhoneNumber = guid,
+                VisibleName = $"Admin{guid}",
             };
 
-            adminUser.OverwritePermissions(new EntityPermissions().AddFlag(PermissionFlags.CAN_MODIFY_OTHER_USER));
+            adminUser.OverwritePermissions(new EntityPermissions().AddFlag(Enum.GetValues<PermissionFlags>()));
             _dbContext.Set<User>().Add(adminUser);
             _dbContext.SaveChanges();
             return guid;
@@ -110,14 +109,18 @@ namespace vetcms.ServerApplicationTests.IntegrationTests.Features.IAM
 
             // Arrange
             var adminUserGuid = SeedAdminUser(); // Create an admin user
-            int userId = 1; // ID of the user to be modified
 
+            var adminUser = await _dbContext.Set<User>().FirstOrDefaultAsync(x => x.Email.Contains(adminUserGuid));
+
+            var mockAuthenticationCommon = Mock.Get(_authenticationCommon);
+            mockAuthenticationCommon.Setup(x => x.GetUser(It.IsAny<string>())).ReturnsAsync(adminUser);
+            
             // Add a user to the database
             var permission = new EntityPermissions().AddFlag(PermissionFlags.CAN_LOGIN);
+            string testUserGuid = Guid.NewGuid().ToString();
             var user = new User
             {
-                Id = userId,
-                Email = $"test{userId}@test.com",
+                Email = $"test{testUserGuid}@test.com",
                 Password = PasswordUtility.HashPassword("oldPassword123"),
                 PhoneNumber = "06111111111",
                 VisibleName = "Test User",
@@ -126,13 +129,16 @@ namespace vetcms.ServerApplicationTests.IntegrationTests.Features.IAM
             _dbContext.Set<User>().Add(user);
             await _dbContext.SaveChangesAsync();
 
+            var testUser = await _dbContext.Set<User>().FirstOrDefaultAsync(x => x.Email.Contains(testUserGuid));
+
+
             var modifyUserCommand = new ModifyOtherUserApiCommand
             {
-                Id = userId,
+                Id = testUser.Id,
                 ModifiedUser = new UserDto()
                 {
-                    Id = userId,
-                    Email = $"test{userId}@test.com",
+                    Id = testUser.Id,
+                    Email = $"test{testUser.Id}@test.com",
                     PhoneNumber = "06111111111",
                     VisibleName = "Modified User",
                     Password = "newPassword123",
@@ -149,7 +155,7 @@ namespace vetcms.ServerApplicationTests.IntegrationTests.Features.IAM
             Assert.Contains("Felhasználó módosítva.", result.Message);
 
             // Verify the user is modified
-            var modifiedUser = await _dbContext.Set<User>().FindAsync(userId);
+            var modifiedUser = await _dbContext.Set<User>().FindAsync(testUser.Id);
             Assert.NotNull(modifiedUser);
             Assert.Equal("Modified User", modifiedUser.VisibleName);
             Assert.True(PasswordUtility.VerifyPassword("newPassword123", modifiedUser.Password));
@@ -162,6 +168,10 @@ namespace vetcms.ServerApplicationTests.IntegrationTests.Features.IAM
             var adminUserGuid = SeedAdminUser(); // Create an admin user
             int userId = 999; // Assuming this user does not exist
 
+            var adminUser = await _dbContext.Set<User>().FirstOrDefaultAsync(x => x.Email.Contains(adminUserGuid));
+
+            var mockAuthenticationCommon = Mock.Get(_authenticationCommon);
+            mockAuthenticationCommon.Setup(x => x.GetUser(It.IsAny<string>())).ReturnsAsync(adminUser);
 
             var modifyUserCommand = new ModifyOtherUserApiCommand
             {

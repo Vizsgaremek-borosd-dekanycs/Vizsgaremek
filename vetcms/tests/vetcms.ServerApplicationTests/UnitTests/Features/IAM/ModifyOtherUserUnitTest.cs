@@ -13,6 +13,9 @@ using vetcms.SharedModels.Features.IAM;
 using vetcms.SharedModels.Common.IAM.Authorization;
 using vetcms.SharedModels.Common.Dto;
 using System.Security;
+using vetcms.ServerApplication.Common.Abstractions.IAM;
+using Microsoft.EntityFrameworkCore;
+using vetcms.ServerApplication.Features.IAM;
 
 namespace vetcms.ServerApplicationTests.UnitTests.Features.IAM
 {
@@ -20,19 +23,38 @@ namespace vetcms.ServerApplicationTests.UnitTests.Features.IAM
     {
         private readonly Mock<IUserRepository> _userRepositoryMock;
         private readonly Mock<IMailService> _mailServiceMock;
+        private readonly Mock<IAuthenticationCommon> _authenticationCommonMock;
         private readonly ModifyOtherUserCommandHandler _modifyHandler;
 
         public ModifyOtherUserUnitTests()
         {
             _userRepositoryMock = new Mock<IUserRepository>();
             _mailServiceMock = new Mock<IMailService>();
-            _modifyHandler = new ModifyOtherUserCommandHandler(_userRepositoryMock.Object, _mailServiceMock.Object);
+            _authenticationCommonMock = new Mock<IAuthenticationCommon>();
+            _modifyHandler = new ModifyOtherUserCommandHandler(_userRepositoryMock.Object, _mailServiceMock.Object, _authenticationCommonMock.Object);
+
+            User adminUser = GenerateAdminUser();
+            _authenticationCommonMock.Setup(x => x.GetUser(It.IsAny<string>())).ReturnsAsync(adminUser);
+        }
+
+        private User GenerateAdminUser()
+        {
+            var guid = Guid.NewGuid().ToString();
+            var adminUser = new User
+            {
+                Email = $"{guid}@admin.com",
+                Password = PasswordUtility.HashPassword(guid),
+                PhoneNumber = guid,
+                VisibleName = $"Admin{guid}",
+            };
+
+            adminUser.OverwritePermissions(new EntityPermissions().AddFlag(Enum.GetValues<PermissionFlags>()));
+            return adminUser;
         }
 
         [Fact]
         public async Task ModifyOtherUser_ShouldReturnSuccess_WhenUserIsModified()
         {
-            var permission = new EntityPermissions().AddFlag(PermissionFlags.CAN_LOGIN);
             // Arrange
             var user = new User
             {
@@ -42,6 +64,7 @@ namespace vetcms.ServerApplicationTests.UnitTests.Features.IAM
                 VisibleName = "Test User",
                 Password = "oldPassword123",
             };
+            var permission = new EntityPermissions().AddFlag(PermissionFlags.CAN_LOGIN);
             user.OverwritePermissions(permission);
             _userRepositoryMock.Setup(repo => repo.GetByIdAsync(It.IsAny<int>(), false)).ReturnsAsync(user);
             _userRepositoryMock.Setup(repo => repo.ExistAsync(It.IsAny<int>(), false)).ReturnsAsync(true);
@@ -60,7 +83,6 @@ namespace vetcms.ServerApplicationTests.UnitTests.Features.IAM
             };
             modifyUserCommand.ModifiedUser.OverwritePermissions(permission);
 
-
             // Act
             var result = await _modifyHandler.Handle(modifyUserCommand, CancellationToken.None);
 
@@ -75,15 +97,7 @@ namespace vetcms.ServerApplicationTests.UnitTests.Features.IAM
         public async Task ModifyOtherUser_ShouldReturnFailure_WhenUserDoesNotExist()
         {
             // Arrange
-            var user = new User
-            {
-                Id = 2, // Different ID to simulate non-existent user
-                Email = "test@example.com",
-                PhoneNumber = "1234567890",
-                VisibleName = "Test User",
-                Password = "oldPassword123",
-            };
-            _userRepositoryMock.Setup(repo => repo.GetByIdAsync(It.IsAny<int>(), false)).ReturnsAsync(user);
+            _userRepositoryMock.Setup(repo => repo.GetByIdAsync(It.IsAny<int>(), false)).ReturnsAsync((User)null);
 
             var modifyUserCommand = new ModifyOtherUserApiCommand
             {

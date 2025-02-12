@@ -80,7 +80,7 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
                 VisibleName = guid,
             };
 
-            adminUser.OverwritePermissions(new EntityPermissions().AddFlag(PermissionFlags.CAN_MODIFY_OTHER_USER));
+            adminUser.OverwritePermissions(new EntityPermissions().AddFlag(Enum.GetValues<PermissionFlags>()));
             _dbContext.Set<User>().Add(adminUser);
             _dbContext.SaveChanges();
             return guid;
