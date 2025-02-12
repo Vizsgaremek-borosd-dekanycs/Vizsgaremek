@@ -18,8 +18,9 @@ namespace vetcms.ServerApplication.Common.Abstractions.Data
 
         public async Task<IEnumerable<T>> GetAllAsync(bool includeDeleted = false)
         {
-            return await Entities.Where(e => includeDeleted || !e.Deleted).ToListAsync();
+            return await WhereAsync(e => true);
         }
+
 
         public async Task<T> GetByIdAsync(int id, bool includeDeleted = false)
         {
@@ -38,6 +39,11 @@ namespace vetcms.ServerApplication.Common.Abstractions.Data
         public IEnumerable<T> Where(Func<T, bool> predicate, bool includeDeleted = false)
         {
             return Entities.Where(predicate).Where(e => includeDeleted || !e.Deleted);
+        }
+
+        public async Task<IEnumerable<T>> WhereAsync(Func<T, bool> predicate, bool includeDeleted = false)
+        {
+            return await Entities.Where(e => includeDeleted || !e.Deleted).ToListAsync();
         }
 
         public async Task<T> AddAsync(T entity)
@@ -67,17 +73,56 @@ namespace vetcms.ServerApplication.Common.Abstractions.Data
             return entity;
         }
 
-        public async Task<bool> ExistAsync(int id)
+        public async Task<bool> ExistAsync(int id, bool includeDeleted = false)
         {
-
-
-            return await Entities.AnyAsync(e => e.Id == id);
+            return await Entities.AnyAsync(e => (e.Id == id && (includeDeleted || !e.Deleted)) );
         }
 
         public void LoadReferencedCollection<TProperty>(T entity, Expression<Func<T, IEnumerable<TProperty>>> propertyExpression)
             where TProperty : class
         {
             Entities.Entry(entity).Collection(propertyExpression).Load();
+        }
+
+
+        public IQueryable<T> Search(string searchTerm = "", bool includeDeleted = false)
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm))
+                return Entities; // Return paginated original query if search term is empty
+
+            var parameter = Expression.Parameter(typeof(T), "e");
+            var properties = typeof(T)
+                .GetProperties()
+                .Where(p => p.PropertyType == typeof(string)) // Only string properties
+                .ToList();
+
+            if (!properties.Any())
+                return Entities;
+
+            Expression combinedExpression = null;
+
+            foreach (var property in properties)
+            {
+                var propertyAccess = Expression.Property(parameter, property);
+                var searchExpression = Expression.Call(
+                    propertyAccess,
+                    nameof(string.Contains),
+                    Type.EmptyTypes,
+                    Expression.Constant(searchTerm)
+                );
+
+                combinedExpression = combinedExpression == null
+                    ? searchExpression
+                    : Expression.OrElse(combinedExpression, searchExpression);
+            }
+
+            var lambda = Expression.Lambda<Func<T, bool>>(combinedExpression, parameter);
+            return Entities.Where(e => includeDeleted || !e.Deleted).Where(lambda);
+        }
+
+        public async Task<List<T>> SearchAsync(string searchTerm = "", int skip = 0, int take = 10, bool includeDeleted = false)
+        {
+            return await Search(searchTerm).Skip(skip).Take(take).ToListAsync();
         }
     }
 }

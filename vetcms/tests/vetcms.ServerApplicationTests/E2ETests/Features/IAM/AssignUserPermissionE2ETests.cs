@@ -18,6 +18,8 @@ using vetcms.ServerApplication.Features.IAM;
 using Microsoft.Extensions.Configuration;
 using vetcms.SharedModels.Common.IAM.Authorization;
 using vetcms.ServerApplication.Common.Abstractions.IAM;
+using Moq;
+using vetcms.ServerApplication.Common.Abstractions.Data;
 
 namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
 {
@@ -37,8 +39,14 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
                     // Replace the real database with an in-memory database for testing
                     services.AddDbContext<ApplicationDbContext>(options =>
                     {
-                        options.UseInMemoryDatabase("TestDb_AssignPermission");
+                        options.UseInMemoryDatabase(new Guid().ToString());
                     });
+
+                    var mockAppConfig = new Mock<IApplicationConfiguration>();
+                    mockAppConfig.Setup(c => c.GetJwtSecret()).Returns("TAstCtBi3RzzcCiPxHl15gG6uSdBokKatTOcQW48YIkKssbr6x");
+                    mockAppConfig.Setup(c => c.GetJwtAudience()).Returns(Guid.NewGuid().ToString());
+                    mockAppConfig.Setup(c => c.GetJwtIssuer()).Returns(Guid.NewGuid().ToString());
+                    services.AddSingleton(mockAppConfig.Object);
 
                     // Build the service provider
                     var serviceProvider = services.BuildServiceProvider();
@@ -177,7 +185,6 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
 
             // Act
             var response = await client.PostAsJsonAsync("/api/v1/iam/assign-permission", command);
-
             // Assert
             var result = await response.Content.ReadFromJsonAsync<AssignUserPermissionApiCommandResponse>();
             Assert.False(result.Success);

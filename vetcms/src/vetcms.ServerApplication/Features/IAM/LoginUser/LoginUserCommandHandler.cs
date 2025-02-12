@@ -46,6 +46,11 @@ namespace vetcms.ServerApplication.Features.IAM.LoginUser
                         AccessToken = authenticationCommon.GenerateAccessToken(user)
                     });
                 }
+                return Task.FromResult(new LoginUserApiCommandResponse()
+                {
+                    Success = false,
+                    Message = "Hibás jelszó"
+                });
             }
 
             return Task.FromResult(new LoginUserApiCommandResponse()

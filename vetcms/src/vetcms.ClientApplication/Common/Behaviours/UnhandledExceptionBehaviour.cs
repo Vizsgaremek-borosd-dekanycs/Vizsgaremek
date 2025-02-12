@@ -18,6 +18,7 @@ namespace vetcms.ClientApplication.Common.Behaviours
 {
     public class UnhandledExceptionBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IClientCommand<TResponse>
+    where TResponse : new()
     {
         private readonly IDialogService dialogService;
         private readonly NavigationManager navigationManager;
@@ -38,6 +39,8 @@ namespace vetcms.ClientApplication.Common.Behaviours
         /// <returns>Az API válasz.</returns>
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
+
+            Console.WriteLine("UnhandledExceptionBehaviour");
             try
             {
                 return await next();
@@ -48,12 +51,12 @@ namespace vetcms.ClientApplication.Common.Behaviours
             }
             catch(ApiCommandExecutionUnknownException ex)
             {
-                request.DialogService.ShowError(ex.Problem.detail, $"Váratlan hiba történt: {ex.Problem.title}");
+                dialogService.ShowError(ex.Problem.detail, $"Váratlan (API végrehajtási) hiba történt: {ex.Problem.title}");
                 return default;
             }
             catch (Exception ex)
             {
-                request.DialogService.ShowError(ex.StackTrace, $"Váratlan hiba történt: {ex.GetType().FullName}: {ex.Message}");
+                dialogService.ShowError(ex.StackTrace, $"Váratlan hiba történt: {ex.GetType().FullName}: {ex.Message}");
                 return default;
             }
         }
@@ -66,20 +69,24 @@ namespace vetcms.ClientApplication.Common.Behaviours
         /// <returns>Az API válasz.</returns>
         private async Task<TResponse> HandleApiLogicException(TRequest request, CommonApiLogicException ex)
         {
-            IDialogReference r = await request.DialogService.ShowErrorAsync(ex.GetExceptionCodeDescription(), "Hiba történt a kérés feldolgozása közben.");
+            Console.WriteLine("UnhandledExceptionBehaviour: ApiLogicException");
+            IDialogReference r = await dialogService.ShowErrorAsync(ex.GetExceptionCodeDescription(), "Hiba történt a kérés feldolgozása közben.");
             await r.Result;
             switch (ex.ExceptionCode)
             {
                 case ApiLogicExceptionCode.INVALID_AUTHENTICATION:
+                    Console.WriteLine("Pre Navigating to /iam/login?redirected=true");
                     await authenticationManger.ClearAuthenticationDetails();
+                    Console.WriteLine("Navigating to /iam/login?redirected=true");
                     navigationManager.NavigateTo("/iam/login?redirected=true");
                     break;
                 case ApiLogicExceptionCode.INSUFFICIENT_PERMISSIONS:
+                    Console.WriteLine("Pre Navigating to");
                     navigationManager.NavigateTo("/");
                     break;
             }
 
-            return default!;
+            return new TResponse();
         }
 
     }

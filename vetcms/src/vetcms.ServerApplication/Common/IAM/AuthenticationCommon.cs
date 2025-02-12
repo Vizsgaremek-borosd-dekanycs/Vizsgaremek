@@ -20,7 +20,7 @@ namespace vetcms.ServerApplication.Common.IAM
     /// </summary>
     public class AuthenticationCommon : IAuthenticationCommon
     {
-        private readonly IConfiguration configuration;
+        private readonly IApplicationConfiguration configuration;
         private readonly IUserRepository userRepository;
 
         private const string CLAIM_KEY_ID = "id";
@@ -32,7 +32,7 @@ namespace vetcms.ServerApplication.Common.IAM
         /// </summary>
         /// <param name="_config">A konfigurációs beállítások.</param>
         /// <param name="_userRepository">A felhasználói adatok elérésére szolgáló felhasználói adattár.</param>
-        public AuthenticationCommon(IConfiguration _config, IUserRepository _userRepository)
+        public AuthenticationCommon(IApplicationConfiguration _config, IUserRepository _userRepository)
         {
             configuration = _config;
             userRepository = _userRepository;
@@ -50,10 +50,10 @@ namespace vetcms.ServerApplication.Common.IAM
             {
                 expirationDate = DateTime.Now.AddDays(7);
             }
-            string audience = configuration["Jwt:WebAPIAudience"];
+            string audience = configuration.GetJwtAudience();
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetJwtSecret()));
 
             var claims = new[] {
                     new Claim(CLAIM_KEY_ID, user.Id.ToString()),
@@ -63,7 +63,7 @@ namespace vetcms.ServerApplication.Common.IAM
 
             var signing = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(
-                configuration["Jwt:Issuer"],
+                configuration.GetJwtIssuer(),
                 audience,
                 claims,
                 expires: expirationDate,
@@ -87,7 +87,9 @@ namespace vetcms.ServerApplication.Common.IAM
                 string trackingId = jwtToken.Claims.First(x => x.Type == CLAIM_KEY_TRACKING_ID).Value;
                 string permissionSet = jwtToken.Claims.First(x => x.Type == CLAIM_KEY_PERMISSION_SET).Value;
 
-                if(CreateTrackingId(user.Password) != trackingId || user.PermissionSet != permissionSet)
+                string currentTrackingId = CreateTrackingId(user.Password);
+
+                if (currentTrackingId != trackingId || user.PermissionSet != permissionSet)
                 {
                     return false;
                 }
@@ -171,9 +173,9 @@ namespace vetcms.ServerApplication.Common.IAM
                 throw new ArgumentNullException(nameof(token));
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(configuration["Jwt:Key"]);
+            var key = Encoding.ASCII.GetBytes(configuration.GetJwtSecret());
 
-            string audience = configuration["Jwt:WebAPIAudience"];
+            string audience = configuration.GetJwtAudience();
 
             tokenHandler.ValidateToken(token, new TokenValidationParameters
             {
@@ -182,7 +184,7 @@ namespace vetcms.ServerApplication.Common.IAM
                 ValidateIssuer = true,
                 ValidIssuers = new List<string>()
                 {
-                    configuration["Jwt:Issuer"]
+                    configuration.GetJwtIssuer()
                 },
 
                 ValidateAudience = true,

@@ -16,6 +16,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using vetcms.ServerApplication.Features.IAM;
 using Microsoft.Extensions.Configuration;
+using Moq;
+using vetcms.ServerApplication.Common.Abstractions.Data;
 
 namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
 {
@@ -37,6 +39,12 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
                     {
                         options.UseInMemoryDatabase("TestDb_Login");
                     });
+
+                    var mockAppConfig = new Mock<IApplicationConfiguration>();
+                    mockAppConfig.Setup(c => c.GetJwtSecret()).Returns("TAstCtBi3RzzcCiPxHl15gG6uSdBokKatTOcQW48YIkKssbr6x");
+                    mockAppConfig.Setup(c => c.GetJwtAudience()).Returns(Guid.NewGuid().ToString());
+                    mockAppConfig.Setup(c => c.GetJwtIssuer()).Returns(Guid.NewGuid().ToString());
+                    services.AddSingleton(mockAppConfig.Object);
 
                     // Build the service provider
                     var serviceProvider = services.BuildServiceProvider();

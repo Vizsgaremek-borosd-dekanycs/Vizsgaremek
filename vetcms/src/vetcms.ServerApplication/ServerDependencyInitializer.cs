@@ -14,6 +14,10 @@ using vetcms.ServerApplication.Infrastructure.Communication.Mail;
 using vetcms.ServerApplication.Common.Abstractions.Data;
 using vetcms.ServerApplication.Common.Abstractions.IAM;
 using vetcms.ServerApplication.Common.Behaviour;
+using vetcms.ServerApplication.Features.IAM.SuperUser;
+using vetcms.ServerApplication.Domain.Entity;
+using vetcms.ServerApplication.Features.IAM.ResetPassword;
+using Microsoft.AspNetCore.Hosting;
 
 namespace vetcms.ServerApplication
 {
@@ -25,13 +29,8 @@ namespace vetcms.ServerApplication
         {
             services.AddValidatorsFromAssembly(typeof(ServerDependencyInitializer).Assembly);
 
-            services.AddMediatR(options =>
-            {
-                options.RegisterServicesFromAssembly(typeof(ServerDependencyInitializer).Assembly);
-                options.AddOpenBehavior(typeof(ValidationBehaviour<,>));
-                options.AddOpenBehavior(typeof(UserValidationBehavior<,>));
-                options.AddOpenBehavior(typeof(PermissionRequirementBehaviour<,>));
-            });
+            InitMediatR(services);
+            InitAutoMapper(services);
 
             services.Configure<RouteOptions>(o =>
             {
@@ -44,29 +43,67 @@ namespace vetcms.ServerApplication
             return services;
         }
 
+        
+
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration baseConfiguration)
         {
             var configuration = SecuredConfiguration.FromPlainConfiguration(baseConfiguration);
-            if(!IsTestEnviroment)
+            if (!IsTestEnviroment)
             {
                 services.InitializeDatabaseDriver(configuration);
+                services.AddScoped<IApplicationConfiguration, SecuredConfiguration>();
             }
             services.InitializeRepositoryComponents(configuration);
             services.AddCommunicationServices(configuration);
             services.AddScoped<IAuthenticationCommon, AuthenticationCommon>();
+            services.AddHostedService<SuperUserInitializer>();
+            return services;
+        }
+
+        private static IServiceCollection InitMediatR(IServiceCollection services)
+        {
+            services.AddMediatR(options =>
+            {
+                options.RegisterServicesFromAssembly(typeof(ServerDependencyInitializer).Assembly);
+                options.AddOpenBehavior(typeof(ValidationBehaviour<,>));
+                options.AddOpenBehavior(typeof(UserValidationBehavior<,>));
+                options.AddOpenBehavior(typeof(PermissionRequirementBehaviour<,>));
+            });
+            return services;
+        }
+
+        private static IServiceCollection InitAutoMapper(IServiceCollection services)
+        {
+            services.AddAutoMapper(typeof(ServerDependencyInitializer));
             return services;
         }
 
         private static void AddCommunicationServices(this IServiceCollection services, SecuredConfiguration configuration)
         {
-            services.AddSingleton<IMailDeliveryProviderWrapper>(p =>
-                new MailgunServiceWrapper(
-                    configuration.GetValue<string>("MailServices:Mailgun:Domain"),
-                    configuration.GetValue<string>("MailServices:Mailgun:ApiKey"),
-                    configuration.GetValue<string>("MailServices:Mailgun:Sender")
-                    )
-            );
-            services.AddSingleton<IMailService, MailService>();
+            if(IsOnlyLocalMailServiceAvaliable(configuration))
+            {
+                services.AddScoped<IMailDeliveryProviderWrapper, LocalMailDeliveryServiceWrapper>();
+            }
+            else
+            {
+                services.AddScoped<IMailDeliveryProviderWrapper>(p =>
+                    new MailgunServiceWrapper(configuration)
+                );
+            }
+            
+            services.AddScoped<IMailService, MailService>();
+        }
+
+        private static bool IsOnlyLocalMailServiceAvaliable(SecuredConfiguration configuration)
+        {
+            try
+            {
+                return configuration.GetValue<bool>("MailServices:UseOnlyLocal");
+            }
+            catch(Exception e)
+            {
+                return true;
+            }
         }
 
         private static void InitializeDatabaseDriver(this IServiceCollection services, SecuredConfiguration configuration)
@@ -92,6 +129,8 @@ namespace vetcms.ServerApplication
         private static void InitializeRepositoryComponents(this IServiceCollection services, SecuredConfiguration configuration)
         {
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IRepositoryBase<SentEmail>, SentEmailRepository>();
+            services.AddScoped<IFirstTimeAuthenticationCodeRepository, FirstTimeAuthenticationCodeRepository>();
         }
 
         private static void AddInMemoryDatabase(this IServiceCollection services, SecuredConfiguration configuration)

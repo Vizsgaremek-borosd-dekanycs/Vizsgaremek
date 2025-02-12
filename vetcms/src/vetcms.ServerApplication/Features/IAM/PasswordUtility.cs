@@ -44,6 +44,10 @@ namespace vetcms.ServerApplication.Features.IAM
         {
             return Convert.ToBase64String(HashPasswordWithSalt(password, GenerateSalt()));
         }
+        public static string HashPassword(string password, byte[] tamperedSalt)
+        {
+            return Convert.ToBase64String(HashPasswordWithSalt(password, tamperedSalt));
+        }
 
         public static string CreateUserPassword(User user, string password)
         {

@@ -13,7 +13,11 @@ namespace vetcms.WebApi
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            builder.Services.AddControllers(options => options.Filters.Add<ApiExceptionFilterAttribute>())
+            //
+            builder.Services.AddControllers((o) => {
+                o.ModelValidatorProviders.Clear();
+                o.Filters.Add<ApiExceptionFilterAttribute>();
+            })
                 .AddApplicationPart(typeof(ServerDependencyInitializer).Assembly)
                 .AddControllersAsServices();
 
@@ -28,9 +32,9 @@ namespace vetcms.WebApi
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "vetcms API", Version = "v1" }));
 
-            builder.Services.AddProblemDetails();
+            //builder.Services.AddProblemDetails();
 
-            // csekkolja hogy az ef add-migrationba futtatja, és akkor nem hajtja végre, mert magyarázni fog a mediatr
+            // csekkolja hogy az ef add-migrationba futtatja, ï¿½s akkor nem hajtja vï¿½gre, mert magyarï¿½zni fog a mediatr
             if (!EF.IsDesignTime)
                 builder.Services.AddServerApp();
 
@@ -50,7 +54,6 @@ namespace vetcms.WebApi
             app.UseSwaggerUI(options =>
             {
                 options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-                options.RoutePrefix = string.Empty;
             });
 
             app.UseCors();
@@ -59,7 +62,7 @@ namespace vetcms.WebApi
 
             if (app.Environment.IsDevelopment())
             {
-                app.UseExceptionHandler("/error-development");
+                app.UseExceptionHandler("/error-development"); //ez
             }
             else
             {

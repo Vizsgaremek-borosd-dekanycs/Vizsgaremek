@@ -10,6 +10,7 @@ using vetcms.ServerApplication.Common.Abstractions.Data;
 using vetcms.ServerApplication.Domain.Entity;
 using vetcms.ServerApplication.Infrastructure.Presistence.Repository;
 using vetcms.SharedModels.Features.IAM;
+using Microsoft.Extensions.Configuration;
 
 namespace vetcms.ServerApplication.Features.IAM.ResetPassword
 {
@@ -31,9 +32,12 @@ namespace vetcms.ServerApplication.Features.IAM.ResetPassword
         private async Task<BeginResetPasswordApiCommandResponse> ProcessRequest(BeginResetPasswordApiCommand request)
         {
             PasswordReset resetPasswordEntity = await CreatePasswordResetEntity(request);
-            await SendResetEmail(request, resetPasswordEntity);
+            int id = await SendResetEmail(request, resetPasswordEntity);
 
-            return new BeginResetPasswordApiCommandResponse(true);
+            return new BeginResetPasswordApiCommandResponse(true)
+            {
+                Message = $"[BEMUTATÓ MÓD] Az email elküldése sikeres volt. A bemutató céljából az alábbi linken nyitható meg: {mailService.GetEmailPreviewRoute(id)}"
+            };
         }
 
         private async Task<PasswordReset> CreatePasswordResetEntity(BeginResetPasswordApiCommand request)
@@ -51,11 +55,11 @@ namespace vetcms.ServerApplication.Features.IAM.ResetPassword
             return resetPasswordEntity;
         }
 
-        private async Task SendResetEmail(BeginResetPasswordApiCommand request, PasswordReset resetPasswordEntity)
+        private async Task<int> SendResetEmail(BeginResetPasswordApiCommand request, PasswordReset resetPasswordEntity)
         {
             User user = userRepository.GetByEmail(request.Email);
             resetPasswordEntity.User = user;
-            await mailService.SendPasswordResetEmailAsync(resetPasswordEntity);
+            return await mailService.SendPasswordResetEmailAsync(resetPasswordEntity);
         }
 
         private string GenerateToken()

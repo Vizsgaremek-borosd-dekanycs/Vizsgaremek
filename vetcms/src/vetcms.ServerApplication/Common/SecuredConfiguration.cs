@@ -1,17 +1,19 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using vetcms.ServerApplication.Common.Abstractions.Data;
 
 namespace vetcms.ServerApplication.Common
 {
-    internal class SecuredConfiguration : IConfiguration
+    public class SecuredConfiguration : IConfiguration, IApplicationConfiguration
     {
         private readonly IConfiguration baseConfig;
-        private SecuredConfiguration(IConfiguration _baseConfig)
+        public SecuredConfiguration(IConfiguration _baseConfig)
         {
             baseConfig = _baseConfig;
         }
@@ -58,6 +60,39 @@ namespace vetcms.ServerApplication.Common
                 }
             }
             return value;
+        }
+
+        public string GetJwtSecret()
+        {
+            string? result = this["Jwt:Key"];
+            if (result.IsNullOrEmpty())
+            {
+                Console.WriteLine("No JWT Secret Specified");
+                return Guid.NewGuid().ToString();
+            }
+            return result;
+        }
+
+        public string GetJwtAudience()
+        {
+            string? result = this["Jwt:WebAPIAudience"];
+            if (result.IsNullOrEmpty())
+            {
+                Console.WriteLine("No JWT Audience Specified");
+                return Guid.NewGuid().ToString();
+            }
+            return result;
+        }
+
+        public string GetJwtIssuer()
+        {
+            string? result = this["Jwt:Issuer"];
+            if (result.IsNullOrEmpty())
+            {
+                Console.WriteLine("No JWT Issuer Specified");
+                return Guid.NewGuid().ToString();
+            }
+            return result;
         }
     }
 }
