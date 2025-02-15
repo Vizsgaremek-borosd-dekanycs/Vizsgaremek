@@ -9,12 +9,11 @@ using vetcms.SharedModels.Common.Dto;
 
 namespace vetcms.ServerApplication.Common.AutoMapper
 {
-    public class UserProfile : Profile
+    public class AnimalTypeProfile : Profile
     {
-        public UserProfile()
+        public AnimalTypeProfile()
         {
-            CreateMap<User, UserDto>().ForMember(src => src.Password, opt => opt.Ignore());
-            CreateMap<UserDto, User>();
+            CreateMap<AnimalType, AnimalTypeDto>();
         }
     }
 }

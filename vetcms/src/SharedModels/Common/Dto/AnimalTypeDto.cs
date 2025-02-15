@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace vetcms.SharedModels.Common.Dto
 {
-    public class PatientTypeDto
+    public class AnimalTypeDto
     {
         public int? Id { get; set; }
         public string TypeName { get; set; }

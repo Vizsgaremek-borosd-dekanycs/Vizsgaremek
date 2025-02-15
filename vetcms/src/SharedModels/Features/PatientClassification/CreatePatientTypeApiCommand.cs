@@ -14,7 +14,7 @@ namespace vetcms.SharedModels.Features.PatientClassification
 {
     public record CreatePatientTypeApiCommand : AuthenticatedApiCommandBase<CreatePatientTypeApiCommandResponse>
     {
-        public PatientTypeDto PatientTypeModel { get; set; }
+        public AnimalTypeDto PatientTypeModel { get; set; }
         public override string GetApiEndpoint()
         {
             return "/api/v1/patient-classification/patient-type";
@@ -50,7 +50,7 @@ namespace vetcms.SharedModels.Features.PatientClassification
     {
         public bool Success { get; set; }
         public string Message { get; set; } = string.Empty;
-        public PatientTypeDto PatientTypeModel { get; set; }
+        public AnimalTypeDto PatientTypeModel { get; set; }
         public CreatePatientTypeApiCommandResponse()
         {
 
