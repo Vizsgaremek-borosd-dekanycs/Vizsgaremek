@@ -18,6 +18,7 @@ using vetcms.ServerApplication.Features.IAM.SuperUser;
 using vetcms.ServerApplication.Domain.Entity;
 using vetcms.ServerApplication.Features.IAM.ResetPassword;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace vetcms.ServerApplication
 {
