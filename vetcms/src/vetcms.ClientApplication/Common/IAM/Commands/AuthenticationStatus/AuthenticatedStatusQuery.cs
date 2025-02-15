@@ -15,5 +15,10 @@ namespace vetcms.ClientApplication.Common.IAM.Commands.AuthenticationStatus
         {
 
         }
+
+        public AuthenticatedStatusQuery()
+        {
+            
+        }
     }
 }

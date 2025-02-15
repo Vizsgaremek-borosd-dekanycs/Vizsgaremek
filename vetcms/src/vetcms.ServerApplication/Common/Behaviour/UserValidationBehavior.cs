@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using MediatR;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -7,13 +8,15 @@ using System.Text;
 using System.Threading.Tasks;
 using vetcms.ServerApplication.Common.Abstractions.IAM;
 using vetcms.ServerApplication.Common.IAM;
+using vetcms.ServerApplication.Domain.Entity;
 using vetcms.SharedModels.Common;
 using vetcms.SharedModels.Common.Abstract;
 using vetcms.SharedModels.Common.ApiLogicExceptionHandling;
+using vetcms.SharedModels.Common.Dto;
 
 namespace vetcms.ServerApplication.Common.Behaviour
 {
-    public class UserValidationBehavior<TRequest, TResponse>(IAuthenticationCommon authenticationCommon) : IPipelineBehavior<TRequest, TResponse>
+    public class UserValidationBehavior<TRequest, TResponse>(IAuthenticationCommon authenticationCommon, IMapper mapper) : IPipelineBehavior<TRequest, TResponse>
         where TRequest : AuthenticatedApiCommandBase<TResponse>
         where TResponse : ICommandResult
     {
@@ -21,7 +24,11 @@ namespace vetcms.ServerApplication.Common.Behaviour
         {
             if (!request.BearerToken.IsNullOrEmpty() && await authenticationCommon.ValidateToken(request.BearerToken))
             {
-                return await next();
+                TResponse result = await next();
+                User currentUser = await authenticationCommon.GetUser(request.BearerToken);
+                result.CurrentUser = mapper.Map<UserDto>(currentUser);
+
+                return result;
             }
             else
             {

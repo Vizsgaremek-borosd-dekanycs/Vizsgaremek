@@ -137,6 +137,10 @@ namespace vetcms.ClientApplication.Common.Abstract
             {
                 throw new Exception("Üres vagy érvénytelen Http válasz.");
             }
+            if(result.CurrentUser != null)
+            {
+                await _credentialStore.SaveCurrentUser(result.CurrentUser);
+            }
             return result;
         }
 
