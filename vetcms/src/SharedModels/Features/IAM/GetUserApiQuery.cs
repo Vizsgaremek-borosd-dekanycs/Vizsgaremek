@@ -42,10 +42,8 @@ namespace vetcms.SharedModels.Features.IAM
         }
     }
 
-    public record GetUserApiQueryResponse : ICommandResult
+    public record GetUserApiQueryResponse : AuthenticatedCommandResult
     {
-        public bool Success { get; set; }
-        public string Message { get; set; } = string.Empty;
         public UserDto User { get; set; }
 
         public GetUserApiQueryResponse()

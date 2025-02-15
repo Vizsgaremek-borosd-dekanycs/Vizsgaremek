@@ -67,7 +67,7 @@ namespace vetcms.SharedModels.Features.IAM
     /// <summary>
     /// Felhasználói jogosultságok hozzárendelésére szolgáló API parancs válasza.
     /// </summary>
-    public record AssignUserPermissionApiCommandResponse : ICommandResult
+    public record AssignUserPermissionApiCommandResponse : AuthenticatedCommandResult
     {
         public AssignUserPermissionApiCommandResponse()
         {

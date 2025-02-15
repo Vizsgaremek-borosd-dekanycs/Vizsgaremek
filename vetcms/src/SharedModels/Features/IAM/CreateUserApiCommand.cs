@@ -55,19 +55,14 @@ namespace vetcms.SharedModels.Features.IAM
     }
 
 
-    public record CreateUserApiCommandResponse : ICommandResult
+    public record CreateUserApiCommandResponse : AuthenticatedCommandResult
     {
-        public bool Success { get; set; }
-        public string Message { get; set; } = string.Empty;
-
         public CreateUserApiCommandResponse()
         {    
         }
 
         public CreateUserApiCommandResponse(bool success, string message = "")
         {
-            Success = success;
-            Message = message;
         }
     }
 }

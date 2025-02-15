@@ -46,7 +46,7 @@ namespace vetcms.SharedModels.Features.PatientClassification
     }
 
 
-    public record CreatePatientTypeApiCommandResponse : ICommandResult
+    public record CreatePatientTypeApiCommandResponse : AuthenticatedCommandResult, ICommandResult
     {
         public bool Success { get; set; }
         public string Message { get; set; } = string.Empty;

@@ -59,11 +59,8 @@ namespace vetcms.SharedModels.Features.IAM
     }
 
 
-    public record ModifyOtherUserApiCommandResponse : ICommandResult
+    public record ModifyOtherUserApiCommandResponse : AuthenticatedCommandResult
     {
-        public override bool Success { get ; set ; }
-        public override string Message { get ; set ; }
-
 
         public ModifyOtherUserApiCommandResponse()
         {

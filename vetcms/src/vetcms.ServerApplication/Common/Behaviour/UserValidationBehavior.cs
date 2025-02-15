@@ -18,7 +18,7 @@ namespace vetcms.ServerApplication.Common.Behaviour
 {
     public class UserValidationBehavior<TRequest, TResponse>(IAuthenticationCommon authenticationCommon, IMapper mapper) : IPipelineBehavior<TRequest, TResponse>
         where TRequest : AuthenticatedApiCommandBase<TResponse>
-        where TResponse : ICommandResult
+        where TResponse : AuthenticatedCommandResult
     {
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
