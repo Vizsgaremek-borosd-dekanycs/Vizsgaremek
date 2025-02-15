@@ -12,9 +12,9 @@ using vetcms.SharedModels.Features.IAM;
 
 namespace vetcms.SharedModels.Features.PatientClassification
 {
-    public record CreatePatientTypeApiCommand : AuthenticatedApiCommandBase<CreatePatientTypeApiCommandResponse>
+    public record CreateAnimalTypeApiCommand : AuthenticatedApiCommandBase<CreateAnimalTypeApiCommandResponse>
     {
-        public AnimalTypeDto PatientTypeModel { get; set; }
+        public AnimalTypeDto AnimalTypeModel { get; set; }
         public override string GetApiEndpoint()
         {
             return "/api/v1/patient-classification/patient-type";
@@ -31,32 +31,30 @@ namespace vetcms.SharedModels.Features.PatientClassification
         }
     }
 
-    public class CreatePatientTypeApiCommandValidator : AbstractValidator<CreatePatientTypeApiCommand>
+    public class CreatePatientTypeApiCommandValidator : AbstractValidator<CreateAnimalTypeApiCommand>
     {
         public CreatePatientTypeApiCommandValidator()
         {
-            RuleFor(x => x.PatientTypeModel.TypeName)
+            RuleFor(x => x.AnimalTypeModel.TypeName)
                 .NotEmpty().WithMessage("A típus neve nem lehet üres")
                 .MaximumLength(100).WithMessage("A típus neve nem haladhatja meg a 100 karaktert");
 
-            RuleFor(x => x.PatientTypeModel.Description)
+            RuleFor(x => x.AnimalTypeModel.Description)
                 .NotEmpty().WithMessage("A leírás nem lehet üres")
                 .MaximumLength(500).WithMessage("A leírás nem haladhatja meg az 500 karaktert");
         }
     }
 
 
-    public record CreatePatientTypeApiCommandResponse : AuthenticatedCommandResult, ICommandResult
+    public record CreateAnimalTypeApiCommandResponse : AuthenticatedCommandResult
     {
-        public bool Success { get; set; }
-        public string Message { get; set; } = string.Empty;
-        public AnimalTypeDto PatientTypeModel { get; set; }
-        public CreatePatientTypeApiCommandResponse()
+        public AnimalTypeDto AnimalTypeData { get; set; }
+        public CreateAnimalTypeApiCommandResponse()
         {
 
         }
 
-        public CreatePatientTypeApiCommandResponse(bool success, string message = "")
+        public CreateAnimalTypeApiCommandResponse(bool success, string message = "")
         {
             Success = success;
             Message = message;

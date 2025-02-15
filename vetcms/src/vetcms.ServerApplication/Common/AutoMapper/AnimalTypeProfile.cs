@@ -14,6 +14,7 @@ namespace vetcms.ServerApplication.Common.AutoMapper
         public AnimalTypeProfile()
         {
             CreateMap<AnimalType, AnimalTypeDto>();
+            CreateMap<AnimalTypeDto, AnimalType>();
         }
     }
 }

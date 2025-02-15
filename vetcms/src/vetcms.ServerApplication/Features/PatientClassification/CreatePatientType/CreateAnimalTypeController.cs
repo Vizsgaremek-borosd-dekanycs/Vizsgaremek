@@ -11,8 +11,8 @@ namespace vetcms.ServerApplication.Features.PatientClassification.CreatePatientT
 {
     public partial class PatientClassificationController : ApiV1ControllerBase
     {
-        [HttpPost("patient-type")]
-        public async Task<CreatePatientTypeApiCommandResponse> CreatePatientType(CreatePatientTypeApiCommand command)
+        [HttpPost("animal-type")]
+        public async Task<CreateAnimalTypeApiCommandResponse> CreatePatientType(CreateAnimalTypeApiCommand command)
         {
             command.Prepare(Request);
             return await Mediator.Send(command);
