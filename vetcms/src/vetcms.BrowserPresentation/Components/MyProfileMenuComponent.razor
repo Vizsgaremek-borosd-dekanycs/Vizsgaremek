@@ -1,4 +1,5 @@
 ﻿@using vetcms.ClientApplication.Common.IAM.Commands.AuthenticationStatus
+@using vetcms.ClientApplication.Features.IAM.UserLogout;
 @using vetcms.SharedModels.Common.Dto
 @using System
 
@@ -22,12 +23,13 @@
     <FooterTemplate>
         <FluentStack>
             <FluentAnchor Appearance="@Appearance.Hypertext"
-                          Href="https://microsoft.com"
-                          Target="_blank">Fiók kezelése</FluentAnchor>
+                          Href="/iam/user-management"
+                          >Fiók kezelése</FluentAnchor>
             <FluentSpacer />
             <FluentAnchor Appearance="@Appearance.Hypertext"
-                          Href="https://microsoft.com"
-                          Target="_blank">Kijelentkezés</FluentAnchor>
+                          OnClick="Logout"
+                          Href="/iam/login"
+                          >Kijelentkezés</FluentAnchor>
             
         </FluentStack>
     </FooterTemplate>
@@ -44,6 +46,8 @@
         PhoneNumber = "N/A"
     };
 
+	private string showProfilePath => $"/iam/user/{User.Id.ToString()}";
+
     private string GetInitials()
     {
         return $"{User.FirstName.Substring(0, 1)}{User.LastName.Substring(0, 1)}";
@@ -56,5 +60,10 @@
         {
             User = result.CurrentUser;
         }
+    }
+
+	private async Task Logout()
+	{
+        await Mediator.Send(new UserLogoutCommand());
     }
 }
