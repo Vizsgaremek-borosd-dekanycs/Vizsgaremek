@@ -27,7 +27,7 @@ namespace vetcms.SharedModels.Features.PatientClassification
 
         public override PermissionFlags[] GetRequiredPermissions()
         {
-            return [PermissionFlags.CAN_ADD_PATIENT_TYPE];
+            return [PermissionFlags.CAN_ADD_ANIMAL_TYPE];
         }
     }
 

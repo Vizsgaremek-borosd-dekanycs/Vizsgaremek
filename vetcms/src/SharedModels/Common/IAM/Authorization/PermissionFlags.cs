@@ -31,7 +31,9 @@ namespace vetcms.SharedModels.Common.IAM.Authorization
         CAN_VIEW_OTHERS_ANIMALS,
         CAN_VIEW_OTHER_USER,
         CAN_MODIFY_OTHER_USER_PASSWORD,
-        CAN_ADD_PATIENT_TYPE,
+        CAN_ADD_ANIMAL_TYPE,
         CAN_VIEW_ANIMAL_TYPES,
+        CAN_MODIFY_ANIMAL_TYPES,
+        CAN_DELETE_ANIMAL_TYPES
     }
 }
