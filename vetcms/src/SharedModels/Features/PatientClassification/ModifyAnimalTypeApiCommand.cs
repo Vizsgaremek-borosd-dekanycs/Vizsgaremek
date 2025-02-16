@@ -18,7 +18,7 @@ namespace vetcms.SharedModels.Features.PatientClassification
         public AnimalTypeDto AnimalTypeModel { get; set; }
         public override string GetApiEndpoint()
         {
-            return $"/api/v1/patient-classification/patient-type/{Id}";
+            return $"/api/v1/patient-classification/animal-type/{Id}";
         }
 
         public override HttpMethodEnum GetApiMethod()

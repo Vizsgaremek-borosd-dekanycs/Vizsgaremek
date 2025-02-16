@@ -12,14 +12,15 @@ using vetcms.SharedModels.Features.IAM;
 
 namespace vetcms.SharedModels.Features.PatientClassification
 {
-    public record ListAnimalTypeApiQuery : AuthenticatedApiCommandBase<ListAnimalTypeApiQueryResponse>
+    public record ListAnimalBreedApiQuery : AuthenticatedApiCommandBase<ListAnimalBreedApiQueryResponse>
     {
         public int Skip { get; set; } = 0;
         public int Take { get; set; } = 10;
         public string SearchTerm { get; set; } = string.Empty;
+
         public override string GetApiEndpoint()
         {
-            return Path.Join(ApiBaseUrl, $"/api/v1/patient-classification/animal-type?skip={Skip}&take={Take}&query={SearchTerm}");
+            return Path.Join(ApiBaseUrl, $"/api/v1/patient-classification/animal-breed?skip={Skip}&take={Take}&query={SearchTerm}");
         }
 
         public override HttpMethodEnum GetApiMethod()
@@ -29,13 +30,13 @@ namespace vetcms.SharedModels.Features.PatientClassification
 
         public override PermissionFlags[] GetRequiredPermissions()
         {
-            return [PermissionFlags.CAN_VIEW_ANIMAL_TYPES];
+            return new[] { PermissionFlags.CAN_VIEW_ANIMAL_BREED };
         }
     }
 
-    public class ListAnimalTypeApiQueryValidator : AbstractValidator<ListAnimalTypeApiQuery>
+    public class ListAnimalBreedApiQueryValidator : AbstractValidator<ListAnimalBreedApiQuery>
     {
-        public ListAnimalTypeApiQueryValidator()
+        public ListAnimalBreedApiQueryValidator()
         {
             RuleFor(x => x.Skip)
                 .GreaterThanOrEqualTo(0).WithMessage("A Skip értéke nem lehet kisebb, mint 0");
@@ -49,17 +50,16 @@ namespace vetcms.SharedModels.Features.PatientClassification
         }
     }
 
-
-    public record ListAnimalTypeApiQueryResponse : AuthenticatedCommandResult
+    public record ListAnimalBreedApiQueryResponse : AuthenticatedCommandResult
     {
         public int ResultCount { get; set; } = 0;
-        public List<AnimalTypeDto> AnimalTypes { get; set; } = new List<AnimalTypeDto>();
-        public ListAnimalTypeApiQueryResponse()
-        {
+        public List<AnimalBreedDto> AnimalBreeds { get; set; } = new List<AnimalBreedDto>();
 
+        public ListAnimalBreedApiQueryResponse()
+        {
         }
 
-        public ListAnimalTypeApiQueryResponse(bool success, string message = "")
+        public ListAnimalBreedApiQueryResponse(bool success, string message = "")
         {
             Success = success;
             Message = message;

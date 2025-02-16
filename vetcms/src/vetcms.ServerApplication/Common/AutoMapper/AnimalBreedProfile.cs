@@ -9,12 +9,12 @@ using vetcms.SharedModels.Common.Dto;
 
 namespace vetcms.ServerApplication.Common.AutoMapper
 {
-    public class AnimalBreedProfile : Profile
+    public class AnimalTypeProfile : Profile
     {
-        public AnimalBreedProfile()
+        public AnimalTypeProfile()
         {
-            CreateMap<AnimalBreed, AnimalBreedDto>();
-            CreateMap<AnimalBreedDto, AnimalBreed>();
+            CreateMap<AnimalType, AnimalTypeDto>();
+            CreateMap<AnimalTypeDto, AnimalType>();
         }
     }
 }

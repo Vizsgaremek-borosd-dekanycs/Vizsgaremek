@@ -8,8 +8,11 @@
 
   <ItemGroup>
     <Compile Remove="Domain\Abstractions\**" />
+    <Compile Remove="Features\AnimalBreed\**" />
     <EmbeddedResource Remove="Domain\Abstractions\**" />
+    <EmbeddedResource Remove="Features\AnimalBreed\**" />
     <None Remove="Domain\Abstractions\**" />
+    <None Remove="Features\AnimalBreed\**" />
   </ItemGroup>
 
   <ItemGroup>
