@@ -7,15 +7,17 @@ using Microsoft.AspNetCore.Mvc;
 using vetcms.ServerApplication.Common.Abstractions.Api;
 using vetcms.SharedModels.Features.PatientClassification;
 
-namespace vetcms.ServerApplication.Features.PatientClassification.CreateAnimalType
+namespace vetcms.ServerApplication.Features.PatientClassification.CreatePatientType
 {
     public partial class PatientClassificationController : ApiV1ControllerBase
     {
-        [HttpPost("animal-type")]
-        public async Task<CreateAnimalTypeApiCommandResponse> CreatePatientType(CreateAnimalTypeApiCommand command)
+        [HttpPut("animal-type/{id}")]
+        public async Task<ModifyAnimalTypeApiCommandResponse> UpdateAnimalType(int id, ModifyAnimalTypeApiCommand command)
         {
             command.Prepare(Request);
+            command.Id = id;
             return await Mediator.Send(command);
         }
     }
 }
+ 
