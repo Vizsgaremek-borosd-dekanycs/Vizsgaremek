@@ -15,5 +15,11 @@ namespace vetcms.ServerApplication.Infrastructure.Presistence.Repository
         public AnimalBreedRepository(ApplicationDbContext context) : base(context)
         {
         }
+
+        public override IQueryable<AnimalBreed> IncludeAll(IQueryable<AnimalBreed> dataset)
+        {
+            return dataset.Include(x => x.Type);
+        }
+
     }
 }

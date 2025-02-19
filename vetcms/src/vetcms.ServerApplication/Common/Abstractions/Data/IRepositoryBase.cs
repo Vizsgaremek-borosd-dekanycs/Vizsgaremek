@@ -19,5 +19,6 @@ namespace vetcms.ServerApplication.Common.Abstractions.Data
         Task<List<T>> SearchAsync(string searchTerm = "", int skip = 0, int take = 10, bool includeDeleted = false);
         Task<bool> ExistAsync(int id, bool includeDeleted = false);
         void LoadReferencedCollection<TProperty>(T entity, Expression<Func<T, IEnumerable<TProperty>>> propertyExpression) where TProperty : class;
+        IQueryable<T> IncludeAll();
     }
 }

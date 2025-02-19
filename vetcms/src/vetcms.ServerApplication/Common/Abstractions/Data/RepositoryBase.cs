@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +28,7 @@ namespace vetcms.ServerApplication.Common.Abstractions.Data
 
             try
             {
-                var result = await Entities.Where(e => (includeDeleted || !e.Deleted) && e.Id == id).FirstAsync();
+                var result = await IncludeAll(Entities).Where(e => (includeDeleted || !e.Deleted) && e.Id == id).FirstAsync();
                 return result;
             }
             catch(InvalidOperationException)
@@ -38,12 +39,12 @@ namespace vetcms.ServerApplication.Common.Abstractions.Data
 
         public IEnumerable<T> Where(Func<T, bool> predicate, bool includeDeleted = false)
         {
-            return Entities.Where(predicate).Where(e => includeDeleted || !e.Deleted);
+            return IncludeAll(Entities).Where(predicate).Where(e => includeDeleted || !e.Deleted);
         }
 
         public async Task<IEnumerable<T>> WhereAsync(Func<T, bool> predicate, bool includeDeleted = false)
         {
-            return await Entities.Where(e => includeDeleted || !e.Deleted).ToListAsync();
+            return await IncludeAll(Entities).Where(e => includeDeleted || !e.Deleted).ToListAsync();
         }
 
         public async Task<T> AddAsync(T entity)
@@ -117,12 +118,19 @@ namespace vetcms.ServerApplication.Common.Abstractions.Data
             }
 
             var lambda = Expression.Lambda<Func<T, bool>>(combinedExpression, parameter);
-            return Entities.Where(e => includeDeleted || !e.Deleted).Where(lambda);
+            return IncludeAll(Entities).Where(e => includeDeleted || !e.Deleted).Where(lambda);
         }
 
         public async Task<List<T>> SearchAsync(string searchTerm = "", int skip = 0, int take = 10, bool includeDeleted = false)
         {
             return await Search(searchTerm).Skip(skip).Take(take).ToListAsync();
+        }
+
+
+
+        public virtual IQueryable<T> IncludeAll(IQueryable<T> dataset)
+        {
+            return dataset;
         }
     }
 }
