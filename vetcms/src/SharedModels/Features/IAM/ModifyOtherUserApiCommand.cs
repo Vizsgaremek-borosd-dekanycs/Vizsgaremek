@@ -17,10 +17,6 @@ namespace vetcms.SharedModels.Features.IAM
 
         public int Id { get; set; }
 
-        /// <summary>
-        /// A felhasználó e-mail címe.
-        /// </summary>
-        /// 
         public UserDto ModifiedUser { get; set; }
 
         public override string GetApiEndpoint()
