@@ -11,13 +11,13 @@ using vetcms.ServerApplication.Domain.Entity;
 using vetcms.SharedModels.Common.Dto;
 using vetcms.SharedModels.Features.IAM;
 
-namespace vetcms.ServerApplication.Features.IAM.ListUsers
+namespace vetcms.ServerApplication.Features.IAM.GetUser
 {
     internal class GetUserQueryHandler(IUserRepository userRepository, IMapper mapper) : IRequestHandler<GetUserApiQuery, GetUserApiQueryResponse>
     {
         public async Task<GetUserApiQueryResponse> Handle(GetUserApiQuery request, CancellationToken cancellationToken)
         {
-            if(await userRepository.ExistAsync(request.UserId))
+            if (await userRepository.ExistAsync(request.UserId))
             {
                 User user = await userRepository.GetByIdAsync(request.UserId);
                 UserDto userDto = mapper.Map<UserDto>(user);

@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Web.Http;
 using vetcms.ServerApplication;
+using vetcms.ServerApplication.Common;
 using vetcms.WebApi.Filters;
 
 namespace vetcms.WebApi
@@ -17,6 +19,7 @@ namespace vetcms.WebApi
             builder.Services.AddControllers((o) => {
                 o.ModelValidatorProviders.Clear();
                 o.Filters.Add<ApiExceptionFilterAttribute>();
+                o.Conventions.Add(new RouteTokenTransformerConvention(new KebabCaseRouteTokenTransformer()));
             })
                 .AddApplicationPart(typeof(ServerDependencyInitializer).Assembly)
                 .AddControllersAsServices();

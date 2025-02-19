@@ -18,6 +18,7 @@ using vetcms.ServerApplication.Features.IAM.SuperUser;
 using vetcms.ServerApplication.Domain.Entity;
 using vetcms.ServerApplication.Features.IAM.ResetPassword;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace vetcms.ServerApplication
 {
@@ -131,6 +132,8 @@ namespace vetcms.ServerApplication
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRepositoryBase<SentEmail>, SentEmailRepository>();
             services.AddScoped<IFirstTimeAuthenticationCodeRepository, FirstTimeAuthenticationCodeRepository>();
+            services.AddScoped<IAnimalTypeRepository, AnimalTypeRepository>();
+            services.AddScoped<IAnimalBreedRepository, AnimalBreedRepository>();
         }
 
         private static void AddInMemoryDatabase(this IServiceCollection services, SecuredConfiguration configuration)

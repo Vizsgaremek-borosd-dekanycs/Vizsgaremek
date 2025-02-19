@@ -12,7 +12,7 @@ using vetcms.ServerApplication.Infrastructure.Presistence.Repository;
 using vetcms.SharedModels.Common.ApiLogicExceptionHandling;
 using vetcms.SharedModels.Features.IAM;
 
-namespace vetcms.ServerApplication.Features.IAM.RegisterUser
+namespace vetcms.ServerApplication.Features.IAM.AssignUserPermission
 {
     internal class AssignUserPermissionCommandHandler(IUserRepository userRepository) : IRequestHandler<AssignUserPermissionApiCommand, AssignUserPermissionApiCommandResponse>
     {
