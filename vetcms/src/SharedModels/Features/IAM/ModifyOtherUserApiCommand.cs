@@ -34,6 +34,11 @@ namespace vetcms.SharedModels.Features.IAM
             return [PermissionFlags.CAN_MODIFY_OTHER_USER];
         }
 
+        public override bool ProcessSpecialPermissionQuery(UserDto executorUser)
+        {
+            return true;
+        }
+
         public EntityPermissions GetPermissions()
         {
             return new EntityPermissions(ModifiedUser.PermissionSet);

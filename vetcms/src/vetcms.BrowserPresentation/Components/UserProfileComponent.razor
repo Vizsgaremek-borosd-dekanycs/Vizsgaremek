@@ -1,4 +1,5 @@
 ﻿@using vetcms.ClientApplication.Common.IAM.Commands.AuthenticationStatus
+@using vetcms.ClientApplication.Features.IAM.ModifyProifle
 @using vetcms.SharedModels.Common.Dto
 @inject MediatR.IMediator Mediator
 @inject IDialogService DialogService
@@ -73,7 +74,7 @@
 
     string pass1 = "", pass2 = "";
 
-    private void Modify()
+    private async void Modify()
     {
         if(pass1 != pass2)
         {
@@ -81,7 +82,12 @@
             return;
         }
         User.Password = pass1;
-        Console.WriteLine(User.FirstName);
+        ModifyProfileClientCommand command = new()
+        {
+                ModifiedProfile = User
+        };
+
+        await Mediator.Send(command);
     }
 
     private void OnPasswordInput(ChangeEventArgs e)
