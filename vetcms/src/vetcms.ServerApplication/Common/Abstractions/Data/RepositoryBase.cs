@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using vetcms.ServerApplication.Common.Exceptions;
 using vetcms.ServerApplication.Domain.Entity;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace vetcms.ServerApplication.Common.Abstractions.Data
 {
@@ -89,7 +90,7 @@ namespace vetcms.ServerApplication.Common.Abstractions.Data
         public IQueryable<T> Search(string searchTerm = "", bool includeDeleted = false)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
-                return Entities; // Return paginated original query if search term is empty
+                return IncludeAll(Entities); // Return paginated original query if search term is empty
 
             var parameter = Expression.Parameter(typeof(T), "e");
             var properties = typeof(T)
@@ -98,7 +99,7 @@ namespace vetcms.ServerApplication.Common.Abstractions.Data
                 .ToList();
 
             if (!properties.Any())
-                return Entities;
+                return IncludeAll(Entities);
 
             Expression combinedExpression = null;
 
@@ -126,10 +127,12 @@ namespace vetcms.ServerApplication.Common.Abstractions.Data
             return await Search(searchTerm).Skip(skip).Take(take).ToListAsync();
         }
 
-
-
-        public virtual IQueryable<T> IncludeAll(IQueryable<T> dataset)
+        protected IQueryable<T> IncludeAll(IQueryable<T> dataset)
         {
+            foreach (var property in context.Model.FindEntityType(typeof(T)).GetNavigations())
+            {
+                dataset = dataset.Include(property.Name);
+            }
             return dataset;
         }
     }

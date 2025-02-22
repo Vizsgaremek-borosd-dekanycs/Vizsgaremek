@@ -16,10 +16,7 @@ namespace vetcms.ServerApplication.Infrastructure.Presistence.Repository
         {
         }
 
-        public override IQueryable<AnimalBreed> IncludeAll(IQueryable<AnimalBreed> dataset)
-        {
-            return dataset.Include(x => x.Type);
-        }
+        
 
     }
 }

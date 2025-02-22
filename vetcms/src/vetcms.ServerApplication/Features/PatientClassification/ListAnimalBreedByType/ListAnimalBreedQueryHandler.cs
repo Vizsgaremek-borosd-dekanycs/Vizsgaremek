@@ -17,17 +17,16 @@ using vetcms.SharedModels.Features.PatientClassification;
 
 namespace vetcms.ServerApplication.Features.PatientClassification.ListAnimalBreed
 {
-    internal class ListAnimalBreedQueryHandler(IMapper mapper, IAnimalBreedRepository animalBreedRepository, ApplicationDbContext dbContext) : IRequestHandler<ListAnimalBreedApiQuery, ListAnimalBreedApiQueryResponse>
+    internal class ListAnimalBreedByTypeHandler(IMapper mapper, IAnimalBreedRepository animalBreedRepository, ApplicationDbContext dbContext) : IRequestHandler<ListAnimalBreedByTypeApiQuery, ListAnimalBreedByTypeApiQueryResponse>
     {
-        public async Task<ListAnimalBreedApiQueryResponse> Handle(ListAnimalBreedApiQuery request, CancellationToken cancellationToken)
+        public async Task<ListAnimalBreedByTypeApiQueryResponse> Handle(ListAnimalBreedByTypeApiQuery request, CancellationToken cancellationToken)
         {
-            int count = await animalBreedRepository.Search(request.SearchTerm).CountAsync();
+            int count = animalBreedRepository.Where(q => q.Type.Id == request.TypeId).Count();
 
-                
-            List<AnimalBreed> animalBreeds = await animalBreedRepository.SearchAsync(request.SearchTerm, request.Skip, request.Take);
 
+            List<AnimalBreed> animalBreeds = animalBreedRepository.Where(q => q.Type.Id == request.TypeId).Skip(request.Skip).Take(request.Take).ToList();
             List<AnimalBreedDto> animalBreedDtos = mapper.Map<List<AnimalBreedDto>>(animalBreeds);
-            return new ListAnimalBreedApiQueryResponse(true)
+            return new ListAnimalBreedByTypeApiQueryResponse(true)
             {
                 AnimalBreeds = animalBreedDtos,
                 ResultCount = count
