@@ -1,0 +1,246 @@
+﻿@page "/iam/animal-management"
+@using vetcms.BrowserPresentation.Components
+@using vetcms.BrowserPresentation.Utility
+@using vetcms.ClientApplication.Common.CommandAbstraction
+@using vetcms.ClientApplication.Features.PatientClassification.AnimalBreedList
+@using vetcms.ClientApplication.Features.PatientClassification.CreateNewAnimalBreed
+@using vetcms.ClientApplication.Features.PatientClassification.DeleteAnimalBreed
+@using vetcms.ClientApplication.Features.PatientClassification.GetAnimalBreed
+@using vetcms.ClientApplication.Features.PatientClassification.ModifyAnimalBreed
+@using vetcms.SharedModels.Common.Dto
+@inject IDialogService DialogService
+@inject IToastService ToastService;
+@inject MediatR.IMediator Mediator
+
+<div>
+</div>
+<FluentCard style="overflow:auto;">
+    <FluentGrid>
+        <FluentGridItem xs="12">
+            <FluentToolbar id="toolbar-fluent-components" style="width:100%">
+                <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_ADD_NEW_BREED]">
+                    <FluentButton Disabled="isBusy" @onclick="@OpenCreateAnimalBreedDialog" style="padding-bottom: 5px;" IconStart="@(new Icons.Regular.Size16.PersonAdd())" Appearance="Appearance.Accent">Új állatfaj</FluentButton>
+                </PermissionWrapper>
+                <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_DELETE_BREED]">
+                    <FluentButton Disabled="isBusy"  style="padding-bottom: 5px;" IconStart="@(new Icons.Regular.Size16.PersonDelete())" Appearance="Appearance.Accent">Törlés</FluentButton>
+                </PermissionWrapper>
+                <div slot="end">
+                    <FluentSearch Disabled="isBusy" @bind-Value="searchValue" Immediate="true" ImmediateDelay="300" @bind-Value:after="SearchValueChanged" AutoComplete="off" />
+                </div>
+            </FluentToolbar>
+        </FluentGridItem>
+        <FluentGridItem xs="12">
+            <FluentDataGrid Virtualize="true"
+                            ItemsProvider="animalBreedProvider"
+                            GenerateHeader="GenerateHeaderOption.Sticky"
+                            Style="min-width: max-content;"
+                            Pagination="@pagination"
+                            @ref="dataGrid">
+                <SelectColumn TGridItem="SelectableAnimalBreedDto"
+                              SelectMode="DataGridSelectMode.Multiple"
+                              SelectFromEntireRow="false"
+                              OnSelect="@(e => e.Item.Selected = e.Selected)"
+                              SelectAllDisabled="true"
+                              @bind-SelectedItems="selectedAnimalBreeds" />
+                <PropertyColumn Title="Azonosító" Property="@(p => p.Id)" Sortable="true" />
+                <PropertyColumn Title="Fajta név" Property="@(p => p.BreedName)" Sortable="true" />
+                <PropertyColumn Title="Jellemzők" Property="@(p => p.Charachteristics)" Sortable="true" />
+
+                <TemplateColumn Title="Művelet" Align="@Align.End">
+                     <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_MODIFY_ANIMAL_BREED]">
+                        <FluentButton Disabled="isBusy" aria-label="Szerkesztés" OnClick="@(async ()=> await OpenEditAnimalBreedDialog(context))" IconStart="@(new Icons.Regular.Size16.Edit())" />
+                    </PermissionWrapper> 
+
+                </TemplateColumn>
+            </FluentDataGrid>
+        </FluentGridItem>
+        <FluentGridItem xs="12">
+            <FluentPaginator State="@pagination" />
+        </FluentGridItem>
+    </FluentGrid>
+</FluentCard>
+
+@code {
+    private string searchValue = "";
+    GridItemsProvider<SelectableAnimalBreedDto> animalBreedProvider = default!;
+    bool isBusy = false;
+    PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
+    IEnumerable<SelectableAnimalBreedDto>? selectedAnimalBreeds = new List<SelectableAnimalBreedDto>();
+    private FluentDataGrid<SelectableAnimalBreedDto> dataGrid;
+
+    private class SelectableAnimalBreedDto : AnimalBreedDto
+    {
+        public bool Selected { get; set; } = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        animalBreedProvider = gridItemsProviderResult;
+    }
+
+    private async Task SearchValueChanged()
+    {
+        await dataGrid.RefreshDataAsync();
+    }
+
+    private async ValueTask<GridItemsProviderResult<SelectableAnimalBreedDto>> gridItemsProviderResult(GridItemsProviderRequest<SelectableAnimalBreedDto> req)
+    {
+        var query = new AnimalBreedListClientQuery()
+            {
+                SearchTerm = searchValue,
+                Skip = req.StartIndex,
+                Take = req.Count.HasValue ? req.Count.Value : 10
+            };
+
+        var data = await ToastService.ShowIndeterminateProgressToast(Mediator.Send(query), "Kérjük várjon...", "Állatfajták betöltése folyamatban...");
+
+        if (data == null)
+        {
+            data = new AnimalBreedListClientQueryResponse();
+        }
+
+        List<SelectableAnimalBreedDto> animalBreeds = data.AnimalBreeds.Select(u => new SelectableAnimalBreedDto
+            {
+                Id = u.Id,
+                TypeId = u.TypeId,
+                BreedName = u.BreedName,
+                Charachteristics = u.Charachteristics
+            }).ToList();
+
+        selectedAnimalBreeds = new List<SelectableAnimalBreedDto>();
+
+        return GridItemsProviderResult.From(
+            items: animalBreeds,
+            totalItemCount: data.ResultCount);
+    }
+
+    public async Task DeleteAnimalBreeds()
+    {
+        if (!selectedAnimalBreeds.Any())
+        {
+            DialogService.ShowError("Nincsenek elemek kijelölve!");
+            return;
+        }
+        isBusy = true;
+        var dialog = await DialogService.ShowConfirmationAsync("Biztosan el szeretnéd távolítani az állatfajtákat?");
+        var result = await dialog.Result;
+        bool canceled = result.Cancelled;
+
+        DeleteAnimalBreedClientCommand command = new DeleteAnimalBreedClientCommand()
+            {
+                BreedIds = selectedAnimalBreeds.Select(u => u.Id).ToList()
+            };
+
+        if (!canceled)
+        {
+            await ToastService.ShowIndeterminateProgressToast(Mediator.Send(command), "Kérjük várjon...", "Állatfajták törlése folyamatban...");
+        }
+
+        await dataGrid.RefreshDataAsync();
+        isBusy = false;
+    }
+
+    private async Task<DialogResult?> ShowAnimalBreedDialog(string title, AnimalBreedDto animalBreed)
+    {
+        DialogParameters parameters = new()
+            {
+                Title = title,
+                PrimaryAction = "Mentés",
+                PrimaryActionEnabled = true,
+                SecondaryAction = "Mégsem",
+                Width = "fit-content",
+                TrapFocus = true,
+                Modal = true,
+                PreventScroll = true
+            };
+        IDialogReference dialog = await DialogService.ShowDialogAsync<EditAnimalBreedDialog>(animalBreed, parameters);
+        DialogResult? result = await dialog.Result;
+        return result;
+    }
+
+    private async Task OpenCreateAnimalBreedDialog()
+    {
+        isBusy = true;
+        Console.WriteLine($"Open dialog create animal breed");
+
+        AnimalBreedDto simpleAnimalBreed = new AnimalBreedDto();
+
+        var result = await ShowAnimalBreedDialog("Új állatfaj létrehozása", simpleAnimalBreed);
+
+        if (result.Data is not null)
+        {
+            AnimalBreedDto? animalBreedData = result.Data as AnimalBreedDto;
+            Console.WriteLine($"create animal breed Dialog closed by {animalBreedData?.BreedName} - Canceled: {result.Cancelled}");
+            if (!result.Cancelled)
+            {
+                //await ToastService.ShowIndeterminateProgressToast(SubmitNewAnimalBreedData(animalBreedData), "Kérjük várjon...", "Állatfaj adatainak mentése");
+            }
+        }
+        else
+        {
+            Console.WriteLine($"create animal breed Dialog closed - Canceled: {result.Cancelled}");
+        }
+        isBusy = false;
+    }
+
+    private async Task OpenEditAnimalBreedDialog(AnimalBreedDto animalBreed)
+    {
+        isBusy = true;
+        int id = animalBreed.Id;
+        Console.WriteLine($"Open dialog edit animal breed");
+        var simpleAnimalBreed = await ToastService.ShowIndeterminateProgressToast(LoadEditAnimalBreedData(id), "Kérjük várjon...", "Állatfaj adatainak betöltése");
+
+        var result = await ShowAnimalBreedDialog("Állatfaj szerkesztése", simpleAnimalBreed);
+
+        if (result.Data is not null)
+        {
+            AnimalBreedDto? editResult = result.Data as AnimalBreedDto;
+            Console.WriteLine($"Edit animal breed Dialog closed by {editResult?.BreedName} - Canceled: {result.Cancelled}");
+            if (!result.Cancelled)
+            {
+                await ToastService.ShowIndeterminateProgressToast(SubmitEditAnimalBreedData(editResult), "Kérjük várjon...", "Állatfaj adatainak mentése");
+            }
+        }
+        else
+        {
+            Console.WriteLine($"Edit animal breed Dialog closed - Canceled: {result.Cancelled}");
+        }
+
+        isBusy = false;
+    }
+
+    private async Task<AnimalBreedDto> LoadEditAnimalBreedData(int id)
+    {
+        var query = new GetAnimalBreedClientQuery()
+            {
+                BreedId = id
+            };
+
+        var data = await Mediator.Send(query);
+
+        return data.Breed;
+    }
+
+    private async Task SubmitNewAnimalBreedData(AnimalBreedDto newAnimalBreed)
+    {
+        CreateNewAnimalBreedClientCommand command = new CreateNewAnimalBreedClientCommand()
+            {
+                NewBreedModel = newAnimalBreed
+            };
+
+        await Mediator.Send(command);
+        await dataGrid.RefreshDataAsync();
+    }
+
+    private async Task SubmitEditAnimalBreedData(AnimalBreedDto editedAnimalBreed)
+    {
+        ModifyAnimalBreedClientCommand command = new ModifyAnimalBreedClientCommand()
+            {
+                BreedId = editedAnimalBreed.Id,
+                ModifiedBreedDto = editedAnimalBreed
+            };
+
+        await Mediator.Send(command);
+        await dataGrid.RefreshDataAsync();
+    }
+}

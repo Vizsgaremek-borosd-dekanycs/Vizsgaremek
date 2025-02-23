@@ -28,8 +28,12 @@ namespace vetcms.SharedModels.Common.IAM.Authorization
         /// </summary>
         CAN_DELETE_USERS,
         CAN_ADD_NEW_USERS,
+        CAN_VIEW_ANIMAL_TYPES,
         CAN_VIEW_OTHERS_ANIMALS,
         CAN_VIEW_OTHER_USER,
-        CAN_MODIFY_OTHER_USER_PASSWORD
+        CAN_MODIFY_OTHER_USER_PASSWORD,
+        CAN_MODIFY_ANIMAL_BREED,
+        CAN_DELETE_BREED,
+        CAN_ADD_NEW_BREED,
     }
 }
