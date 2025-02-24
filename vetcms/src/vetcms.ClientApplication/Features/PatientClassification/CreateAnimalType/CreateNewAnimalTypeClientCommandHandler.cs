@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace vetcms.ClientApplication.Features.PatientClassification.CreateAnimalType
 {
-    internal class CreateAnimalTypeClientCommandHandler : IRequestHandler<CreateNewAnimalTypeClientCommand, bool>
+    internal class CreateNewAnimalTypeClientCommandHandler : IRequestHandler<CreateNewAnimalTypeClientCommand, bool>
     {
         public async Task<bool> Handle(CreateNewAnimalTypeClientCommand request, CancellationToken cancellationToken)
         {

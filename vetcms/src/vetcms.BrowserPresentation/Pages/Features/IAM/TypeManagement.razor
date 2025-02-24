@@ -151,7 +151,7 @@
                 Modal = true,
                 PreventScroll = true
             };
-        //IDialogReference dialog = await DialogService.ShowDialogAsync<EditAnimalTypeDialog>(animalType, parameters);
+        IDialogReference dialog = await DialogService.ShowDialogAsync<EditAnimalTypeDialog>(animalType, parameters);
         DialogResult? result = await dialog.Result;
         return result;
     }

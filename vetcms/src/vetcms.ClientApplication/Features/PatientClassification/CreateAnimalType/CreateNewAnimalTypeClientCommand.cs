@@ -8,7 +8,7 @@ using vetcms.SharedModels.Common.Dto;
 
 namespace vetcms.ClientApplication.Features.PatientClassification.CreateAnimalType
 {
-    public class CreateAnimalTypeClientCommand : IClientCommand<bool>
+    public class CreateNewAnimalTypeClientCommand : IClientCommand<bool>
     {
         public AnimalTypeDto NewTypeModel { get; set; }
     }
