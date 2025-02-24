@@ -19,14 +19,14 @@
                 <FluentTextArea Style="width: 100%" @bind-Value="Content.Charachteristics" Label="Jellemzők"/>
             </FluentGridItem>
 
-            <FluentGridItem Style="display: flex; flex-direction: column; height: 100%;" xs="12" md="12">
-                <FluentSearch Style="width: 40%; margin-bottom: 10px;" Disabled="isBusy" @bind-Value="searchTerm" ImmediateDelay="300" AutoComplete="off" Placeholder="Keresés..." />
-
-                <!-- Görgethető konténer -->
-                <div style="width: 40%; max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 5px;">
-                    <FluentListbox Style="width: 100%;" Items="animalTypes" OptionText="@(at => at.TypeName)" Label="Állatfajok" />
-                </div>
-            </FluentGridItem>
+            <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_VIEW_ANIMAL_TYPES]">
+                <FluentGridItem Style="display: flex; flex-direction: column; height: 100%;" xs="12" md="12">
+                    <FluentSearch Style="width: 40%; margin-bottom: 10px;" Disabled="isBusy" @bind-Value="searchTerm" ImmediateDelay="300" AutoComplete="off" Placeholder="Keresés..." />
+                    <div style="width: 40%; max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 5px;">
+                        <FluentListbox Style="width: 100%;" Items="animalTypes" OptionText="@(at => at.TypeName)" Label="Állatfajok" />
+                    </div>
+                </FluentGridItem>
+            </PermissionWrapper>
 
 
         </FluentGrid>
@@ -64,7 +64,7 @@
 
         if (result == null)
         {
-            result = new AnimalTypeByBreedListClientQueryResponse();
+            result = new AnimalTypeListClientQueryResponse();
         }
         return result.AnimalType;
     }

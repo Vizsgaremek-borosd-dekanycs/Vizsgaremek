@@ -8,7 +8,7 @@ using vetcms.SharedModels.Common.Abstract;
 
 namespace vetcms.ClientApplication.Features.PatientClassification.ListAnimalType
 {
-    public class AnimalTypeListClientQuery : IClientCommand<AnimalTypeByBreedListClientQueryResponse>
+    public class AnimalTypeListClientQuery : IClientCommand<AnimalTypeListClientQueryResponse>
     {
         public int BreedId { get; set; } = 0;
         public string SearchTerm { get; set; } = string.Empty;

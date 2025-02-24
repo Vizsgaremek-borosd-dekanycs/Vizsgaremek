@@ -7,7 +7,7 @@ using vetcms.SharedModels.Common.Dto;
 
 namespace vetcms.ClientApplication.Features.PatientClassification.ListAnimalType
 {
-    public class AnimalTypeByBreedListClientQueryResponse
+    public class AnimalTypeListClientQueryResponse
     {
         public List<AnimalTypeDto> AnimalType { get; set; } = new();
         public int ResultCount { get; set; } = 0;
