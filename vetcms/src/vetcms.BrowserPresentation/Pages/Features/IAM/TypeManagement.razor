@@ -1,0 +1,244 @@
+﻿@page "/iam/type-management"
+@using vetcms.BrowserPresentation.Components
+@using vetcms.BrowserPresentation.Utility
+@using vetcms.ClientApplication.Common.CommandAbstraction
+@using vetcms.ClientApplication.Features.PatientClassification.CreateAnimalType
+@using vetcms.ClientApplication.Features.PatientClassification.ListAnimalType
+@using vetcms.ClientApplication.Features.PatientClassification.DeleteAnimalType
+@using vetcms.ClientApplication.Features.PatientClassification.GetAnimalType
+@using vetcms.ClientApplication.Features.PatientClassification.ModifyAnimalType
+@using vetcms.SharedModels.Common.Dto
+@inject IDialogService DialogService
+@inject IToastService ToastService;
+@inject MediatR.IMediator Mediator
+
+<div>
+</div>
+<FluentCard style="overflow:auto;">
+    <FluentGrid>
+        <FluentGridItem xs="12">
+            <FluentToolbar id="toolbar-fluent-components" style="width:100%">
+                <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_ADD_ANIMAL_TYPE]">
+                    <FluentButton Disabled="isBusy" @onclick="@OpenCreateAnimalTypeDialog" style="padding-bottom: 5px;" IconStart="@(new Icons.Regular.Size16.PersonAdd())" Appearance="Appearance.Accent">Új állattípus</FluentButton>
+                </PermissionWrapper>
+                <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_DELETE_ANIMAL_TYPES]">
+                    <FluentButton Disabled="isBusy" @onclick="@DeleteAnimalTypes" style="padding-bottom: 5px;" IconStart="@(new Icons.Regular.Size16.PersonDelete())" Appearance="Appearance.Accent">Törlés</FluentButton>
+                </PermissionWrapper>
+                <div slot="end">
+                    <FluentSearch Disabled="isBusy" @bind-Value="searchValue" Immediate="true" ImmediateDelay="300" @bind-Value:after="SearchValueChanged" AutoComplete="off" />
+                </div>
+            </FluentToolbar>
+        </FluentGridItem>
+        <FluentGridItem xs="12">
+            <FluentDataGrid Virtualize="true"
+                            ItemsProvider="animalTypeProvider"
+                            GenerateHeader="GenerateHeaderOption.Sticky"
+                            Style="min-width: max-content;"
+                            Pagination="@pagination"
+                            @ref="dataGrid">
+                <SelectColumn TGridItem="SelectableAnimalTypeDto"
+                              SelectMode="DataGridSelectMode.Multiple"
+                              SelectFromEntireRow="false"
+                              OnSelect="@(e => e.Item.Selected = e.Selected)"
+                              SelectAllDisabled="true"
+                              @bind-SelectedItems="selectedAnimalTypes" />
+                <PropertyColumn Title="Azonosító" Property="@(p => p.Id)" Sortable="true" />
+                <PropertyColumn Title="Típus név" Property="@(p => p.TypeName)" Sortable="true" />
+                <PropertyColumn Title="Leírás" Property="@(p => p.Description)" Sortable="true" />
+
+                <TemplateColumn Title="Művelet" Align="@Align.End">
+                    <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_MODIFY_ANIMAL_TYPES]">
+                        <FluentButton Disabled="isBusy" aria-label="Szerkesztés" OnClick="@(async ()=> await OpenEditAnimalTypeDialog(context))" IconStart="@(new Icons.Regular.Size16.Edit())" />
+                    </PermissionWrapper>
+                </TemplateColumn>
+            </FluentDataGrid>
+        </FluentGridItem>
+        <FluentGridItem xs="12">
+            <FluentPaginator State="@pagination" />
+        </FluentGridItem>
+    </FluentGrid>
+</FluentCard>
+
+@code {
+    private string searchValue = "";
+    GridItemsProvider<SelectableAnimalTypeDto> animalTypeProvider = default!;
+    bool isBusy = false;
+    PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
+    IEnumerable<SelectableAnimalTypeDto> selectedAnimalTypes = new List<SelectableAnimalTypeDto>();
+    private FluentDataGrid<SelectableAnimalTypeDto> dataGrid;
+
+    private class SelectableAnimalTypeDto : AnimalTypeDto
+    {
+        public bool Selected { get; set; } = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        animalTypeProvider = gridItemsProviderResult;
+    }
+
+    private async Task SearchValueChanged()
+    {
+        await dataGrid.RefreshDataAsync();
+    }
+
+    private async ValueTask<GridItemsProviderResult<SelectableAnimalTypeDto>> gridItemsProviderResult(GridItemsProviderRequest<SelectableAnimalTypeDto> req)
+    {
+        var query = new AnimalTypeListClientQuery()
+            {
+                SearchTerm = searchValue,
+                Skip = req.StartIndex,
+                Take = req.Count.HasValue ? req.Count.Value : 10
+            };
+
+        var data = await ToastService.ShowIndeterminateProgressToast(Mediator.Send(query), "Kérjük várjon...", "Állattípusok betöltése folyamatban...");
+
+        if (data == null)
+        {
+            data = new AnimalTypeListClientQueryResponse();
+        }
+
+        List<SelectableAnimalTypeDto> animalTypes = data.AnimalType.Select(u => new SelectableAnimalTypeDto
+            {
+                Id = u.Id,
+                TypeName = u.TypeName,
+                Description = u.Description
+            }).ToList();
+
+        selectedAnimalTypes = new List<SelectableAnimalTypeDto>();
+
+        return GridItemsProviderResult.From(
+            items: animalTypes,
+            totalItemCount: data.ResultCount);
+    }
+
+    public async Task DeleteAnimalTypes()
+    {
+        if (!selectedAnimalTypes.Any())
+        {
+            DialogService.ShowError("Nincsenek elemek kijelölve!");
+            return;
+        }
+        isBusy = true;
+        var dialog = await DialogService.ShowConfirmationAsync("Biztosan el szeretnéd távolítani az állattípusokat?");
+        var result = await dialog.Result;
+        bool canceled = result.Cancelled;
+
+        DeleteAnimalTypeClientCommand command = new DeleteAnimalTypeClientCommand()
+            {
+                TypeIds = selectedAnimalTypes.Select(u => u.Id).ToList()
+            };
+
+        if (!canceled)
+        {
+            await ToastService.ShowIndeterminateProgressToast(Mediator.Send(command), "Kérjük várjon...", "Állattípusok törlése folyamatban...");
+        }
+
+        await dataGrid.RefreshDataAsync();
+        isBusy = false;
+    }
+
+    private async Task<DialogResult?> ShowAnimalTypeDialog(string title, AnimalTypeDto animalType)
+    {
+        DialogParameters parameters = new()
+            {
+                Title = title,
+                PrimaryAction = "Mentés",
+                PrimaryActionEnabled = true,
+                SecondaryAction = "Mégsem",
+                Width = "fit-content",
+                TrapFocus = true,
+                Modal = true,
+                PreventScroll = true
+            };
+        //IDialogReference dialog = await DialogService.ShowDialogAsync<EditAnimalTypeDialog>(animalType, parameters);
+        DialogResult? result = await dialog.Result;
+        return result;
+    }
+
+    private async Task OpenCreateAnimalTypeDialog()
+    {
+        isBusy = true;
+        Console.WriteLine($"Open dialog create animal type");
+
+        AnimalTypeDto simpleAnimalType = new AnimalTypeDto();
+
+        var result = await ShowAnimalTypeDialog("Új állattípus létrehozása", simpleAnimalType);
+
+        if (result.Data is not null)
+        {
+            AnimalTypeDto? animalTypeData = result.Data as AnimalTypeDto;
+            Console.WriteLine($"create animal type Dialog closed by {animalTypeData?.TypeName} - Canceled: {result.Cancelled}");
+            if (!result.Cancelled)
+            {
+                await ToastService.ShowIndeterminateProgressToast(SubmitNewAnimalTypeData(animalTypeData), "Kérjük várjon...", "Állattípus adatainak mentése");
+            }
+        }
+        else
+        {
+            Console.WriteLine($"create animal type Dialog closed - Canceled: {result.Cancelled}");
+        }
+        isBusy = false;
+    }
+
+    private async Task OpenEditAnimalTypeDialog(AnimalTypeDto animalType)
+    {
+        isBusy = true;
+        int id = animalType.Id;
+        Console.WriteLine($"Open dialog edit animal type");
+        var simpleAnimalType = await ToastService.ShowIndeterminateProgressToast(LoadEditAnimalTypeData(id), "Kérjük várjon...", "Állattípus adatainak betöltése");
+
+        var result = await ShowAnimalTypeDialog("Állattípus szerkesztése", simpleAnimalType);
+
+        if (result.Data is not null)
+        {
+            AnimalTypeDto? editResult = result.Data as AnimalTypeDto;
+            Console.WriteLine($"Edit animal type Dialog closed by {editResult?.TypeName} - Canceled: {result.Cancelled}");
+            if (!result.Cancelled)
+            {
+                await ToastService.ShowIndeterminateProgressToast(SubmitEditAnimalTypeData(editResult), "Kérjük várjon...", "Állattípus adatainak mentése");
+            }
+        }
+        else
+        {
+            Console.WriteLine($"Edit animal type Dialog closed - Canceled: {result.Cancelled}");
+        }
+
+        isBusy = false;
+    }
+
+    private async Task<AnimalTypeDto> LoadEditAnimalTypeData(int id)
+    {
+        var query = new GetAnimalTypeClientQuery()
+            {
+                TypeId = id
+            };
+
+        var data = await Mediator.Send(query);
+
+        return data.Type;
+    }
+
+    private async Task SubmitNewAnimalTypeData(AnimalTypeDto newAnimalType)
+    {
+        CreateNewAnimalTypeClientCommand command = new CreateNewAnimalTypeClientCommand()
+            {
+                NewTypeModel = newAnimalType
+            };
+
+        await Mediator.Send(command);
+        await dataGrid.RefreshDataAsync();
+    }
+
+    private async Task SubmitEditAnimalTypeData(AnimalTypeDto editedAnimalType)
+    {
+        ModifyAnimalTypeClientCommand command = new ModifyAnimalTypeClientCommand()
+            {
+                TypeId = editedAnimalType.Id,
+                ModifiedTypeDto = editedAnimalType
+            };
+
+        await Mediator.Send(command);
+        await dataGrid.RefreshDataAsync();
+    }
+}

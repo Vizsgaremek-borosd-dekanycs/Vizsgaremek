@@ -8,7 +8,7 @@ namespace vetcms.SharedModels.Common.Dto
 {
     public class AnimalTypeDto
     {
-        public int? Id { get; set; }
+        public int Id { get; set; }
         public string TypeName { get; set; }
         public string Description { get; set; }
     }

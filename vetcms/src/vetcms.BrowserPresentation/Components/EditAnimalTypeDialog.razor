@@ -1,0 +1,68 @@
+﻿@using System.Globalization
+@using vetcms.BrowserPresentation.Utility
+@using vetcms.ClientApplication.Common.CommandAbstraction;
+@using vetcms.ClientApplication.Features.PatientClassification.ListAnimalType
+@using vetcms.SharedModels.Common.Dto
+@using vetcms.SharedModels.Common.IAM.Authorization;
+@inject MediatR.IMediator Mediator
+@inject IToastService ToastService
+@implements IDialogContentComponent<AnimalTypeDto>
+
+<FluentGrid>
+    <FluentGridItem xs="12" md="12">
+        <FluentGrid>
+            <FluentGridItem xs="12" sm="12">
+                <FluentTextField Style="width: 100%" @bind-Value="Content.TypeName" Label="Típus név" TextFieldType="TextFieldType.Text" />
+            </FluentGridItem>
+            <br />
+            <FluentGridItem xs="12" sm="12">
+                <FluentTextArea Style="width: 100%" @bind-Value="Content.Description" Label="Leírás" />
+            </FluentGridItem>
+
+            <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_VIEW_ANIMAL_TYPES]">
+                <FluentGridItem Style="display: flex; flex-direction: column; height: 100%;" xs="12" md="12">
+                    <FluentSearch Style="width: 40%; margin-bottom: 10px;" Disabled="isBusy" @bind-Value="searchTerm" ImmediateDelay="300" AutoComplete="off" Placeholder="Keresés..." />
+                    <div style="width: 40%; max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 5px;">
+                        <FluentListbox Style="width: 100%;" Items="animalTypes" OptionText="@(at => at.TypeName)" Label="Állatfajok" />
+                    </div>
+                </FluentGridItem>
+            </PermissionWrapper>
+        </FluentGrid>
+    </FluentGridItem>
+</FluentGrid>
+
+@code {
+    [Parameter]
+    public AnimalTypeDto Content { get; set; }
+
+    [CascadingParameter]
+    public FluentDialog? Dialog { get; set; }
+
+    private bool isBusy = false;
+    private string searchTerm = "";
+
+    private List<AnimalTypeDto> animalTypes = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        animalTypes = await GetAnimalTypes();
+    }
+
+    private async Task<List<AnimalTypeDto>> GetAnimalTypes()
+    {
+        var query = new AnimalTypeListClientQuery
+            {
+                SearchTerm = searchTerm,
+                Take = null
+            };
+
+        var result = await ToastService.ShowIndeterminateProgressToast(Mediator.Send(query), "Kérjük várjon...", "Állatfajok betöltése folyamatban...");
+
+        if (result == null)
+        {
+            result = new AnimalTypeListClientQueryResponse();
+        }
+        return result.AnimalType;
+    }
+}
+

@@ -2,58 +2,70 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using vetcms.ClientApplication.Features.PatientClassification.AnimalBreedList;
 using vetcms.SharedModels.Common.Dto;
 
 namespace vetcms.ClientApplication.Features.PatientClassification.ListAnimalType
 {
-    internal class AnimalTypeListClientQueryHandler(IMediator mediator) : IRequestHandler<AnimalTypeListClientQuery, AnimalTypeListClientQueryResponse>
+    internal class AnimalTypeListClientQueryHandler : IRequestHandler<AnimalTypeListClientQuery, AnimalTypeListClientQueryResponse>
     {
-        private static readonly List<AnimalTypeDto> AnimalTypes = new()
+        private static readonly List<string> SampleTypeNames = new()
         {
-            new AnimalTypeDto { Id = 1, TypeName = "Dog", Description = "Domestic dog" },
-            new AnimalTypeDto { Id = 2, TypeName = "Cat", Description = "Domestic cat" },
-            new AnimalTypeDto { Id = 3, TypeName = "Bird", Description = "Various species of birds" },
-            new AnimalTypeDto { Id = 4, TypeName = "Fish", Description = "Various species of fish" },
-            new AnimalTypeDto { Id = 5, TypeName = "Reptile", Description = "Various species of reptiles" },
-            new AnimalTypeDto { Id = 6, TypeName = "Dog", Description = "Domestic dog" },
-            new AnimalTypeDto { Id = 7, TypeName = "Cat", Description = "Domestic cat" },
-            new AnimalTypeDto { Id = 8, TypeName = "Bird", Description = "Various species of birds" },
-            new AnimalTypeDto { Id = 9, TypeName = "Fish", Description = "Various species of fish" },
-            new AnimalTypeDto { Id = 10, TypeName = "Reptile", Description = "Various species of reptiles" },
-            new AnimalTypeDto { Id = 11, TypeName = "Dog", Description = "Domestic dog" },
-            new AnimalTypeDto { Id = 12, TypeName = "Cat", Description = "Domestic cat" },
-            new AnimalTypeDto { Id = 13, TypeName = "Bird", Description = "Various species of birds" },
-            new AnimalTypeDto { Id = 14, TypeName = "Fish", Description = "Various species of fish" },
-            new AnimalTypeDto { Id = 15, TypeName = "Reptile", Description = "Various species of reptiles" },
-            new AnimalTypeDto { Id = 16, TypeName = "Dog", Description = "Domestic dog" },
-            new AnimalTypeDto { Id = 17, TypeName = "Cat", Description = "Domestic cat" },
-            new AnimalTypeDto { Id = 18, TypeName = "Bird", Description = "Various species of birds" },
-            new AnimalTypeDto { Id = 19, TypeName = "Fish", Description = "Various species of fish" },
-            new AnimalTypeDto { Id = 20, TypeName = "Reptile", Description = "Various species of reptiles" }
+            "Dog", "Cat", "Bird", "Fish", "Reptile",
+            "Horse", "Rabbit", "Hamster", "Guinea Pig", "Turtle",
+            "Frog", "Snake", "Lizard", "Spider", "Insect",
+            "Chicken", "Duck", "Goose", "Turkey", "Pig",
+            "Sheep", "Goat", "Cow", "Buffalo", "Deer",
+            "Elephant", "Lion", "Tiger", "Bear", "Wolf",
+            "Fox", "Leopard", "Cheetah", "Giraffe", "Zebra",
+            "Kangaroo", "Koala", "Panda", "Monkey", "Chimpanzee",
+            "Gorilla", "Orangutan", "Baboon", "Lemur", "Otter"
         };
-        public Task<AnimalTypeListClientQueryResponse> Handle(AnimalTypeListClientQuery request, CancellationToken cancellationToken)
+
+        private static readonly List<string> SampleDescriptions = new()
         {
-            var filteredAnimalTypes = AnimalTypes;
+            "Domestic animal", "Wild animal", "Aquatic animal", "Reptile", "Bird",
+            "Farm animal", "Pet", "Exotic animal", "Endangered species", "Common animal"
+        };
 
-            filteredAnimalTypes = AnimalTypes
-                .Where(at => at.TypeName.Contains(request.SearchTerm, StringComparison.OrdinalIgnoreCase))
-                .ToList();
+        static AnimalTypeListClientQueryHandler()
+        {
+            GenerateAnimalTypes(50);
+        }
 
-            var paginatedAnimalTypes = filteredAnimalTypes
-                .Skip(request.Skip)
-                .Take(request.Take ?? filteredAnimalTypes.Count)
-                .ToList();
+        internal static IQueryable<AnimalTypeDto> Types;
 
-            var response = new AnimalTypeListClientQueryResponse
+        public async Task<AnimalTypeListClientQueryResponse> Handle(AnimalTypeListClientQuery request, CancellationToken cancellationToken)
+        {
+            AnimalTypeListClientQueryResponse response = new();
+            response.AnimalType = Types.Skip(request.Skip).Take((int)request.Take).ToList();
+            response.ResultCount = Types.Count();
+
+            await Task.Delay(1000);
+            return response;
+        }
+
+        private static void GenerateAnimalTypes(int count)
+        {
+            var random = new Random();
+            var animalTypes = new List<AnimalTypeDto>();
+
+            for (int i = 1; i <= count; i++)
             {
-                AnimalType = paginatedAnimalTypes,
-                ResultCount = filteredAnimalTypes.Count
-            };
-            Task.Delay(1000);
-            return Task.FromResult(response);
+                var typeName = SampleTypeNames[random.Next(SampleTypeNames.Count)];
+                var description = SampleDescriptions[random.Next(SampleDescriptions.Count)];
+
+                animalTypes.Add(new AnimalTypeDto
+                {
+                    Id = i,
+                    TypeName = typeName,
+                    Description = description
+                });
+            }
+
+            Types = animalTypes.AsQueryable();
         }
     }
 }
+
