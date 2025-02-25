@@ -20,13 +20,19 @@
             </FluentGridItem>
 
             <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_VIEW_ANIMAL_TYPES]">
-                <FluentGridItem Style="display: flex; flex-direction: column; height: 100%;" xs="12" md="12">
-                    <FluentSearch Style="width: 40%; margin-bottom: 10px;" Disabled="isBusy" @bind-Value="searchTerm" ImmediateDelay="300" AutoComplete="off" Placeholder="Keresés..." />
-                    <div style="width: 40%; max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 5px;">
-                        <FluentListbox Style="width: 100%;" Items="animalTypes" OptionText="@(at => at.TypeName)" Label="Állatfajok" />
-                    </div>
+                <FluentGridItem xs="12" md="12">
+                    <FluentSelect TOption="AnimalTypeDto"
+                    Label="Állatfaj"
+                    Items="@animalTypes"
+                    Placeholder="@SelectedType.TypeName"
+                    OptionValue="@(p => p.Id.ToString())"
+                    OptionText="@(p => p.TypeName)"
+                    @bind-Value="@SelectedTypeId"
+                    @bind-SelectedOption="@SelectedType"/>
                 </FluentGridItem>
             </PermissionWrapper>
+
+
 
 
         </FluentGrid>
@@ -40,6 +46,10 @@
     [CascadingParameter]
     public FluentDialog? Dialog { get; set; }
 
+    private AnimalTypeDto SelectedType { get; set; } = new();
+    private string SelectedTypeId { get; set; } = "";
+
+
     private bool isBusy = false;
     private string searchTerm = "";
 
@@ -48,16 +58,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-        animalTypes = await GetBreedTypes();
+        animalTypes = await GetAnimalTypes();
 
     }
 
-    private async Task<List<AnimalTypeDto>> GetBreedTypes()
+    private async Task<List<AnimalTypeDto>> GetAnimalTypes()
     {
         var query = new AnimalTypeListClientQuery(){
-            BreedId = Content.Id,
             SearchTerm = searchTerm,
-            Take = null
+            Take = 10
         };
 
         var result = await ToastService.ShowIndeterminateProgressToast(Mediator.Send(query), "Kérjük várjon...", "Fajták betöltése folyamatban...");
@@ -66,6 +75,9 @@
         {
             result = new AnimalTypeListClientQueryResponse();
         }
+
+        SelectedTypeId = Content.TypeId.ToString();
+        SelectedType = result.AnimalType.First(x => x.Id == Content.TypeId);
         return result.AnimalType;
     }
 
