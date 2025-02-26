@@ -50,6 +50,8 @@
 
     private string GetInitials()
     {
+        if (User.FirstName == string.Empty || User.LastName == string.Empty)
+            return "N/A";
         return $"{User.FirstName.Substring(0, 1)}{User.LastName.Substring(0, 1)}";
     }
 

@@ -63,6 +63,8 @@ namespace vetcms.SharedModels.Features.IAM
 
         public CreateUserApiCommandResponse(bool success, string message = "")
         {
+            Success = success;
+            Message = message;
         }
     }
 }

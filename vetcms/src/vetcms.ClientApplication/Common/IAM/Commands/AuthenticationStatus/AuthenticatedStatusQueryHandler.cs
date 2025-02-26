@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using vetcms.ClientApplication.Features.IAM.LoginUser;
 using vetcms.SharedModels.Common.Dto;
@@ -19,6 +20,7 @@ namespace vetcms.ClientApplication.Common.IAM.Commands.AuthenticationStatus
             try
             {
                 currentUser = await authenticationManger.GetCurrentUser();
+                Console.WriteLine(JsonSerializer.Serialize(currentUser));
             }
             catch(Exception)
             {
