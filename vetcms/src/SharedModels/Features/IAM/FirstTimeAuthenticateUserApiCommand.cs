@@ -33,18 +33,14 @@ namespace vetcms.SharedModels.Features.IAM
     }
 
 
-    public record FirstTimeAuthenticateUserApiCommandResponse : ICommandResult
+    public record FirstTimeAuthenticateUserApiCommandResponse : AuthenticatedCommandResult
     {
-        public bool Success { get; set; }
-        public string Message { get; set; } = string.Empty;
         public FirstTimeAuthenticateUserApiCommandResponse()
         {
         }
 
         public FirstTimeAuthenticateUserApiCommandResponse(bool success, string message = "")
         {
-            Success = success;
-            Message = message;
         }
     }
 }

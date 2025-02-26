@@ -60,10 +60,9 @@ namespace vetcms.SharedModels.Features.IAM
     }
 
 
-    public record ModifyOtherUserApiCommandResponse : ICommandResult
+    public record ModifyOtherUserApiCommandResponse : AuthenticatedCommandResult
     {
-        public bool Success { get ; set ; }
-        public string Message { get ; set ; }
+
         public ModifyOtherUserApiCommandResponse()
         {
             
