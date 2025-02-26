@@ -1,0 +1,30 @@
+﻿@page "/iam/user-profile"
+@using vetcms.BrowserPresentation.Components
+@using vetcms.BrowserPresentation.Utility
+@using vetcms.ClientApplication.Common.IAM.Commands.AuthenticationStatus
+@using vetcms.SharedModels.Common.Dto
+@inject MediatR.IMediator Mediator
+@inject IToastService ToastService
+
+<h3>UserProfile</h3>
+
+<FluentTabs Orientation="Orientation.Vertical" ActiveTabId="tab-v1" Style="height: 200px;">
+    <FluentTab Label="Személyes adatok" Id="profile">
+        <UserProfileComponent User="User">
+
+        </UserProfileComponent>
+    </FluentTab>
+    <FluentTab Label="Állatok" Id="animals">
+    </FluentTab>
+</FluentTabs>
+
+@code {
+    public UserDto User { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await ToastService.ShowIndeterminateProgressToast<AuthenticatedStatusResponseModel>(Mediator.Send(new AuthenticatedStatusQuery()), "Kérjük várjon...", "Felhasználói adatok betöltése folyamatban");
+        User = result.CurrentUser;
+    }
+
+}

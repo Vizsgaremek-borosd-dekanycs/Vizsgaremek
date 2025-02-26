@@ -16,23 +16,33 @@ namespace vetcms.ServerApplication.Features.IAM.FirstTimeAuthenticateUser
     {
         public async Task<FirstTimeAuthenticateUserApiCommandResponse> Handle(FirstTimeAuthenticateUserApiCommand request, CancellationToken cancellationToken)
         {
-            User? user = firstTimeAuthenticationCodeRepository.GetUserByCode(request.AuthenticationCode);
-            if(user == null)
+            try
             {
-                return await Task.FromResult(new FirstTimeAuthenticateUserApiCommandResponse(true)
+                User? user = firstTimeAuthenticationCodeRepository.GetUserByCode(request.AuthenticationCode);
+                if(user == null)
+                {
+                    return await Task.FromResult(new FirstTimeAuthenticateUserApiCommandResponse(false)
+                    {
+                        Message = "Érvénytelen kód"
+                    });
+                }
+                else
+                {
+                    user.Password = PasswordUtility.CreateUserPassword(user, request.Password);
+                    user.OverwritePermissions(new EntityPermissions().AddFlag(PermissionFlags.CAN_LOGIN));
+                    await userRepository.UpdateAsync(user);
+
+                    await DeleteAuthCode(user);
+
+                    return await Task.FromResult(new FirstTimeAuthenticateUserApiCommandResponse(true));
+                }
+            }
+            catch(Exception ex)
+            {
+                return await Task.FromResult(new FirstTimeAuthenticateUserApiCommandResponse(false)
                 {
                     Message = "Érvénytelen kód"
                 });
-            }
-            else
-            {
-                user.Password = PasswordUtility.CreateUserPassword(user, request.Password);
-                user.OverwritePermissions(new EntityPermissions().AddFlag(PermissionFlags.CAN_LOGIN));
-                await userRepository.UpdateAsync(user);
-
-                await DeleteAuthCode(user);
-
-                return await Task.FromResult(new FirstTimeAuthenticateUserApiCommandResponse(true));
             }
         }
 

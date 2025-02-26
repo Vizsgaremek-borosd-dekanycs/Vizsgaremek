@@ -25,7 +25,9 @@
     "Password": "32154"
   },
   "Host": {
-    "ApiBase": "http://localhost:5042"
+    "ApiBase": "http://localhost:5042",
+    "WebBase": "http://localhost:7140"
+
   },
   "AllowedHosts": "*",
   "database_driver": "sqlite"

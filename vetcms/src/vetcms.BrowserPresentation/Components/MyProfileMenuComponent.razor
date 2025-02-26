@@ -23,8 +23,8 @@
     <FooterTemplate>
         <FluentStack>
             <FluentAnchor Appearance="@Appearance.Hypertext"
-                          Href="/iam/user-management"
-                          >Fiók kezelése</FluentAnchor>
+                          Href="/iam/user-profile">
+                          Fiók kezelése</FluentAnchor>
             <FluentSpacer />
             <FluentAnchor Appearance="@Appearance.Hypertext"
                           OnClick="Logout"
@@ -50,6 +50,8 @@
 
     private string GetInitials()
     {
+        if (User.FirstName == string.Empty || User.LastName == string.Empty)
+            return "N/A";
         return $"{User.FirstName.Substring(0, 1)}{User.LastName.Substring(0, 1)}";
     }
 
