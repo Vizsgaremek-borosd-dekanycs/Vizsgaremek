@@ -37,10 +37,8 @@ namespace vetcms.SharedModels.Features.IAM
         }
     }
 
-    public record ListUsersApiCommandResponse : ICommandResult
+    public record ListUsersApiCommandResponse : AuthenticatedCommandResult
     {
-        public bool Success { get; set; }
-        public string Message { get; set; } = string.Empty;
         public int ResultCount { get; set; } = 0;
         public List<UserDto> Users { get; set; } = new List<UserDto>();
 
@@ -50,14 +48,10 @@ namespace vetcms.SharedModels.Features.IAM
 
         public ListUsersApiCommandResponse(bool _success, string _message = "")
         {
-            Success = _success;
-            Message = _message;
         }
 
         public ListUsersApiCommandResponse(bool _success, List<UserDto> _users, string _message = "")
         {
-            Success = _success;
-            Message = _message;
             Users = _users;
         }
     }
