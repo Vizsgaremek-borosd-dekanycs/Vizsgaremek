@@ -6,7 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using vetcms.ClientApplication.Features.IAM.GetUser;
 using vetcms.ClientApplication.Features.IAM.UserList;
+using vetcms.ClientApplication.Features.PatientClassification.AnimalBreedList;
 using vetcms.SharedModels.Features.IAM;
+using vetcms.SharedModels.Features.PatientClassification;
 
 namespace vetcms.ClientApplication.Common.AutoMapping
 {
@@ -15,6 +17,7 @@ namespace vetcms.ClientApplication.Common.AutoMapping
         public ClientApplicationProfile()
         {
             CreateMap<GetUserApiQueryResponse, GetUserClientQueryResponse>();
+            CreateMap<ListAnimalBreedApiQueryResponse, AnimalBreedListClientQueryResponse>();
         }
     }
 }
