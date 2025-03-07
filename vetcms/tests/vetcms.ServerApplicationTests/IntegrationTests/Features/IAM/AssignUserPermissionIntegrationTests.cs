@@ -9,6 +9,7 @@ using vetcms.ServerApplication.Common.Abstractions.IAM;
 using vetcms.ServerApplication.Common.IAM;
 using vetcms.ServerApplication.Domain.Entity;
 using vetcms.ServerApplication.Features.IAM;
+using vetcms.ServerApplication.Features.IAM.AssignUserPermission;
 using vetcms.ServerApplication.Features.IAM.RegisterUser;
 using vetcms.ServerApplication.Infrastructure.Presistence;
 using vetcms.ServerApplication.Infrastructure.Presistence.Repository;

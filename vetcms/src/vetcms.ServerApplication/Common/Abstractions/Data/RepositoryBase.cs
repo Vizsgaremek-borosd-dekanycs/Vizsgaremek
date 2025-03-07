@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using vetcms.ServerApplication.Common.Exceptions;
 using vetcms.ServerApplication.Domain.Entity;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace vetcms.ServerApplication.Common.Abstractions.Data
 {
@@ -27,7 +29,7 @@ namespace vetcms.ServerApplication.Common.Abstractions.Data
 
             try
             {
-                var result = await Entities.Where(e => (includeDeleted || !e.Deleted) && e.Id == id).FirstAsync();
+                var result = await IncludeAll(Entities).Where(e => (includeDeleted || !e.Deleted) && e.Id == id).FirstAsync();
                 return result;
             }
             catch(InvalidOperationException)
@@ -38,12 +40,12 @@ namespace vetcms.ServerApplication.Common.Abstractions.Data
 
         public IEnumerable<T> Where(Func<T, bool> predicate, bool includeDeleted = false)
         {
-            return Entities.Where(predicate).Where(e => includeDeleted || !e.Deleted);
+            return IncludeAll(Entities).Where(predicate).Where(e => includeDeleted || !e.Deleted);
         }
 
         public async Task<IEnumerable<T>> WhereAsync(Func<T, bool> predicate, bool includeDeleted = false)
         {
-            return await Entities.Where(e => includeDeleted || !e.Deleted).ToListAsync();
+            return await IncludeAll(Entities).Where(e => includeDeleted || !e.Deleted).ToListAsync();
         }
 
         public async Task<T> AddAsync(T entity)
@@ -88,7 +90,7 @@ namespace vetcms.ServerApplication.Common.Abstractions.Data
         public IQueryable<T> Search(string searchTerm = "", bool includeDeleted = false)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
-                return Entities; // Return paginated original query if search term is empty
+                return IncludeAll(Entities); // Return paginated original query if search term is empty
 
             var parameter = Expression.Parameter(typeof(T), "e");
             var properties = typeof(T)
@@ -97,7 +99,7 @@ namespace vetcms.ServerApplication.Common.Abstractions.Data
                 .ToList();
 
             if (!properties.Any())
-                return Entities;
+                return IncludeAll(Entities);
 
             Expression combinedExpression = null;
 
@@ -117,12 +119,21 @@ namespace vetcms.ServerApplication.Common.Abstractions.Data
             }
 
             var lambda = Expression.Lambda<Func<T, bool>>(combinedExpression, parameter);
-            return Entities.Where(e => includeDeleted || !e.Deleted).Where(lambda);
+            return IncludeAll(Entities).Where(e => includeDeleted || !e.Deleted).Where(lambda);
         }
 
         public async Task<List<T>> SearchAsync(string searchTerm = "", int skip = 0, int take = 10, bool includeDeleted = false)
         {
             return await Search(searchTerm).Skip(skip).Take(take).ToListAsync();
+        }
+
+        protected IQueryable<T> IncludeAll(IQueryable<T> dataset)
+        {
+            foreach (var property in context.Model.FindEntityType(typeof(T)).GetNavigations())
+            {
+                dataset = dataset.Include(property.Name);
+            }
+            return dataset;
         }
     }
 }

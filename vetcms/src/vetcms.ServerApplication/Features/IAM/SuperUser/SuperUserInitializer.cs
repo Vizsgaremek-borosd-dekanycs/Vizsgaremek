@@ -78,7 +78,6 @@ namespace vetcms.ServerApplication.Features.IAM.SuperUser
                 superUserEntity.Password = PasswordUtility.HashPassword(superUserPassword, salt);
                 users.Update(superUserEntity);
                 await context.SaveChangesAsync();
-
                 Console.WriteLine("##################################################");
                 Console.WriteLine("##################################################");
                 Console.WriteLine("############# [SUPERUSER GENERATED] ##############");

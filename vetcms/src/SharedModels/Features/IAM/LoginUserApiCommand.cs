@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using vetcms.SharedModels.Common;
 using vetcms.SharedModels.Common.Abstract;
+using vetcms.SharedModels.Common.Dto;
 using vetcms.SharedModels.Common.IAM.Authorization;
 
 namespace vetcms.SharedModels.Features.IAM
@@ -63,6 +64,8 @@ namespace vetcms.SharedModels.Features.IAM
         /// A parancs üzenetét tartalmazó tulajdonság.
         /// </summary>
         public string Message { get; set; }
+
+        public UserDto? CurrentUser { get; set; }
 
         /// <summary>
         /// A felhasználó jogosultságainak halmaza.

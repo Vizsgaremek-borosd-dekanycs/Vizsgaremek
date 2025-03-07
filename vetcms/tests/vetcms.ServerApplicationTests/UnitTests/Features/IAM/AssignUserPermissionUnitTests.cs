@@ -4,7 +4,7 @@ using Moq;
 using vetcms.ServerApplication.Common.Abstractions.Data;
 using vetcms.ServerApplication.Common.Exceptions;
 using vetcms.ServerApplication.Domain.Entity;
-using vetcms.ServerApplication.Features.IAM.RegisterUser;
+using vetcms.ServerApplication.Features.IAM.AssignUserPermission;
 using vetcms.ServerApplication.Infrastructure.Presistence.Repository;
 using vetcms.SharedModels.Common.IAM.Authorization;
 using vetcms.SharedModels.Features.IAM;

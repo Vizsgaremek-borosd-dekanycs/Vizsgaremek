@@ -10,18 +10,17 @@ namespace vetcms.SharedModels.Common.Abstract
     /// <summary>
     /// Az API parancsok eredményét reprezentáló osztály.
     /// </summary>
-    public record ICommandResult
+    public interface ICommandResult
     {
         /// <summary>
         /// Az API parancs sikerességét jelző tulajdonság.
         /// </summary>
-        public virtual bool Success { get; set; }
+        public bool Success { get; set; }
 
         /// <summary>
         /// Az API parancs üzenetét tartalmazó tulajdonság.
         /// </summary>
-        public virtual string Message { get; set; }
+        public string Message { get; set; }
 
-        public UserDto CurrentUser { get; set; }
     }
 }

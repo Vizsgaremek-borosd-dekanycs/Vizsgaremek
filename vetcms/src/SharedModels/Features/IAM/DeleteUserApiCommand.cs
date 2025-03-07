@@ -61,11 +61,8 @@ namespace vetcms.SharedModels.Features.IAM
         }
     }
 
-    public record DeleteUserApiCommandResponse : ICommandResult
+    public record DeleteUserApiCommandResponse : AuthenticatedCommandResult
     {
-        public bool Success { get; set; }
-        public string Message { get; set; } = string.Empty;
-
         public DeleteUserApiCommandResponse()
         {
 
@@ -73,8 +70,6 @@ namespace vetcms.SharedModels.Features.IAM
 
         public DeleteUserApiCommandResponse(bool _success, string _message = "")
         {
-            Success = _success;
-            Message = _message;
         }
     }
 }
