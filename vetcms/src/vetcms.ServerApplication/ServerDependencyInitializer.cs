@@ -38,7 +38,7 @@ namespace vetcms.ServerApplication
                 o.LowercaseUrls = true;
             });
 
-            services.AddValidatorsFromAssemblyContaining<LoginUserCommandValidator>(); // minden validatort adjon hozzá a shared lib-ből
+            services.AddValidatorsFromAssemblyContaining<LoginUserCommandValidator>(); // minden validatort adjon hozzá a shared lib-bőla
             services.AddValidatorsFromAssemblyContaining<ApplicationDbContext>();  // minden validatort adjon hozzá a server appból
 
             return services;

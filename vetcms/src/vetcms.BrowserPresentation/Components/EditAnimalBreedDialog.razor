@@ -1,0 +1,82 @@
+﻿@using System.Globalization
+@using vetcms.BrowserPresentation.Utility
+@using vetcms.ClientApplication.Common.CommandAbstraction;
+@using vetcms.ClientApplication.Features.PatientClassification.ListAnimalType
+@using vetcms.SharedModels.Common.Dto
+@using vetcms.SharedModels.Common.IAM.Authorization;
+@inject MediatR.IMediator Mediator
+@inject IToastService ToastService
+@implements IDialogContentComponent<AnimalBreedDto>
+
+<FluentGrid>
+    <FluentGridItem xs="12" md="12">
+        <FluentGrid>
+            <FluentGridItem xs="12" sm="12">
+                <FluentTextField Style="width: 100%" @bind-Value="Content.BreedName" Label="Fajta név" TextFieldType="TextFieldType.Text" />
+            </FluentGridItem>
+            <br />
+            <FluentGridItem xs="12" sm="12">
+                <FluentTextArea Style="width: 100%" @bind-Value="Content.Charachteristics" Label="Jellemzők"/>
+            </FluentGridItem>
+
+            <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_VIEW_ANIMAL_TYPES]">
+                <FluentGridItem xs="12" md="12">
+                    <FluentSelect TOption="AnimalTypeDto"
+                    Label="Állatfaj"
+                    Items="@animalTypes"
+                    Placeholder="@SelectedType?.TypeName"
+                    OptionValue="@(p => p?.Id.ToString())"
+                    OptionText="@(p => p?.TypeName)"
+                    @bind-Value="@SelectedTypeId"
+                    @bind-SelectedOption="@SelectedType"/>
+                </FluentGridItem>
+            </PermissionWrapper>
+        </FluentGrid>
+    </FluentGridItem>
+</FluentGrid>
+
+@code {
+
+    [Parameter]
+    public AnimalBreedDto Content { get; set; } = new();
+
+    [CascadingParameter]
+    public FluentDialog? Dialog { get; set; }
+
+    private AnimalTypeDto SelectedType { get; set; } = new();
+    private string SelectedTypeId { get; set; } = "";
+
+
+    private bool isBusy = false;
+    private string searchTerm = "";
+
+    private List<AnimalTypeDto> animalTypes = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        animalTypes = await GetAnimalTypes();
+
+    }
+
+    private async Task<List<AnimalTypeDto>> GetAnimalTypes()
+    {
+        var query = new AnimalTypeListClientQuery(){
+            SearchTerm = searchTerm,
+            Take = 10
+        };
+
+        var result = await ToastService.ShowIndeterminateProgressToast(Mediator.Send(query), "Kérjük várjon...", "Fajták betöltése folyamatban...");
+
+        if (result == null)
+        {
+            ToastService.ShowError("Sikertelen adatlekérés.");
+            return new List<AnimalTypeDto>();
+        }
+
+        SelectedTypeId = Content?.TypeId.ToString() ?? string.Empty;
+        SelectedType = result.AnimalType.FirstOrDefault(x => x.Id == Content?.TypeId) ?? new AnimalTypeDto();
+        return result.AnimalType;
+    }
+
+}
