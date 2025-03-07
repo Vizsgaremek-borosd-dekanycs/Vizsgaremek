@@ -14,4 +14,4 @@ namespace vetcms.SharedModels.Common.Dto
         public string Charachteristics { get; set; }
     }
 }
-}
+

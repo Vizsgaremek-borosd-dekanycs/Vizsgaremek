@@ -24,24 +24,21 @@
                     <FluentSelect TOption="AnimalTypeDto"
                     Label="Állatfaj"
                     Items="@animalTypes"
-                    Placeholder="@SelectedType.TypeName"
-                    OptionValue="@(p => p.Id.ToString())"
-                    OptionText="@(p => p.TypeName)"
+                    Placeholder="@SelectedType?.TypeName"
+                    OptionValue="@(p => p?.Id.ToString())"
+                    OptionText="@(p => p?.TypeName)"
                     @bind-Value="@SelectedTypeId"
                     @bind-SelectedOption="@SelectedType"/>
                 </FluentGridItem>
             </PermissionWrapper>
-
-
-
-
         </FluentGrid>
     </FluentGridItem>
 </FluentGrid>
 
 @code {
+
     [Parameter]
-    public AnimalBreedDto Content { get; set; }
+    public AnimalBreedDto Content { get; set; } = new();
 
     [CascadingParameter]
     public FluentDialog? Dialog { get; set; }
@@ -73,11 +70,12 @@
 
         if (result == null)
         {
-            result = new AnimalTypeListClientQueryResponse();
+            ToastService.ShowError("Sikertelen adatlekérés.");
+            return new List<AnimalTypeDto>();
         }
 
-        SelectedTypeId = Content.TypeId.ToString();
-        SelectedType = result.AnimalType.First(x => x.Id == Content.TypeId);
+        SelectedTypeId = Content?.TypeId.ToString() ?? string.Empty;
+        SelectedType = result.AnimalType.FirstOrDefault(x => x.Id == Content?.TypeId) ?? new AnimalTypeDto();
         return result.AnimalType;
     }
 
