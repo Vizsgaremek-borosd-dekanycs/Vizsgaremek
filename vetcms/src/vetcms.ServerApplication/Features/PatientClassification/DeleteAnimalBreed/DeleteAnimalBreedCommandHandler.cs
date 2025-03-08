@@ -13,9 +13,9 @@ using vetcms.SharedModels.Features.PatientClassification;
 
 namespace vetcms.ServerApplication.Features.PatientClassification.DeleteAnimalType
 {
-    internal class DeleteAnimalBreedCommandHandler(IAnimalBreedRepository animalBreedRepository) : IRequestHandler<DeleteAnimalBreedApiCommand, DeleteAnimalBreedApiCommandResponse>
+    internal class DeleteAnimalBreedCommandHandler(IAnimalBreedRepository animalBreedRepository) : IRequestHandler<DeleteAnimalBreedApiCommand, DeleteAnimalBreedApiCommandResult>
     {
-        public async Task<DeleteAnimalBreedApiCommandResponse> Handle(DeleteAnimalBreedApiCommand request, CancellationToken cancellationToken)
+        public async Task<DeleteAnimalBreedApiCommandResult> Handle(DeleteAnimalBreedApiCommand request, CancellationToken cancellationToken)
         {
             List<int> nonExistentIds = new();
             request.Ids.ForEach(async id =>
@@ -28,7 +28,7 @@ namespace vetcms.ServerApplication.Features.PatientClassification.DeleteAnimalTy
 
             if (nonExistentIds.Any())
             {
-                return new DeleteAnimalBreedApiCommandResponse(false)
+                return new DeleteAnimalBreedApiCommandResult(false)
                 {
                     Message = $"Nem létező állatfaj azonosítók: {string.Join(",", nonExistentIds)}"
                 };
@@ -39,7 +39,7 @@ namespace vetcms.ServerApplication.Features.PatientClassification.DeleteAnimalTy
                 await animalBreedRepository.DeleteAsync(id);
             }
 
-            return new DeleteAnimalBreedApiCommandResponse()
+            return new DeleteAnimalBreedApiCommandResult()
             {
                 Success = true
             };

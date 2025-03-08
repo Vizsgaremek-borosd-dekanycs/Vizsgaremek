@@ -9,6 +9,6 @@ namespace vetcms.ClientApplication.Features.PatientClassification.GetAnimalType
 {
     public class GetAnimalTypeClientQuery : IClientCommand<GetAnimalTypeClientQueryResponse>
     {
-        public int TypeId { get; set; } = 0;
+        public int Id { get; set; } = 0;
     }
 }

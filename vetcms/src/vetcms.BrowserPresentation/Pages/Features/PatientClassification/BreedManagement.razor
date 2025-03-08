@@ -171,7 +171,7 @@
             Console.WriteLine($"create animal breed Dialog closed by {animalBreedData?.BreedName} - Canceled: {result.Cancelled}");
             if (!result.Cancelled)
             {
-                //await ToastService.ShowIndeterminateProgressToast(SubmitNewAnimalBreedData(animalBreedData), "Kérjük várjon...", "Állatfaj adatainak mentése");
+                await ToastService.ShowIndeterminateProgressToast(SubmitNewAnimalBreedData(animalBreedData), "Kérjük várjon...", "Állatfaj adatainak mentése");
             }
         }
         else
@@ -216,7 +216,7 @@
 
         var data = await Mediator.Send(query);
 
-        return data.Breed;
+        return data.AnimalBreedModel;
     }
 
     private async Task SubmitNewAnimalBreedData(AnimalBreedDto newAnimalBreed)
@@ -234,8 +234,8 @@
     {
         ModifyAnimalBreedClientCommand command = new ModifyAnimalBreedClientCommand()
             {
-                BreedId = editedAnimalBreed.Id,
-                ModifiedBreedDto = editedAnimalBreed
+                Id = editedAnimalBreed.Id,
+                AnimalBreedModel = editedAnimalBreed
             };
 
         await Mediator.Send(command);

@@ -35,7 +35,7 @@ namespace vetcms.SharedModels.Features.PatientClassification
 
         public override string GetApiEndpoint()
         {
-            return Path.Join(ApiBaseUrl, "/api/v1/iam/animal-type/batch-delete");
+            return Path.Join(ApiBaseUrl, "/api/v1/patient-classification/animal-type/batch-delete");
         }
 
         public override HttpMethodEnum GetApiMethod()

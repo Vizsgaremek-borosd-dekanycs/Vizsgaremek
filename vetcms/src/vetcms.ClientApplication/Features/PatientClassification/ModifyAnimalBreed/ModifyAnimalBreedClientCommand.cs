@@ -10,7 +10,7 @@ namespace vetcms.ClientApplication.Features.PatientClassification.ModifyAnimalBr
 {
     public class ModifyAnimalBreedClientCommand : IClientCommand<bool>
     {
-        public int BreedId { get; set; }
-        public AnimalBreedDto ModifiedBreedDto { get; set; }
+        public int Id { get; set; }
+        public AnimalBreedDto AnimalBreedModel { get; set; }
     }
 }

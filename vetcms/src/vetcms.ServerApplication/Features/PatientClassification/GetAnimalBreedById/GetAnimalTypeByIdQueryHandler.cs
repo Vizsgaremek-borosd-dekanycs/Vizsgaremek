@@ -19,9 +19,9 @@ namespace vetcms.ServerApplication.Features.PatientClassification.ListAnimalType
     {
         public async Task<GetAnimalBreedByIdApiQueryResponse> Handle(GetAnimalBreedByIdApiQuery request, CancellationToken cancellationToken)
         {
-            if(await breedRepository.ExistAsync(request.Id))
+            if(await breedRepository.ExistAsync(request.BreedId))
             {
-                AnimalBreed animalBreed = await breedRepository.GetByIdAsync(request.Id);
+                AnimalBreed animalBreed = await breedRepository.GetByIdAsync(request.BreedId);
                 AnimalBreedDto animalBreedDto = mapper.Map<AnimalBreedDto>(animalBreed);
                 return new GetAnimalBreedByIdApiQueryResponse(true)
                 {

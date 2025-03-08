@@ -126,7 +126,7 @@
 
         DeleteAnimalTypeClientCommand command = new DeleteAnimalTypeClientCommand()
             {
-                TypeIds = selectedAnimalTypes.Select(u => u.Id).ToList()
+                Ids = selectedAnimalTypes.Select(u => u.Id).ToList()
             };
 
         if (!canceled)
@@ -211,12 +211,12 @@
     {
         var query = new GetAnimalTypeClientQuery()
             {
-                TypeId = id
+                Id = id
             };
 
         var data = await Mediator.Send(query);
 
-        return data.Type;
+        return data.AnimalTypeModel;
     }
 
     private async Task SubmitNewAnimalTypeData(AnimalTypeDto newAnimalType)
@@ -234,8 +234,8 @@
     {
         ModifyAnimalTypeClientCommand command = new ModifyAnimalTypeClientCommand()
             {
-                TypeId = editedAnimalType.Id,
-                ModifiedTypeDto = editedAnimalType
+                Id = editedAnimalType.Id,
+                AnimalTypeModel = editedAnimalType
             };
 
         await Mediator.Send(command);
