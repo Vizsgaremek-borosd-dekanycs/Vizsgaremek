@@ -15,11 +15,7 @@ namespace vetcms.ClientApplication.Features.PatientClassification.GetAnimalType
     {
         public async Task<GetAnimalTypeClientQueryResponse> Handle(GetAnimalTypeClientQuery request, CancellationToken cancellationToken)
         {
-            AnimalTypeDto animalType = AnimalTypeListClientQueryHandler.Types.FirstOrDefault(t => t.Id == request.TypeId);
-
             GetAnimalTypeClientQueryResponse response = new GetAnimalTypeClientQueryResponse();
-            response.Type = animalType;
-
             await Task.Delay(1000);
             return response;
         }

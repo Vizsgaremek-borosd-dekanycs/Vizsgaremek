@@ -75,8 +75,8 @@
         }
 
         SelectedTypeId = Content?.TypeId.ToString() ?? string.Empty;
-        SelectedType = result.AnimalType.FirstOrDefault(x => x.Id == Content?.TypeId) ?? new AnimalTypeDto();
-        return result.AnimalType;
+        SelectedType = result.AnimalTypes.FirstOrDefault(x => x.Id == Content?.TypeId) ?? new AnimalTypeDto();
+        return result.AnimalTypes;
     }
 
 }

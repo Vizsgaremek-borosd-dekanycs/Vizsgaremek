@@ -1,4 +1,4 @@
-﻿@page "/iam/type-management"
+﻿@page "/patient-classification/type-management"
 @using vetcms.BrowserPresentation.Components
 @using vetcms.BrowserPresentation.Utility
 @using vetcms.ClientApplication.Common.CommandAbstraction
@@ -98,7 +98,7 @@
             data = new AnimalTypeListClientQueryResponse();
         }
 
-        List<SelectableAnimalTypeDto> animalTypes = data.AnimalType.Select(u => new SelectableAnimalTypeDto
+        List<SelectableAnimalTypeDto> animalTypes = data.AnimalTypes.Select(u => new SelectableAnimalTypeDto
             {
                 Id = u.Id,
                 TypeName = u.TypeName,

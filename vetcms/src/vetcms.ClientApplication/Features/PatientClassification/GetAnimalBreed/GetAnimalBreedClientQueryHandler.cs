@@ -15,11 +15,7 @@ namespace vetcms.ClientApplication.Features.PatientClassification.GetAnimalBreed
     {
         public async Task<GetAnimalBreedClientQueryResponse> Handle(GetAnimalBreedClientQuery request, CancellationToken cancellationToken)
         {
-            AnimalBreedDto animalBreed = AnimalBreedListClientQueryHandler.Breeds.FirstOrDefault(b => b.Id == request.BreedId);
-
             GetAnimalBreedClientQueryResponse response = new GetAnimalBreedClientQueryResponse();
-            response.Breed = animalBreed;
-
             await Task.Delay(1000);
             return response;
         }

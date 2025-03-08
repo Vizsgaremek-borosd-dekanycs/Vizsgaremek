@@ -12,13 +12,6 @@ namespace vetcms.ClientApplication.Features.PatientClassification.DeleteAnimalTy
     {
         public async Task<bool> Handle(DeleteAnimalTypeClientCommand request, CancellationToken cancellationToken)
         {
-            request.TypeIds.ForEach(breedId =>
-            {
-                var list = AnimalTypeListClientQueryHandler.Types.ToList();
-                list.RemoveAll(b => b.Id == breedId);
-                AnimalTypeListClientQueryHandler.Types = list.AsQueryable();
-            });
-
             await Task.Delay(1000);
             return true;
         }
