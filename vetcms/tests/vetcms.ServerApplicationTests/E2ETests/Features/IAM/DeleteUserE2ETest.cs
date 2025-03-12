@@ -140,7 +140,7 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
             // Assert
             Assert.NotNull(result);
             Assert.True(result.Success);
-            Assert.Equal("", result.Message);
+            Assert.Equal(null, result.Message);
 
             // Verify the user is deleted
             var userDeleted = _dbContext.Set<User>().Where(x => x.Deleted).Select(x => x.Id);
@@ -211,7 +211,7 @@ namespace vetcms.ServerApplicationTests.E2ETests.Features.IAM
 
             Assert.NotNull(result);
             Assert.True(result.Success);
-            Assert.Equal("", result.Message);
+            Assert.Equal(null, result.Message);
             var deletedUserIds = _dbContext.Set<User>().Where(x => x.Deleted).Select(x => x.Id);
             foreach (var userId in userIds)
             {
