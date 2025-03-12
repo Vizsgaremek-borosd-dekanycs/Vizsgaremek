@@ -16,6 +16,7 @@ namespace vetcms.ClientApplication.Features.IAM.CreateNewUser
     {
         public async Task<bool> Handle(CreateNewUserClientCommand request, CancellationToken cancellationToken)
         {
+            
             CreateUserApiCommand createUserApiCommand = new CreateUserApiCommand()
             {
                 NewUser = request.NewUserModel

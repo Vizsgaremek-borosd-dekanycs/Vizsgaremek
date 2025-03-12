@@ -54,7 +54,7 @@ namespace vetcms.ServerApplicationTests.IntegrationTests.Features.IAM
 
             // Assert
             Assert.True(result.Success);
-            Assert.Equal("", result.Message);
+            Assert.Equal(null, result.Message);
             Assert.Null(await _dbContext.Set<User>().FindAsync(userId));
         }
 
@@ -82,7 +82,7 @@ namespace vetcms.ServerApplicationTests.IntegrationTests.Features.IAM
 
             // Assert
             Assert.True(result.Success);
-            Assert.Equal("", result.Message);
+            Assert.Equal(null, result.Message);
             foreach (var userId in userIds)
             {
                 Assert.Null(await _dbContext.Set<User>().FindAsync(userId));

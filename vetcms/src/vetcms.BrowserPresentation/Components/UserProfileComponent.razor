@@ -1,0 +1,99 @@
+﻿@using vetcms.ClientApplication.Common.IAM.Commands.AuthenticationStatus
+@using vetcms.ClientApplication.Features.IAM.ModifyProifle
+@using vetcms.SharedModels.Common.Dto
+@inject MediatR.IMediator Mediator
+@inject IDialogService DialogService
+
+
+<FluentGrid Justify="JustifyContent.FlexStart">
+    <FluentGridItem xs="12" sm="6" md="4" lg="3">
+
+        <FluentGridItem xs="12" sm="12" md="12" lg="12">
+            <h3 style="text-align:center">Saját adatok</h3>
+        </FluentGridItem>
+
+        <FluentGridItem xs="12" sm="12" md="12" lg="12">
+            <FluentTextField Label="Vezetéknév" @bind-Value=User.LastName TextFieldType="TextFieldType.Text" Style="width: 100%;">
+            </FluentTextField>
+        </FluentGridItem>
+
+        <FluentGridItem xs="12" sm="12" md="12" lg="12">
+            <FluentTextField Label="Keresztnév" @bind-Value=User.FirstName TextFieldType="TextFieldType.Text" Style="width: 100%;">
+            </FluentTextField>
+        </FluentGridItem>
+
+        <FluentGridItem xs="12" sm="12" md="12" lg="12">
+            <FluentTextField Label="Megjelenített név" @bind-Value=User.VisibleName TextFieldType="TextFieldType.Text" Placeholder="johndoe01" Style="width: 100%;">
+            </FluentTextField>
+        </FluentGridItem>
+
+        <FluentGridItem xs="12" sm="12" md="12" lg="12">
+            <FluentDatePicker Label="Születési dátum" @bind-Value=User.DateOfBirth Style="width: 100%;" />
+        </FluentGridItem>
+
+        <FluentGridItem xs="12" sm="12" md="12" lg="12">
+            <FluentTextField Label="Email" @bind-Value=User.Email TextFieldType="TextFieldType.Email" Placeholder="johndoe01@example.com" Style="width: 100%;">
+            </FluentTextField>
+        </FluentGridItem>
+
+        <FluentGridItem xs="12" sm="12" md="12" lg="12">
+            <FluentTextField Label="Jelszó" @bind-Value="pass1" TextFieldType="TextFieldType.Password" Style="width: 100%;" @oninput="OnPasswordInput"></FluentTextField>
+        </FluentGridItem>
+
+        @if (!string.IsNullOrEmpty(pass1))
+        {
+            <FluentGridItem xs="12" sm="12" md="12" lg="12">
+                <FluentTextField Label="Jelszó mégegyszer" @bind-Value="pass2" TextFieldType="TextFieldType.Password" Style="width: 100%;"></FluentTextField>
+            </FluentGridItem>
+        }
+
+        <FluentGridItem xs="12" sm="12" md="12" lg="12">
+            <FluentTextField Label="Telefonszám" @bind-Value=User.PhoneNumber TextFieldType="TextFieldType.Tel" Style="width: 100%;">
+            </FluentTextField>
+        </FluentGridItem>
+
+        <FluentGridItem xs="12" sm="12" md="12" lg="12">
+            <FluentTextField Label="Lakcím" @bind-Value=User.Address TextFieldType="TextFieldType.Text" Style="width: 100%;">
+            </FluentTextField>
+        </FluentGridItem>
+
+        <FluentGridItem xs="12" sm="12" md="6" lg="6" Justify="JustifyContent.Center">
+            <FluentButton @onclick="Modify" Appearance="Appearance.Accent">
+                Adatok módosítása
+            </FluentButton>
+        </FluentGridItem>
+
+    </FluentGridItem>
+</FluentGrid>
+
+
+
+@code {
+    [Parameter]
+    public UserDto User { get; set; }
+
+    string pass1 = "", pass2 = "";
+
+    private async void Modify()
+    {
+        if(pass1 != pass2)
+        {
+            DialogService.ShowError("A két jelszó nem egyezik meg!");
+            return;
+        }
+        User.Password = pass1;
+        ModifyProfileClientCommand command = new()
+        {
+                ModifiedProfile = User
+        };
+
+        await Mediator.Send(command);
+    }
+
+    private void OnPasswordInput(ChangeEventArgs e)
+    {
+        pass1 = e.Value.ToString();
+    }
+
+
+}

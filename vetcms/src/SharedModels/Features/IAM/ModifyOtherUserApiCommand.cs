@@ -17,10 +17,6 @@ namespace vetcms.SharedModels.Features.IAM
 
         public int Id { get; set; }
 
-        /// <summary>
-        /// A felhasználó e-mail címe.
-        /// </summary>
-        /// 
         public UserDto ModifiedUser { get; set; }
 
         public override string GetApiEndpoint()
@@ -36,6 +32,11 @@ namespace vetcms.SharedModels.Features.IAM
         public override PermissionFlags[] GetRequiredPermissions()
         {
             return [PermissionFlags.CAN_MODIFY_OTHER_USER];
+        }
+
+        public override bool ProcessSpecialPermissionQuery(UserDto executorUser)
+        {
+            return true;
         }
 
         public EntityPermissions GetPermissions()

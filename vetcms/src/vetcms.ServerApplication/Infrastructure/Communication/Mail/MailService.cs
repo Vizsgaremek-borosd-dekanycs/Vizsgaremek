@@ -46,9 +46,11 @@ namespace vetcms.ServerApplication.Infrastructure.Communication.Mail
 
         public async Task<int> SendFirstAuthenticationEmailAsync(FirstTimeAuthenticationCode authModel)
         {
+            string webBase = configuration.GetValue<string>("Host:WebBase");
+
             var fields = new Dictionary<TemplateField, string>
             {
-                { TemplateField.URL, $"https://localhost:44317/iam/first-time-login/{authModel.Code}" },
+                { TemplateField.URL, $"{webBase}/iam/first-time-login/{authModel.Code}" },
                 { TemplateField.visible_name, authModel.User.VisibleName }
             };
             return await SendEmailAsync(authModel.User.Email, "VETCMS: Első belépés", TemplateCatalog.AdminCreateUser, fields);
@@ -83,7 +85,7 @@ namespace vetcms.ServerApplication.Infrastructure.Communication.Mail
             return template;
         }
 
-        public string GetEmailPreviewRoute(int emailId)
+        public string GetEmailPreviewRoute(int emailId)//
         {
             string apiBase = configuration.GetValue<string>("Host:ApiBase");
             return $"{apiBase}/api/v1/misc/email-preview/{emailId}";

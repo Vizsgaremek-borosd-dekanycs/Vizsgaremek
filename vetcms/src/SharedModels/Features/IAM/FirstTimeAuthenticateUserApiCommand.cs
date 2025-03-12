@@ -41,6 +41,8 @@ namespace vetcms.SharedModels.Features.IAM
 
         public FirstTimeAuthenticateUserApiCommandResponse(bool success, string message = "")
         {
+            Success = success;
+            Message = message;
         }
     }
 }
