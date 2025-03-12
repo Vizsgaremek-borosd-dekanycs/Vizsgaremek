@@ -15,6 +15,7 @@ using vetcms.ClientApplication.Features.PatientClassification.ListAnimalBreedByT
 using vetcms.ClientApplication.Features.PatientClassification.ListAnimalType;
 using vetcms.ClientApplication.Features.PatientClassification.ModifyAnimalBreed;
 using vetcms.ClientApplication.Features.PatientClassification.ModifyAnimalType;
+using vetcms.ClientApplication.Features.PatientManagement.ListPatients;
 using vetcms.SharedModels.Features.IAM;
 using vetcms.SharedModels.Features.PatientClassification;
 
