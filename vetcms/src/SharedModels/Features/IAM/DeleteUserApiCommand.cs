@@ -70,6 +70,8 @@ namespace vetcms.SharedModels.Features.IAM
 
         public DeleteUserApiCommandResponse(bool _success, string _message = "")
         {
+            Success = _success;
+            Message = _message;
         }
     }
 }

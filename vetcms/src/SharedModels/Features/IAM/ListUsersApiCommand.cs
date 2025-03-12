@@ -52,7 +52,9 @@ namespace vetcms.SharedModels.Features.IAM
 
         public ListUsersApiCommandResponse(bool _success, List<UserDto> _users, string _message = "")
         {
+            Success = _success;
             Users = _users;
+            Message = _message;
         }
     }
 }

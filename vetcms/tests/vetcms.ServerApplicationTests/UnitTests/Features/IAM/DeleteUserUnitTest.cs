@@ -37,7 +37,7 @@ namespace vetcms.ServerApplicationTests.UnitTests.Features.IAM
 
             // Assert
             Assert.True(result.Success);
-            Assert.Equal("", result.Message);
+            Assert.Equal(null, result.Message);
             _userRepositoryMock.Verify(repo => repo.DeleteAsync(userId), Times.Once);
         }
 
@@ -59,7 +59,7 @@ namespace vetcms.ServerApplicationTests.UnitTests.Features.IAM
 
             // Assert
             Assert.True(result.Success);
-            Assert.Equal("", result.Message);
+            Assert.Equal(null, result.Message);
             foreach (var userId in userIds)
             {
                 _userRepositoryMock.Verify(repo => repo.DeleteAsync(userId), Times.Once);

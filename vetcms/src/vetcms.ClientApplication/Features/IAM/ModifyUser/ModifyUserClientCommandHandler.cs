@@ -25,7 +25,7 @@ namespace vetcms.ClientApplication.Features.IAM.ModifyUser
             ModifyOtherUserApiCommandResponse response = await mediator.Send(modifyOtherUserApiCommand);
             if(response.Success)
             {
-                await dialogService.ShowSuccessAsync("Felhasználó sikeresen módosítva", "Siker");
+                await dialogService.ShowSuccessAsync(response.Message, "Siker");
                 return true;
             }
             else
