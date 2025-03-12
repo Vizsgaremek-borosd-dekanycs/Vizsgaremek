@@ -1,4 +1,4 @@
-﻿@page "/iam/breed-management"
+﻿@page "/patient-classification/breed-management"
 @using vetcms.BrowserPresentation.Components
 @using vetcms.BrowserPresentation.Utility
 @using vetcms.ClientApplication.Common.CommandAbstraction
@@ -12,8 +12,6 @@
 @inject IToastService ToastService;
 @inject MediatR.IMediator Mediator
 
-<div>
-</div>
 <FluentCard style="overflow:auto;">
     <FluentGrid>
         <FluentGridItem xs="12">
@@ -173,7 +171,7 @@
             Console.WriteLine($"create animal breed Dialog closed by {animalBreedData?.BreedName} - Canceled: {result.Cancelled}");
             if (!result.Cancelled)
             {
-                //await ToastService.ShowIndeterminateProgressToast(SubmitNewAnimalBreedData(animalBreedData), "Kérjük várjon...", "Állatfaj adatainak mentése");
+                await ToastService.ShowIndeterminateProgressToast(SubmitNewAnimalBreedData(animalBreedData), "Kérjük várjon...", "Állatfaj adatainak mentése");
             }
         }
         else
@@ -218,7 +216,7 @@
 
         var data = await Mediator.Send(query);
 
-        return data.Breed;
+        return data.AnimalBreedModel;
     }
 
     private async Task SubmitNewAnimalBreedData(AnimalBreedDto newAnimalBreed)
@@ -236,8 +234,8 @@
     {
         ModifyAnimalBreedClientCommand command = new ModifyAnimalBreedClientCommand()
             {
-                BreedId = editedAnimalBreed.Id,
-                ModifiedBreedDto = editedAnimalBreed
+                Id = editedAnimalBreed.Id,
+                AnimalBreedModel = editedAnimalBreed
             };
 
         await Mediator.Send(command);

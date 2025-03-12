@@ -9,6 +9,6 @@ namespace vetcms.ClientApplication.Features.PatientClassification.ListAnimalBree
 {
     public class ListAnimalBreedByTypeClientQueryResponse
     {
-        public List<AnimalBreedDto> BreedList { get; set; } = new();
+        public List<AnimalBreedDto> AnimalBreeds { get; set; } = new();
     }
 }

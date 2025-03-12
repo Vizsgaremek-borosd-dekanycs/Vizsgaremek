@@ -12,7 +12,7 @@ namespace vetcms.ServerApplication.Features.PatientClassification.CreatePatientT
     public partial class PatientClassificationController : ApiV1ControllerBase
     {
         [HttpPost("animal-breed/batch-delete")]
-        public async Task<DeleteAnimalBreedApiCommandResponse> DeleteAnimalType(DeleteAnimalBreedApiCommand command)
+        public async Task<DeleteAnimalBreedApiCommandResult> DeleteAnimalType(DeleteAnimalBreedApiCommand command)
         {
             command.Prepare(Request);
             return await Mediator.Send(command);

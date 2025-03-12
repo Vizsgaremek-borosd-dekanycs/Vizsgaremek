@@ -27,8 +27,8 @@
                     Placeholder="@SelectedType?.TypeName"
                     OptionValue="@(p => p?.Id.ToString())"
                     OptionText="@(p => p?.TypeName)"
-                    @bind-Value="@SelectedTypeId"
-                    @bind-SelectedOption="@SelectedType"/>
+                    SelectedOption="@SelectedType"
+                    SelectedOptionChanged="SelectionChanged" />
                 </FluentGridItem>
             </PermissionWrapper>
         </FluentGrid>
@@ -46,10 +46,6 @@
     private AnimalTypeDto SelectedType { get; set; } = new();
     private string SelectedTypeId { get; set; } = "";
 
-
-    private bool isBusy = false;
-    private string searchTerm = "";
-
     private List<AnimalTypeDto> animalTypes = new();
 
 
@@ -59,11 +55,20 @@
 
     }
 
+    void SelectionChanged(AnimalTypeDto? animalTypeDto)
+    {
+        if(animalTypeDto != null)
+        {
+            SelectedType = animalTypeDto;
+            Content.TypeId = animalTypeDto.Id;
+        }
+    }
+
     private async Task<List<AnimalTypeDto>> GetAnimalTypes()
     {
         var query = new AnimalTypeListClientQuery(){
-            SearchTerm = searchTerm,
-            Take = 10
+            SearchTerm = "",
+            Take = 100,
         };
 
         var result = await ToastService.ShowIndeterminateProgressToast(Mediator.Send(query), "Kérjük várjon...", "Fajták betöltése folyamatban...");
@@ -75,8 +80,8 @@
         }
 
         SelectedTypeId = Content?.TypeId.ToString() ?? string.Empty;
-        SelectedType = result.AnimalType.FirstOrDefault(x => x.Id == Content?.TypeId) ?? new AnimalTypeDto();
-        return result.AnimalType;
+        SelectedType = result.AnimalTypes.FirstOrDefault(x => x.Id == Content?.TypeId) ?? new AnimalTypeDto();
+        return result.AnimalTypes;
     }
 
 }

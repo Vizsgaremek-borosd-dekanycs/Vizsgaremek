@@ -10,5 +10,7 @@ namespace vetcms.ClientApplication.Features.PatientClassification.ListAnimalBree
     public class ListAnimalBreedByTypeClientQuery : IClientCommand<ListAnimalBreedByTypeClientQueryResponse>
     {
         public int TypeId { get; set; } = 0;
+        public int Skip { get; set; } = 0;
+        public int Take { get; set; } = 100;
     }
 }

@@ -22,7 +22,6 @@
 
             <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_LOGIN]">
                 <FluentGridItem Style="display: flex; flex-direction: column; height: 100%;" xs="12" md="12">
-                    <FluentSearch Style="width: 40%; margin-bottom: 10px;" Disabled="isBusy" @bind-Value="searchTerm" ImmediateDelay="300" AutoComplete="off" Placeholder="Keresés..." />
                     <div style="width: 40%; max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 5px;">
                         <FluentListbox Style="width: 100%;" Items="animalBreeds" OptionText="@(at => at.BreedName)" Label="Állatfajok" />
                     </div>
@@ -63,7 +62,7 @@
         {
             result = new ListAnimalBreedByTypeClientQueryResponse();
         }
-        return result.BreedList;
+        return result.AnimalBreeds;
     }
 }
 

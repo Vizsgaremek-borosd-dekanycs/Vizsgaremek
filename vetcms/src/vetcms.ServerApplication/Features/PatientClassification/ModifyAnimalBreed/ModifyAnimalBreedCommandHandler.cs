@@ -14,14 +14,14 @@ using vetcms.SharedModels.Features.PatientClassification;
 
 namespace vetcms.ServerApplication.Features.PatientClassification.CreatePatientType
 {
-    internal class ModifyAnimalBreedCommandHandler(IMapper mapper, IAnimalBreedRepository animalBreedRepository, IAnimalTypeRepository animalTypeRepository) : IRequestHandler<ModifyAnimalBreedApiCommand, ModifyAnimalBreedApiCommandResponse>
+    internal class ModifyAnimalBreedCommandHandler(IMapper mapper, IAnimalBreedRepository animalBreedRepository, IAnimalTypeRepository animalTypeRepository) : IRequestHandler<ModifyAnimalBreedApiCommand, ModifyAnimalBreedApiCommandResult>
     {
-        public async Task<ModifyAnimalBreedApiCommandResponse> Handle(ModifyAnimalBreedApiCommand request, CancellationToken cancellationToken)
+        public async Task<ModifyAnimalBreedApiCommandResult> Handle(ModifyAnimalBreedApiCommand request, CancellationToken cancellationToken)
         {
             var animalTypeExists = await animalTypeRepository.ExistAsync(request.AnimalBreedModel.TypeId);
             if (!animalTypeExists)
             {
-                return new ModifyAnimalBreedApiCommandResponse(false, "Az állat típus nem létezik.");
+                return new ModifyAnimalBreedApiCommandResult(false, "Az állat típus nem létezik.");
             }
 
             // Check if an animal breed with the same BreedName already exists
@@ -29,7 +29,7 @@ namespace vetcms.ServerApplication.Features.PatientClassification.CreatePatientT
 
             if (!await animalBreedRepository.ExistAsync(request.Id))
             {
-                return new ModifyAnimalBreedApiCommandResponse
+                return new ModifyAnimalBreedApiCommandResult
                 {
                     Success = false,
                     Message = "Nem létezik ilyen bejegyzés az adatbázisban."
@@ -42,7 +42,7 @@ namespace vetcms.ServerApplication.Features.PatientClassification.CreatePatientT
             updatedAnimalType.Id = request.Id;
             updatedAnimalType = await animalBreedRepository.UpdateAsync(updatedAnimalType);
 
-            return new ModifyAnimalBreedApiCommandResponse(true) { AnimalBreedData = mapper.Map<AnimalBreedDto>(updatedAnimalType) };
+            return new ModifyAnimalBreedApiCommandResult(true) { AnimalBreedData = mapper.Map<AnimalBreedDto>(updatedAnimalType) };
         }
     }
 }
