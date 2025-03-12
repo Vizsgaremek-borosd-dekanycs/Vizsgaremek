@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using vetcms.ServerApplication.Common.Abstractions.Data;
 
-namespace vetcms.ServerApplication.Domain.Entity
+namespace vetcms.ServerApplication.Domain.Entity.PatientManagement
 {
     public class Patient : AuditedEntity
     {
