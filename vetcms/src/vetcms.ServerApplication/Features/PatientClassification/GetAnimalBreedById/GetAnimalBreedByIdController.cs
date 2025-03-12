@@ -20,7 +20,7 @@ namespace vetcms.ServerApplication.Features.PatientClassification.ListAnimalType
         {
             GetAnimalBreedByIdApiQuery command = new GetAnimalBreedByIdApiQuery
             {
-                Id = id
+                BreedId = id
             };
             command.Prepare(Request);
             return await Mediator.Send(command);

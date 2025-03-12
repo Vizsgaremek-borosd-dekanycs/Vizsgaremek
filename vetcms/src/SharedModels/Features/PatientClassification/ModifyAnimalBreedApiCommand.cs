@@ -12,7 +12,7 @@ using vetcms.SharedModels.Features.IAM;
 
 namespace vetcms.SharedModels.Features.PatientClassification
 {
-    public record ModifyAnimalBreedApiCommand : AuthenticatedApiCommandBase<ModifyAnimalBreedApiCommandResponse>
+    public record ModifyAnimalBreedApiCommand : AuthenticatedApiCommandBase<ModifyAnimalBreedApiCommandResult>
     {
         public int Id { get; set; }
         public AnimalBreedDto AnimalBreedModel { get; set; }
@@ -51,15 +51,15 @@ namespace vetcms.SharedModels.Features.PatientClassification
     }
 
 
-    public record ModifyAnimalBreedApiCommandResponse : AuthenticatedCommandResult
+    public record ModifyAnimalBreedApiCommandResult : AuthenticatedCommandResult
     {
         public AnimalBreedDto AnimalBreedData { get; set; }
-        public ModifyAnimalBreedApiCommandResponse()
+        public ModifyAnimalBreedApiCommandResult()
         {
 
         }
 
-        public ModifyAnimalBreedApiCommandResponse(bool success, string message = "")
+        public ModifyAnimalBreedApiCommandResult(bool success, string message = "")
         {
             Success = success;
             Message = message;

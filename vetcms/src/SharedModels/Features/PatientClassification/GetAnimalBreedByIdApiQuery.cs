@@ -14,10 +14,10 @@ namespace vetcms.SharedModels.Features.PatientClassification
 {
     public record GetAnimalBreedByIdApiQuery : AuthenticatedApiCommandBase<GetAnimalBreedByIdApiQueryResponse>
     {
-        public int Id { get; set; } = 0;
+        public int BreedId { get; set; } = 0;
         public override string GetApiEndpoint()
         {
-            return Path.Join(ApiBaseUrl, $"/api/v1/patient-classification/animal-breed/{Id}");
+            return Path.Join(ApiBaseUrl, $"/api/v1/patient-classification/animal-breed/{BreedId}");
         }
 
         public override HttpMethodEnum GetApiMethod()
@@ -35,7 +35,7 @@ namespace vetcms.SharedModels.Features.PatientClassification
     {
         public GetAnimalBreedByIdApiQueryValidator()
         {
-            RuleFor(x => x.Id)
+            RuleFor(x => x.BreedId)
                 .GreaterThan(0)
                 .WithMessage("Az azonosítónak nagyobbnak kell lennie 0-nál.");
         }

@@ -10,7 +10,7 @@ using vetcms.SharedModels.Common.IAM.Authorization;
 
 namespace vetcms.SharedModels.Features.PatientClassification
 {
-    public record DeleteAnimalBreedApiCommand : AuthenticatedApiCommandBase<DeleteAnimalBreedApiCommandResponse>
+    public record DeleteAnimalBreedApiCommand : AuthenticatedApiCommandBase<DeleteAnimalBreedApiCommandResult>
     {
         public List<int> Ids { get; set; }
 
@@ -57,13 +57,13 @@ namespace vetcms.SharedModels.Features.PatientClassification
         }
     }
 
-    public record DeleteAnimalBreedApiCommandResponse : AuthenticatedCommandResult
+    public record DeleteAnimalBreedApiCommandResult : AuthenticatedCommandResult
     {
-        public DeleteAnimalBreedApiCommandResponse()
+        public DeleteAnimalBreedApiCommandResult()
         {
         }
 
-        public DeleteAnimalBreedApiCommandResponse(bool _success, string _message = "")
+        public DeleteAnimalBreedApiCommandResult(bool _success, string _message = "")
         {
             Success = _success;
             Message = _message;

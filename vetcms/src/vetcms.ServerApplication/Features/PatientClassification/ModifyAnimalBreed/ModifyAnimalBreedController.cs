@@ -12,7 +12,7 @@ namespace vetcms.ServerApplication.Features.PatientClassification.CreatePatientT
     public partial class PatientClassificationController : ApiV1ControllerBase
     {
         [HttpPut("animal-breed/{id}")]
-        public async Task<ModifyAnimalBreedApiCommandResponse> UpdateAnimalBreed(int id, ModifyAnimalBreedApiCommand command)
+        public async Task<ModifyAnimalBreedApiCommandResult> UpdateAnimalBreed(int id, ModifyAnimalBreedApiCommand command)
         {
             command.Prepare(Request);
             command.Id = id;
