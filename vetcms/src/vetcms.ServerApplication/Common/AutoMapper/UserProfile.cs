@@ -13,7 +13,8 @@ namespace vetcms.ServerApplication.Common.AutoMapper
     {
         public UserProfile()
         {
-            CreateMap<User, UserDto>();
+            CreateMap<User, UserDto>().ForMember(src => src.Password, opt => opt.Ignore());
+            CreateMap<UserDto, User>();
         }
     }
 }

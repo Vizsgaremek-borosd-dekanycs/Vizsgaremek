@@ -36,12 +36,22 @@ namespace vetcms.ServerApplication.Features.IAM.ModifyOtherUser
             user = ModifyUser(request, user, executorUser);
             await userRepository.UpdateAsync(user);
 
-            int mailId = await mailService.SendModifyOtherUserEmailAsync(user, passwordChanged);
-
-            return new ModifyOtherUserApiCommandResponse(true)
+            if ((executorUser.Id == user.Id))
             {
-                Message = $"[BEMUTATÓ MÓD] Felhasználó módosítva. Az email elküldése sikeres volt. A bemutató céljából az alábbi linken nyitható meg: {mailService.GetEmailPreviewRoute(mailId)}"
-            };
+                return new ModifyOtherUserApiCommandResponse(true)
+                {
+                    Message = "Profil sikeresen módosítva!"
+                };
+            }
+            else
+            {
+                int mailId = await mailService.SendModifyOtherUserEmailAsync(user, passwordChanged);
+
+                return new ModifyOtherUserApiCommandResponse(true)
+                {
+                    Message = $"[BEMUTATÓ MÓD] Felhasználó módosítva. Az email elküldése sikeres volt. A bemutató céljából az alábbi linken nyitható meg: {mailService.GetEmailPreviewRoute(mailId)}"
+                };
+            }
         }
 
         private User ModifyUser(ModifyOtherUserApiCommand request, User targetUser, User executorUser)

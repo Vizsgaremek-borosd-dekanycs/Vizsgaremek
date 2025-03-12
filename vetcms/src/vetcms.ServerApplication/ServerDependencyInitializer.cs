@@ -18,6 +18,7 @@ using vetcms.ServerApplication.Features.IAM.SuperUser;
 using vetcms.ServerApplication.Domain.Entity;
 using vetcms.ServerApplication.Features.IAM.ResetPassword;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace vetcms.ServerApplication
 {
@@ -37,7 +38,7 @@ namespace vetcms.ServerApplication
                 o.LowercaseUrls = true;
             });
 
-            services.AddValidatorsFromAssemblyContaining<LoginUserCommandValidator>(); // minden validatort adjon hozzá a shared lib-ből
+            services.AddValidatorsFromAssemblyContaining<LoginUserCommandValidator>(); // minden validatort adjon hozzá a shared lib-bőla
             services.AddValidatorsFromAssemblyContaining<ApplicationDbContext>();  // minden validatort adjon hozzá a server appból
 
             return services;
@@ -131,6 +132,8 @@ namespace vetcms.ServerApplication
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRepositoryBase<SentEmail>, SentEmailRepository>();
             services.AddScoped<IFirstTimeAuthenticationCodeRepository, FirstTimeAuthenticationCodeRepository>();
+            services.AddScoped<IAnimalTypeRepository, AnimalTypeRepository>();
+            services.AddScoped<IAnimalBreedRepository, AnimalBreedRepository>();
         }
 
         private static void AddInMemoryDatabase(this IServiceCollection services, SecuredConfiguration configuration)

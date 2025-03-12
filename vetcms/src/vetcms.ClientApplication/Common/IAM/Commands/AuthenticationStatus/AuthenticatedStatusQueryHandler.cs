@@ -4,8 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using vetcms.ClientApplication.Features.IAM.LoginUser;
+using vetcms.SharedModels.Common.Dto;
 using vetcms.SharedModels.Features.IAM;
 
 namespace vetcms.ClientApplication.Common.IAM.Commands.AuthenticationStatus
@@ -14,7 +16,21 @@ namespace vetcms.ClientApplication.Common.IAM.Commands.AuthenticationStatus
     {
         public async Task<AuthenticatedStatusResponseModel> Handle(AuthenticatedStatusQuery request, CancellationToken cancellationToken)
         {
-            return new AuthenticatedStatusResponseModel(await authenticationManger.IsAuthenticated());
+            UserDto? currentUser = null;
+            try
+            {
+                currentUser = await authenticationManger.GetCurrentUser();
+                Console.WriteLine(JsonSerializer.Serialize(currentUser));
+            }
+            catch(Exception)
+            {
+                Console.WriteLine("Current user not found");
+            }
+
+            return new AuthenticatedStatusResponseModel(await authenticationManger.IsAuthenticated())
+            {
+                CurrentUser = currentUser
+            };
         }
     }
 }

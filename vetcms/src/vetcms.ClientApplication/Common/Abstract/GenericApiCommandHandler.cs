@@ -11,6 +11,7 @@ using vetcms.ClientApplication.Common.IAM;
 using vetcms.SharedModels.Common;
 using vetcms.SharedModels.Common.Abstract;
 using vetcms.SharedModels.Common.ApiLogicExceptionHandling;
+using vetcms.SharedModels.Features.IAM;
 
 namespace vetcms.ClientApplication.Common.Abstract
 {
@@ -132,10 +133,38 @@ namespace vetcms.ClientApplication.Common.Abstract
         private async Task<TResult> ProcessResult(HttpResponseMessage response)
         {
             string content = await response.Content.ReadAsStringAsync();
-            TResult? result = JsonSerializer.Deserialize<TResult>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true});
-            if(result == null)
+            TResult? result = JsonSerializer.Deserialize<TResult>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            if (result == null)
             {
                 throw new Exception("Üres vagy érvénytelen Http válasz.");
+            }
+            if (result is AuthenticatedCommandResult)
+            {
+                AuthenticatedCommandResult authenticatedResult = result as AuthenticatedCommandResult;
+                if (authenticatedResult.CurrentUser != null)
+                {
+                    Console.WriteLine("Current user included in rq");
+                    Console.WriteLine(JsonSerializer.Serialize(authenticatedResult.CurrentUser));
+                    await _credentialStore.SaveCurrentUser(authenticatedResult.CurrentUser);
+                }
+                else
+                {
+                    Console.WriteLine("Current user not included in rq");
+                }
+            }
+            if (result is LoginUserApiCommandResponse)
+            {
+                LoginUserApiCommandResponse loginUserCommandResponse = result as LoginUserApiCommandResponse;
+                if (loginUserCommandResponse.CurrentUser != null)
+                {
+                    Console.WriteLine("Current user included in rq");
+                    Console.WriteLine(JsonSerializer.Serialize(loginUserCommandResponse.CurrentUser));
+                    await _credentialStore.SaveCurrentUser(loginUserCommandResponse.CurrentUser);
+                }
+                else
+                {
+                    Console.WriteLine("Current user not included in rq");
+                }
             }
             return result;
         }

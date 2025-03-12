@@ -63,10 +63,12 @@ namespace vetcms.SharedModels.Common.Behaviour
         /// <returns>Az érvényesítési hibák szöveges üzenete.</returns>
         private string TrasformFailures(List<ValidationFailure> failures)
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine("A mezőket helyesen kell kitölteni: ");
-            failures.ForEach(f => stringBuilder.AppendLine(f.ToString()));
-            return stringBuilder.ToString();
+            string message = "A mezőket helyesen kell kitölteni: ";
+            foreach (ValidationFailure failure in failures)
+            {
+                message += failure.ErrorMessage + ", ";
+            }
+            return message;
         }
  
     }

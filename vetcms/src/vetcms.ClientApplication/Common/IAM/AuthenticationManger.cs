@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using vetcms.ClientApplication.Common.Abstract;
 using vetcms.ClientApplication.Presistence;
+using vetcms.SharedModels.Common.Dto;
 using vetcms.SharedModels.Common.IAM.Authorization;
 
 namespace vetcms.ClientApplication.Common.IAM
@@ -16,9 +18,27 @@ namespace vetcms.ClientApplication.Common.IAM
 
         const string accessTokenPresistenceKey = "access-token";
         const string permissionSetPresistenceKey = "permission-set";
+        const string currentUserPresistenceKey = "current-user";
         public AuthenticationManger(IClientPresistenceDriver presistenceDriver)
         {
             _presistenceDriver = presistenceDriver;
+        }
+
+        internal async Task SaveCurrentUser(UserDto currentUser)
+        {
+            await _presistenceDriver.SaveItem(currentUserPresistenceKey, currentUser);
+        }
+
+        internal async Task<UserDto> GetCurrentUser()
+        {
+            try
+            {
+                return await _presistenceDriver.GetItem<UserDto>(currentUserPresistenceKey);
+            }
+            catch (KeyNotFoundException)
+            {
+                throw new UnauthorizedAccessException("Current user not found");
+            }
         }
 
         /// <summary>

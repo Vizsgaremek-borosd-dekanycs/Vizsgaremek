@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+@using vetcms.BrowserPresentation.Components
 @using vetcms.ClientApplication.Common.IAM.Commands.AuthenticationStatus
 @inject IDialogService DialogService;
 @inject NavigationManager navigationManager;
@@ -8,6 +9,8 @@
 <FluentLayout>
     <FluentHeader>
         vetcms.BrowserPresentation
+        <FluentSpacer />
+        <MyProfileMenuComponent/>
     </FluentHeader>
     <FluentStack Class="main" Orientation="Orientation.Horizontal" Width="100%">
         <NavMenu />
