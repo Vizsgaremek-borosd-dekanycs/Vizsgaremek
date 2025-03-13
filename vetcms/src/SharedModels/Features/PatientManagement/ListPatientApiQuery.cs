@@ -19,7 +19,7 @@ namespace vetcms.SharedModels.Features.PatientManagement
         public string SearchTerm { get; set; } = string.Empty;
         public override string GetApiEndpoint()
         {
-            return $"/api/v1/animal-management/animals?skip={Skip}&take={Take}&query={SearchTerm}";
+            return Path.Join(ApiBaseUrl, $"/api/v1/animal-management/animals?skip={Skip}&take={Take}&query={SearchTerm}");
         }
 
         public override HttpMethodEnum GetApiMethod()
