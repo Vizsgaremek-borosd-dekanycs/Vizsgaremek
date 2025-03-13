@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FluentValidation;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,6 +27,16 @@ namespace vetcms.SharedModels.Features.PatientManagement
         public override PermissionFlags[] GetRequiredPermissions()
         {
             return [PermissionFlags.CAN_VIEW_PATIENT_TREATMENTS];
+        }
+    }
+
+    public class GetPaitentTreatmentApiQueryValidator : AbstractValidator<GetPaitentTreatmentApiQuery>
+    {
+        public GetPaitentTreatmentApiQueryValidator()
+        {
+            RuleFor(x => x.TreatmentId)
+                .GreaterThan(0)
+                .WithMessage("Az azonosítónak nagyobbnak kell lennie 0-nál.");
         }
     }
 
