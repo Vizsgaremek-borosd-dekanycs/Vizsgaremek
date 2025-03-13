@@ -15,7 +15,7 @@ namespace vetcms.SharedModels.Common.Dto
         public string MicrochipNumber { get; set; }
         public bool IsSterilised { get; set; }
         public string ChronicDiseases { get; set; }
-        public DateTime DateOfBirth { get; set; }
+        public DateTime DateOfBirth { get; set; } = DateTime.MinValue;
         public int OwnerId { get; set; }
         public int TypeId { get; set; }
         public int BreedId { get; set; }

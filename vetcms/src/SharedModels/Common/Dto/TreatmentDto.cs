@@ -11,7 +11,7 @@ namespace vetcms.SharedModels.Common.Dto
         public int Id { get; set; }
         public int PatientId { get; set; }
         public int DoctorId { get; set; }
-        public DateTime DateOfTreatment { get; set; }
+        public DateTime DateOfTreatment { get; set; } = DateTime.Now;
         public string Type { get; set; }
         public string? Symptoms { get; set; }
         public string? Diagnosis { get; set; }
