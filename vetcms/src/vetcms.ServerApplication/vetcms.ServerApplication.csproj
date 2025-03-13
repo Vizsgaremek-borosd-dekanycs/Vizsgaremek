@@ -57,8 +57,4 @@
     <ProjectReference Include="..\SharedModels\vetcms.SharedModels.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\PatientManagement\" />
-  </ItemGroup>
-
 </Project>
