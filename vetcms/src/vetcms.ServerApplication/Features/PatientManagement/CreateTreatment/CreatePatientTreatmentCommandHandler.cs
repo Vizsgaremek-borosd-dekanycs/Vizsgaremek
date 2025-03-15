@@ -11,7 +11,7 @@ using vetcms.SharedModels.Features.PatientManagement;
 
 namespace vetcms.ServerApplication.Features.PatientManagement.CreateTreatment
 {
-    internal class CreateAnimalTreatmentCommandHandler(IMapper mapper, ITreatmentRepository treatmentRepository) : IRequestHandler<CreatePatientTreatmentApiCommand, CreatePatientTreatmentApiCommandResponse>
+    internal class CreatePatientTreatmentCommandHandler(IMapper mapper, ITreatmentRepository treatmentRepository) : IRequestHandler<CreatePatientTreatmentApiCommand, CreatePatientTreatmentApiCommandResponse>
     {
         public async Task<CreatePatientTreatmentApiCommandResponse> Handle(CreatePatientTreatmentApiCommand request, CancellationToken cancellationToken)
         {
