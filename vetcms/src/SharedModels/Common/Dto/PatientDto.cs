@@ -12,7 +12,7 @@ namespace vetcms.SharedModels.Common.Dto
         public string Name { get; set; }
         public char Gender { get; set; }
         public double Weight { get; set; }
-        public string MicrochipNumber { get; set; }
+        public string MicrochipNumber { get; set; } = "Nincs mikrocsip";
         public bool IsSterilised { get; set; }
         public string ChronicDiseases { get; set; }
         public DateTime DateOfBirth { get; set; } = DateTime.MinValue;
