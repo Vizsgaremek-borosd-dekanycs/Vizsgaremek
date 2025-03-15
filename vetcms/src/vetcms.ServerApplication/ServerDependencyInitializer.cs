@@ -134,6 +134,8 @@ namespace vetcms.ServerApplication
             services.AddScoped<IFirstTimeAuthenticationCodeRepository, FirstTimeAuthenticationCodeRepository>();
             services.AddScoped<IAnimalTypeRepository, AnimalTypeRepository>();
             services.AddScoped<IAnimalBreedRepository, AnimalBreedRepository>();
+            services.AddScoped<ITreatmentRepository, TreatmentRepository>();
+            services.AddScoped<IPatientRepository, PatientRepository>();
         }
 
         private static void AddInMemoryDatabase(this IServiceCollection services, SecuredConfiguration configuration)

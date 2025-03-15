@@ -11,7 +11,7 @@ namespace vetcms.SharedModels.Features.PatientManagement
         public int UserId { get; set; } = 0;
         public override string GetApiEndpoint()
         {
-            return Path.Join(ApiBaseUrl, $"/api/v1/animal-management/animals/{UserId}");
+            return Path.Join(ApiBaseUrl, $"/api/v1/animal-management/animals/by-user-id/{UserId}");
         }
 
         public override HttpMethodEnum GetApiMethod()

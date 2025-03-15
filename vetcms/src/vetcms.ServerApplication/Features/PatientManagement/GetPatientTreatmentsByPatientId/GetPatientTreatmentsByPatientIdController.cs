@@ -13,7 +13,7 @@ namespace vetcms.ServerApplication.Features.PatientManagement.GetTreatmentsByPat
 {
     public partial class PatientTreatmentManagementController : ApiV1ControllerBase
     {
-        [HttpGet("treatments/{id}")]
+        [HttpGet("treatments/patient/{id}")]
         public async Task<GetPatientTreatmentsByPatientIdApiQueryResponse> Get(int id)
         {
             GetPatientTreatmentsByPatientIdApiQuery command = new GetPatientTreatmentsByPatientIdApiQuery
