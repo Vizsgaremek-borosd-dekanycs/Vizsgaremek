@@ -9,5 +9,6 @@ namespace vetcms.ServerApplication.Common.Abstractions.Data
 {
     public interface ITreatmentRepository : IRepositoryBase<Treatment>
     {
+        Task<List<Treatment>> GetTreatmentsByPatientIdAsync(int patientId);
     }
 }

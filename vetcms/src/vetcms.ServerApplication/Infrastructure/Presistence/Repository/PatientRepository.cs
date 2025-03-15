@@ -12,7 +12,12 @@ namespace vetcms.ServerApplication.Infrastructure.Presistence.Repository
     {
         public PatientRepository(ApplicationDbContext context) : base(context)
         {
-            
+        }
+
+        public Task<List<Patient>> GetPatientsByUserIdAsync(int userId)
+        {
+            List<Patient> patientsByUser = Where(p => p.Owner.Id == userId).ToList();
+            return Task.FromResult(patientsByUser);
         }
     }
 }
