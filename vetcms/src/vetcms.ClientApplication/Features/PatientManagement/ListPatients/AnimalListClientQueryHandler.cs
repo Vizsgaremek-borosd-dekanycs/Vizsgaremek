@@ -27,9 +27,9 @@ namespace vetcms.ClientApplication.Features.PatientManagement.ListPatients
         public int BreedId { get; set; }
     }
 
-    internal class AnimalTypeListClientQueryHandler(IMediator mediator, IMapper mapper) : IRequestHandler<AnimalListClientQuery, AnimalListClientQueryResponse>
+    internal class AnimalListClientQueryHandler(IMediator mediator, IMapper mapper) : IRequestHandler<AnimalListClientQuery, AnimalListClientQueryResponse>
     {
-        AnimalDto[] animals = new AnimalDto[]
+        public static AnimalDto[] animals = new AnimalDto[]
         {
             new AnimalDto { Id = 1, Name = "Bella", Gender = 'F', Weight = 12.5, MicrochipNumber = "MC123456", IsSterilised = true, ChronicDiseases = "None", DateOfBirth = new DateTime(2019, 5, 12), OwnerId = 1, TypeId = 1, BreedId = 1 },
             new AnimalDto { Id = 2, Name = "Max", Gender = 'M', Weight = 18.2, MicrochipNumber = "MC234567", IsSterilised = false, ChronicDiseases = "Diabetes", DateOfBirth = new DateTime(2018, 8, 21), OwnerId = 2, TypeId = 1, BreedId = 2 },

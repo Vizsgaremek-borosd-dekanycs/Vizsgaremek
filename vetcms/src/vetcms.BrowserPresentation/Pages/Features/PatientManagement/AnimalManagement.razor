@@ -6,6 +6,7 @@
 @using vetcms.ClientApplication.Features.PatientClassification.CreateNewAnimalBreed
 @using vetcms.ClientApplication.Features.PatientClassification.DeleteAnimalBreed
 @using vetcms.ClientApplication.Features.PatientClassification.GetAnimalBreed
+@using vetcms.ClientApplication.Features.PatientClassification.GetPatient
 @using vetcms.ClientApplication.Features.PatientClassification.ModifyAnimalBreed
 @using vetcms.ClientApplication.Features.PatientManagement.ListPatients
 @using vetcms.SharedModels.Common.Dto
@@ -146,7 +147,7 @@
         isBusy = false;
     }
 
-    private async Task<DialogResult?> ShowAnimalEditDialog(string title, AnimalBreedDto animalBreed)
+    private async Task<DialogResult?> ShowAnimalEditDialog(string title, AnimalDto animal)
     {
         DialogParameters parameters = new()
             {
@@ -159,7 +160,7 @@
                 Modal = true,
                 PreventScroll = true
             };
-        IDialogReference dialog = await DialogService.ShowDialogAsync<EditAnimalBreedDialog>(animalBreed, parameters);
+        IDialogReference dialog = await DialogService.ShowDialogAsync<EditPatientDialog>(animal, parameters);
         DialogResult? result = await dialog.Result;
         return result;
     }
@@ -169,17 +170,17 @@
         isBusy = true;
         Console.WriteLine($"Open dialog create animal");
 
-        AnimalBreedDto simpleAnimalBreed = new AnimalBreedDto();
+        AnimalDto simpleAnimalBreed = new AnimalDto();
 
         var result = await ShowAnimalEditDialog("Új Állat létrehozása", simpleAnimalBreed);
 
         if (result.Data is not null)
         {
-            AnimalBreedDto? animalBreedData = result.Data as AnimalBreedDto;
-            Console.WriteLine($"create animal Dialog closed by {animalBreedData?.BreedName} - Canceled: {result.Cancelled}");
+            AnimalDto? animalData = result.Data as AnimalDto;
+            Console.WriteLine($"create animal Dialog closed by {animalData?.Name} - Canceled: {result.Cancelled}");
             if (!result.Cancelled)
             {
-                await ToastService.ShowIndeterminateProgressToast(SubmitNewAnimalBreedData(animalBreedData), "Kérjük várjon...", "Állat adatainak mentése");
+                await ToastService.ShowIndeterminateProgressToast(SubmitNewAnimalData(animalData), "Kérjük várjon...", "Állat adatainak mentése");
             }
         }
         else
@@ -194,7 +195,7 @@
         isBusy = true;
         int id = animalBreed.Id;
         Console.WriteLine($"Open dialog edit animal breed");
-        var simpleAnimalBreed = await ToastService.ShowIndeterminateProgressToast(LoadEditAnimalBreedData(id), "Kérjük várjon...", "Állat adatainak betöltése");
+        var simpleAnimalBreed = await ToastService.ShowIndeterminateProgressToast(LoadAnimalData(id), "Kérjük várjon...", "Állat adatainak betöltése");
 
         var result = await ShowAnimalEditDialog("Állat szerkesztése", simpleAnimalBreed);
 
@@ -215,19 +216,19 @@
         isBusy = false;
     }
 
-    private async Task<AnimalBreedDto> LoadEditAnimalBreedData(int id)
+    private async Task<AnimalDto> LoadAnimalData(int id)
     {
-        var query = new GetAnimalBreedClientQuery()
+        var query = new GetPatientClientQuery()
             {
-                BreedId = id
+                PatientId = id
             };
 
         var data = await Mediator.Send(query);
 
-        return data.AnimalBreedModel;
+        return data.PatientModel;
     }
 
-    private async Task SubmitNewAnimalBreedData(AnimalBreedDto newAnimalBreed)
+    private async Task SubmitNewAnimalData(AnimalDto newAnimalDto)
     {
         await Task.Delay(10);
         // CreateNewAnimalBreedClientCommand command = new CreateNewAnimalBreedClientCommand()

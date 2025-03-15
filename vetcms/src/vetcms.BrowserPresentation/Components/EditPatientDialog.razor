@@ -1,0 +1,152 @@
+﻿@using System.Globalization
+@using vetcms.BrowserPresentation.Utility
+@using vetcms.ClientApplication.Common.CommandAbstraction;
+@using vetcms.ClientApplication.Features.PatientClassification.ListAnimalBreedByType
+@using vetcms.ClientApplication.Features.PatientClassification.ListAnimalType
+@using vetcms.ClientApplication.Features.PatientManagement.ListPatients
+@using vetcms.SharedModels.Common.Dto
+@using vetcms.SharedModels.Common.IAM.Authorization;
+@inject MediatR.IMediator Mediator
+@inject IToastService ToastService
+@implements IDialogContentComponent<AnimalDto>
+
+<FluentGrid>
+    <FluentGridItem xs="12" md="12">
+        <FluentGrid>
+            <FluentGridItem xs="12" sm="12">
+                <FluentTextField Style="width: 100%" @bind-Value="Content.Name" Label="Név" TextFieldType="TextFieldType.Text" />
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="12">
+                <FluentNumberField Style="width: 100%" @bind-Value="Content.Weight" Label="Súly" />
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="12">
+                <FluentTextField Style="width: 100%" @bind-Value="Content.MicrochipNumber" Label="Mikrochip szám" TextFieldType="TextFieldType.Text" />
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="12">
+                <FluentCheckbox @bind-Checked="Content.IsSterilised" Label="Sterilizált" />
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="12">
+                <FluentTextArea Style="width: 100%" @bind-Value="Content.ChronicDiseases" Label="Krónikus betegségek" />
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="12">
+                <FluentDatePicker Style="width: 100%" Value="Content.DateOfBirth" ValueChanged="(birthDate) => Content.DateOfBirth = birthDate.Value" Label="Születési dátum" />
+            </FluentGridItem>
+
+            <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_VIEW_ANIMAL_TYPES]">
+                <FluentGridItem xs="12" md="12">
+                    <FluentSelect TOption="AnimalTypeDto"
+                    Label="Állat fajta"
+                    Items="@animalTypes"
+                    Placeholder="@SelectedType?.TypeName"
+                    OptionValue="@(p => p?.Id.ToString())"
+                    OptionText="@(p => p?.TypeName)"
+                    SelectedOption="@SelectedType"
+                    SelectedOptionChanged="AnimalTypeSelectionChanged" />
+                </FluentGridItem>
+            </PermissionWrapper>
+            <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_VIEW_ANIMAL_BREED]">
+                <FluentGridItem xs="12" md="12">
+                    <FluentSelect TOption="AnimalBreedDto"
+                                  Label="Állat faj"
+                                  Items="@animalBreeds"
+                                  Placeholder="@SelectedBreed?.BreedName"
+                                  OptionValue="@(p => p?.Id.ToString())"
+                                  OptionText="@(p => p?.BreedName)"
+                                  SelectedOption="@SelectedBreed"
+                                  SelectedOptionChanged="AnimalBreedSelectionChanged" 
+                                  Value="SelectedBreedId" />
+                </FluentGridItem>
+            </PermissionWrapper>
+        </FluentGrid>
+    </FluentGridItem>
+</FluentGrid>
+
+@code {
+
+    [Parameter]
+    public AnimalDto Content { get; set; } = new();
+
+    [CascadingParameter]
+    public FluentDialog? Dialog { get; set; }
+
+    private AnimalTypeDto SelectedType { get; set; } = new();
+    private AnimalBreedDto SelectedBreed { get; set; } = new();
+    private string SelectedTypeId { get; set; } = "";
+    private string SelectedBreedId { get; set; } = "";
+
+    private List<AnimalTypeDto> animalTypes = new();
+    private List<AnimalBreedDto> animalBreeds = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        animalTypes = await GetAnimalTypes();
+        animalBreeds = await GetAnimalTypeRelatedBreeds(SelectedType.Id);
+    }
+
+    async Task AnimalTypeSelectionChanged(AnimalTypeDto? animalTypeDto)
+    {
+        if(animalTypeDto != null)
+        {
+            SelectedType = animalTypeDto;
+            Content.TypeId = animalTypeDto.Id;
+
+            animalBreeds = await GetAnimalTypeRelatedBreeds(SelectedType.Id);
+        }
+    }
+
+    void AnimalBreedSelectionChanged(AnimalBreedDto? animalBreedDto)
+    {
+        if (animalBreedDto != null)
+        {
+            SelectedBreed = animalBreedDto;
+            Content.BreedId = animalBreedDto.Id;
+            SelectedBreedId = animalBreedDto.Id.ToString();
+            StateHasChanged();
+        }
+    }
+
+    private async Task<List<AnimalTypeDto>> GetAnimalTypes()
+    {
+        var query = new AnimalTypeListClientQuery(){
+            SearchTerm = "",
+            Take = 100,
+        };
+
+        var result = await ToastService.ShowIndeterminateProgressToast(Mediator.Send(query), "Kérjük várjon...", "Fajták betöltése folyamatban...");
+
+        if (result == null)
+        {
+            ToastService.ShowError("Sikertelen adatlekérés.");
+            return new List<AnimalTypeDto>();
+        }
+
+        SelectedType = result.AnimalTypes.FirstOrDefault(x => x.Id == Content?.TypeId) ?? new AnimalTypeDto();
+        return result.AnimalTypes;
+    }
+
+    private async Task<List<AnimalBreedDto>> GetAnimalTypeRelatedBreeds(int typeId)
+    {
+        var query = new ListAnimalBreedByTypeClientQuery()
+            {
+                TypeId = typeId,
+                Take = 100,
+            };
+
+        var result = await ToastService.ShowIndeterminateProgressToast(Mediator.Send(query), "Kérjük várjon...", "Fajták betöltése folyamatban...");
+
+        if (result == null)
+        {
+            ToastService.ShowError("Sikertelen adatlekérés.");
+            return new List<AnimalBreedDto>();
+        }
+
+        SelectedBreed = result.AnimalBreeds.FirstOrDefault(x => x.Id == Content?.BreedId);
+        SelectedBreedId = Content?.BreedId.ToString() ?? string.Empty;
+        return result.AnimalBreeds;
+    }
+
+
+
+
+}
