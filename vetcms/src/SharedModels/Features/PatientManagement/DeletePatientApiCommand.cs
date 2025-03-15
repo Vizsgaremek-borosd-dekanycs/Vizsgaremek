@@ -10,7 +10,7 @@ using vetcms.SharedModels.Common;
 
 namespace vetcms.SharedModels.Features.PatientManagement
 {
-    public record DeletePatientApiCommand : AuthenticatedApiCommandBase<DeletePatientApiCommandResult>
+    public record DeletePatientApiCommand : AuthenticatedApiCommandBase<DeletePatientApiCommandResponse>
     {
         public List<int> Ids { get; set; }
 
@@ -57,13 +57,13 @@ namespace vetcms.SharedModels.Features.PatientManagement
         }
     }
 
-    public record DeletePatientApiCommandResult : AuthenticatedCommandResult
+    public record DeletePatientApiCommandResponse : AuthenticatedCommandResult
     {
-        public DeletePatientApiCommandResult()
+        public DeletePatientApiCommandResponse()
         {
         }
 
-        public DeletePatientApiCommandResult(bool _success, string _message = "")
+        public DeletePatientApiCommandResponse(bool _success, string _message = "")
         {
             Success = _success;
             Message = _message;
