@@ -45,7 +45,7 @@ namespace vetcms.SharedModels.Features.PatientManagement
 
         public override PermissionFlags[] GetRequiredPermissions()
         {
-            return [PermissionFlags.CAN_DELETE_PATIENT];
+            return [PermissionFlags.CAN_DELETE_PATIENT_TREATMENT];
         }
     }
 

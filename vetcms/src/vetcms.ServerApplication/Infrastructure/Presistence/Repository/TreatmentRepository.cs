@@ -8,11 +8,10 @@ using vetcms.ServerApplication.Domain.Entity.PatientManagement;
 
 namespace vetcms.ServerApplication.Infrastructure.Presistence.Repository
 {
-    internal class PatientRepository : RepositoryBase<Patient>, IPatientRepository
+    internal class TreatmentRepository : RepositoryBase<Treatment>, ITreatmentRepository
     {
-        public PatientRepository(ApplicationDbContext context) : base(context)
+        public TreatmentRepository(ApplicationDbContext context) : base(context)
         {
-            
         }
     }
 }
