@@ -10,13 +10,17 @@ using vetcms.ServerApplication.Common.Abstractions.Api;
 using vetcms.SharedModels.Features.PatientClassification;
 using vetcms.SharedModels.Features.PatientManagement;
 
-namespace vetcms.ServerApplication.Features.PatientManagement.CreatePatient
+namespace vetcms.ServerApplication.Features.PatientManagement.GetPatient
 {
     public partial class PatientManagementController : ApiV1ControllerBase
     {
-        [HttpPost("animals")]
-        public async Task<CreatePatientApiCommandResponse> CreatePatient(CreatePatientApiCommand command)
+        [HttpGet("animals/{id}")]
+        public async Task<GetPatientApiQueryResponse> GetPatientById(int id)
         {
+            GetPatientApiQuery command = new GetPatientApiQuery
+            {
+                PatientId = id
+            };
             command.Prepare(Request);
             return await Mediator.Send(command);
         }

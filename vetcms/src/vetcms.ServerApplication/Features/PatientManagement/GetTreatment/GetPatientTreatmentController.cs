@@ -9,13 +9,17 @@ using System.Threading.Tasks;
 using vetcms.ServerApplication.Common.Abstractions.Api;
 using vetcms.SharedModels.Features.PatientManagement;
 
-namespace vetcms.ServerApplication.Features.PatientManagement.DeleteTreatment
+namespace vetcms.ServerApplication.Features.PatientManagement.GetTreatment
 {
     public partial class PatientTreatmentManagementController : ApiV1ControllerBase
     {
-        [HttpPost("treatments/batch-delete")]
-        public async Task<DeletePatientTreatmentApiCommandResponse> DeletePatientTreatment(DeletePatientTreatmentApiCommand command)
+        [HttpGet("treatments/{id}")]
+        public async Task<GetPaitentTreatmentApiQueryResponse> GetPatientTreatmentById(int id)
         {
+            GetPaitentTreatmentApiQuery command = new GetPaitentTreatmentApiQuery
+            {
+                TreatmentId = id
+            };
             command.Prepare(Request);
             return await Mediator.Send(command);
         }

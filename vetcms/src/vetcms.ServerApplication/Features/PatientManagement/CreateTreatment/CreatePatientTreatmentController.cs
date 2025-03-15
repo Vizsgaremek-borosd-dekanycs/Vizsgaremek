@@ -11,10 +11,10 @@ using vetcms.SharedModels.Features.PatientManagement;
 
 namespace vetcms.ServerApplication.Features.PatientManagement.CreateTreatment
 {
-    public partial class AnimalTreatmentManagementController : ApiV1ControllerBase
+    public partial class PatientTreatmentManagementController : ApiV1ControllerBase
     {
         [HttpPost("treatments")]
-        public async Task<CreatePatientTreatmentApiCommandResponse> CreatePatientType(CreatePatientTreatmentApiCommand command)
+        public async Task<CreatePatientTreatmentApiCommandResponse> CreatePatientTreatment(CreatePatientTreatmentApiCommand command)
         {
             command.Prepare(Request);
             return await Mediator.Send(command);
