@@ -13,7 +13,7 @@ namespace vetcms.ServerApplication.Features.PatientManagement.ModifyTreatment
 {
     public partial class PatientTreatmentManagementController : ApiV1ControllerBase
     {
-        [HttpPost("treatments/{id}")]
+        [HttpPut("treatments/{id}")]
         public async Task<ModifyPatientTreatmentApiCommandResponse> UpdateTreatment(int id, ModifyPatientTreatmentApiCommand command)
         {
             command.Prepare(Request);
