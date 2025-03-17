@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using vetcms.ClientApplication.Common.Abstract;
 
-namespace vetcms.ClientApplication.Features.PatientClassification.GetPatient
+namespace vetcms.ClientApplication.Features.PatientManagement.GetPatient
 {
     public class GetPatientClientQuery : IClientCommand<GetPatientClientQueryResponse>
     {

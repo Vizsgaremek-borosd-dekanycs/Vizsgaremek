@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using vetcms.SharedModels.Common.Dto;
 
-namespace vetcms.ClientApplication.Features.PatientClassification.AnimalBreedList
+namespace vetcms.ClientApplication.Features.PatientClassification.ListAnimalBreed
 {
     public class AnimalBreedListClientQueryResponse
     {

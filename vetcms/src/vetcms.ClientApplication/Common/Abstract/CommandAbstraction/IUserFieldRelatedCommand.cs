@@ -1,4 +1,4 @@
-namespace vetcms.ClientApplication.Common.CommandAbstraction
+namespace vetcms.ClientApplication.Common.Abstract.CommandAbstraction
 {
     public interface IUserFieldRelatedCommand
     {

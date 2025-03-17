@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using vetcms.ClientApplication.Features.PatientManagement.ListPatients;
 using vetcms.SharedModels.Common.Dto;
 
-namespace vetcms.ClientApplication.Features.PatientClassification.GetPatient
+namespace vetcms.ClientApplication.Features.PatientManagement.GetPatient
 {
     public class GetPatientClientQueryResponse
     {

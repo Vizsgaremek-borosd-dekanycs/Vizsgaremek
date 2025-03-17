@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using vetcms.ClientApplication.Common.Abstract;
 using vetcms.SharedModels.Common.Dto;
 
-namespace vetcms.ClientApplication.Features.PatientClassification.CreateNewAnimalBreed
+namespace vetcms.ClientApplication.Features.PatientClassification.CreateAnimalBreed
 {
     public class CreateNewAnimalBreedClientCommand : IClientCommand<bool>
     {

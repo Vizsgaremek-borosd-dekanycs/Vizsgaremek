@@ -8,6 +8,8 @@
 @using vetcms.ClientApplication.Features.PatientClassification.GetAnimalBreed
 @using vetcms.ClientApplication.Features.PatientClassification.GetPatient
 @using vetcms.ClientApplication.Features.PatientClassification.ModifyAnimalBreed
+@using vetcms.ClientApplication.Features.PatientManagement.CreatePatient
+@using vetcms.ClientApplication.Features.PatientManagement.GetPatient
 @using vetcms.ClientApplication.Features.PatientManagement.ListPatients
 @using vetcms.SharedModels.Common.Dto
 @inject IDialogService DialogService
@@ -231,12 +233,11 @@
     private async Task SubmitNewAnimalData(AnimalDto newAnimalDto)
     {
         await Task.Delay(10);
-        // CreateNewAnimalBreedClientCommand command = new CreateNewAnimalBreedClientCommand()
-        //     {
-        //         NewBreedModel = newAnimalBreed
-        //     };
-
-        // await Mediator.Send(command);
+        CreatePatientCommand createNewAnimalCommand = new CreatePatientCommand()
+            {
+                NewAnimalModel = newAnimalDto
+            };
+        await Mediator.Send(createNewAnimalCommand);
         await dataGrid.RefreshDataAsync();
     }
 
