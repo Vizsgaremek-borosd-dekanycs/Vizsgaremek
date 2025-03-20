@@ -3,10 +3,9 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.FluentUI.AspNetCore.Components;
 using vetcms.ClientApplication.Common.Abstract;
-using vetcms.ClientApplication.Features.IAM.GetUser;
 using vetcms.SharedModels.Features.IAM;
 
-namespace vetcms.ClientApplication.Features.IAM.FirstTimeSignin
+namespace vetcms.ClientApplication.Features.IAM.GetUser
 {
     internal class GetUserClientQueryHandler(IMediator mediator, IDialogService dialogService, IMapper mapper) : IRequestHandler<GetUserClientQuery, GetUserClientQueryResponse>
     {
@@ -18,7 +17,7 @@ namespace vetcms.ClientApplication.Features.IAM.FirstTimeSignin
             };
 
             GetUserApiQueryResponse response = await mediator.Send(query);
-            if(response.Success)
+            if (response.Success)
             {
                 return mapper.Map<GetUserClientQueryResponse>(response);
             }
