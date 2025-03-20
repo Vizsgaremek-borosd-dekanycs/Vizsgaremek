@@ -15,7 +15,7 @@ using vetcms.SharedModels.Common.Dto;
 using vetcms.SharedModels.Features.IAM;
 using vetcms.SharedModels.Features.PatientClassification;
 
-namespace vetcms.ServerApplication.Features.PatientClassification.ListAnimalBreed
+namespace vetcms.ServerApplication.Features.PatientClassification.ListAnimalBreedByType
 {
     internal class ListAnimalBreedByTypeHandler(IMapper mapper, IAnimalBreedRepository animalBreedRepository, ApplicationDbContext dbContext) : IRequestHandler<ListAnimalBreedByTypeApiQuery, ListAnimalBreedByTypeApiQueryResponse>
     {

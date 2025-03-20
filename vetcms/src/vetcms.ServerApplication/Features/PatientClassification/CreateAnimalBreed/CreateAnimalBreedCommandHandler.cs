@@ -11,7 +11,7 @@ using vetcms.SharedModels.Common.Dto;
 using vetcms.SharedModels.Features.IAM;
 using vetcms.SharedModels.Features.PatientClassification;
 
-namespace vetcms.ServerApplication.Features.PatientClassification.CreateAnimalType
+namespace vetcms.ServerApplication.Features.PatientClassification.CreateAnimalBreed
 {
     internal class CreateAnimalBreedCommandHandler(IMapper mapper, IAnimalBreedRepository animalBreedRepository, IAnimalTypeRepository animalTypeRepository) : IRequestHandler<CreateAnimalBreedApiCommand, CreateAnimalBreedApiCommandResponse>
     {

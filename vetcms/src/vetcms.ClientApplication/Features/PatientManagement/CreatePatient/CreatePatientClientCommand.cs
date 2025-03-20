@@ -7,7 +7,7 @@ using vetcms.ClientApplication.Common.Abstract;
 using vetcms.ClientApplication.Features.PatientManagement.ListPatients;
 using vetcms.SharedModels.Common.Dto;
 
-namespace vetcms.ClientApplication.Features.PatientClassification.CreateNewAnimalBreed
+namespace vetcms.ClientApplication.Features.PatientManagement.CreatePatient
 {
     public class CreatePatientCommand : IClientCommand<bool>
     {

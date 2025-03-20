@@ -9,9 +9,10 @@ using System.Text;
 using System.Threading.Tasks;
 using vetcms.ClientApplication.Common.Abstract;
 using vetcms.ClientApplication.Features.IAM.ModifyUser;
+using vetcms.ClientApplication.Features.PatientClassification.ModifyAnimalBreed;
 using vetcms.SharedModels.Features.PatientClassification;
 
-namespace vetcms.ClientApplication.Features.PatientClassification.ModifyAnimalBreed
+namespace vetcms.ClientApplication.Features.PatientManagement.ModifyPatient
 {
     internal class ModifyAnimalClientCommandHandler(IMediator mediator, IMapper mapper, IDialogService dialogService) : IRequestHandler<ModifyAnimalBreedClientCommand, bool>
     {

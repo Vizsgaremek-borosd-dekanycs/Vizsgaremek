@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using vetcms.ClientApplication.Common.Abstract;
 using vetcms.SharedModels.Features.PatientClassification;
 
-namespace vetcms.ClientApplication.Features.PatientClassification.DeleteAnimalBreed
+namespace vetcms.ClientApplication.Features.PatientManagement.DeletePatient
 {
     internal class DeletePatientClientCommandHandler(IMediator mediator, IMapper mapper, IDialogService dialogService) : IRequestHandler<DeletePatientClientCommand, bool>
     {
