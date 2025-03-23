@@ -35,26 +35,24 @@
             <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_VIEW_ANIMAL_TYPES]">
                 <FluentGridItem xs="12" md="12">
                     <FluentSelect TOption="AnimalTypeDto"
+                    Multiple="false"
                     Label="Állat fajta"
                     Items="@animalTypes"
-                    Placeholder="@SelectedType?.TypeName"
-                    OptionValue="@(p => p?.Id.ToString())"
-                    OptionText="@(p => p?.TypeName)"
-                    SelectedOption="@SelectedType"
-                    SelectedOptionChanged="AnimalTypeSelectionChanged" />
+                    OptionValue="@(p => p.Id.ToString())"
+                    OptionText="@(p => p.TypeName)"
+                    @bind-SelectedOption="SelectedType"
+                                  @bind-SelectedOption:after="AnimalTypeSelectionChanged" />
                 </FluentGridItem>
             </PermissionWrapper>
             <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_VIEW_ANIMAL_BREED]">
                 <FluentGridItem xs="12" md="12">
                     <FluentSelect TOption="AnimalBreedDto"
-                                  Label="Állat faj"
-                                  Items="@animalBreeds"
-                                  Placeholder="@SelectedBreed?.BreedName"
-                                  OptionValue="@(p => p?.Id.ToString())"
-                                  OptionText="@(p => p?.BreedName)"
-                                  SelectedOption="@SelectedBreed"
-                                  SelectedOptionChanged="AnimalBreedSelectionChanged" 
-                                  Value="SelectedBreedId" />
+                    Label="Állat faj"
+                    Items="@animalBreeds"
+                    OptionValue="@(p => p.Id.ToString())"
+                    OptionText="@(p => p.BreedName)"
+                    @bind-SelectedOption="SelectedBreed"
+                    @bind-SelectedOption:after="AnimalBreedSelectionChanged" />
                 </FluentGridItem>
             </PermissionWrapper>
         </FluentGrid>
@@ -62,7 +60,6 @@
 </FluentGrid>
 
 @code {
-
     [Parameter]
     public AnimalDto Content { get; set; } = new();
 
@@ -81,22 +78,26 @@
     protected override async Task OnInitializedAsync()
     {
         animalTypes = await GetAnimalTypes();
-        animalBreeds = await GetAnimalTypeRelatedBreeds(SelectedType.Id);
     }
 
-    async Task AnimalTypeSelectionChanged(AnimalTypeDto? animalTypeDto)
+    private async Task AnimalTypeSelectionChanged()
     {
+
+        AnimalTypeDto animalTypeDto = SelectedType;
         if(animalTypeDto != null)
         {
             SelectedType = animalTypeDto;
             Content.TypeId = animalTypeDto.Id;
 
             animalBreeds = await GetAnimalTypeRelatedBreeds(SelectedType.Id);
+            SelectedBreed = animalBreeds.FirstOrDefault();
+            AnimalBreedSelectionChanged();
         }
     }
 
-    void AnimalBreedSelectionChanged(AnimalBreedDto? animalBreedDto)
+    void AnimalBreedSelectionChanged()
     {
+        AnimalBreedDto? animalBreedDto = SelectedBreed;
         if (animalBreedDto != null)
         {
             SelectedBreed = animalBreedDto;
@@ -121,7 +122,17 @@
             return new List<AnimalTypeDto>();
         }
 
-        SelectedType = result.AnimalTypes.FirstOrDefault(x => x.Id == Content?.TypeId) ?? new AnimalTypeDto();
+        if (Content.TypeId < 1)
+        {
+            AnimalTypeDto animalTypeDto = result.AnimalTypes.FirstOrDefault(x => true, new());
+            SelectedType = animalTypeDto;
+            await AnimalTypeSelectionChanged();
+        }
+
+        SelectedType = result.AnimalTypes.FirstOrDefault(x => x.Id == Content.TypeId, new("N/A"));
+        animalBreeds = await GetAnimalTypeRelatedBreeds(SelectedType.Id);
+
+
         return result.AnimalTypes;
     }
 
@@ -141,8 +152,8 @@
             return new List<AnimalBreedDto>();
         }
 
-        SelectedBreed = result.AnimalBreeds.FirstOrDefault(x => x.Id == Content?.BreedId);
-        SelectedBreedId = Content?.BreedId.ToString() ?? string.Empty;
+        SelectedBreed = result.AnimalBreeds.FirstOrDefault(x => x.Id == Content.BreedId, new("N/A"));
+        SelectedBreedId = Content.BreedId.ToString();
         return result.AnimalBreeds;
     }
 

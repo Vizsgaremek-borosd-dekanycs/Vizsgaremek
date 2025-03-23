@@ -20,7 +20,7 @@
                     <FluentButton Disabled="isBusy" @onclick="@OpenCreateAnimalBreedDialog" style="padding-bottom: 5px;" IconStart="@(new Icons.Regular.Size16.PersonAdd())" Appearance="Appearance.Accent">Új állatfaj</FluentButton>
                 </PermissionWrapper>
                 <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_DELETE_ANIMAL_BREED]">
-                    <FluentButton Disabled="isBusy"  style="padding-bottom: 5px;" IconStart="@(new Icons.Regular.Size16.PersonDelete())" Appearance="Appearance.Accent">Törlés</FluentButton>
+                    <FluentButton Disabled="isBusy" @onclick="@DeleteAnimalBreeds" style="padding-bottom: 5px;" IconStart="@(new Icons.Regular.Size16.PersonDelete())" Appearance="Appearance.Accent">Törlés</FluentButton>
                 </PermissionWrapper>
                 <div slot="end">
                     <FluentSearch Disabled="isBusy" @bind-Value="searchValue" Immediate="true" ImmediateDelay="300" @bind-Value:after="SearchValueChanged" AutoComplete="off" />
@@ -126,7 +126,7 @@
 
         DeleteAnimalBreedClientCommand command = new DeleteAnimalBreedClientCommand()
             {
-                BreedIds = selectedAnimalBreeds.Select(u => u.Id).ToList()
+                Ids = selectedAnimalBreeds.Select(u => u.Id).ToList()
             };
 
         if (!canceled)

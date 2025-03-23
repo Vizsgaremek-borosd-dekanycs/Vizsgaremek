@@ -12,6 +12,16 @@ namespace vetcms.SharedModels.Common.Dto
         public int TypeId { get; set; }
         public string BreedName { get; set; }
         public string Charachteristics { get; set; }
+
+        public AnimalBreedDto()
+        {
+            
+        }
+
+        public AnimalBreedDto(string name)
+        {
+            BreedName = name;
+        }
     }
 }
 

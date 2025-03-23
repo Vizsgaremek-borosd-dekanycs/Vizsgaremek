@@ -52,8 +52,8 @@
 
                 <TemplateColumn Title="Művelet" Align="@Align.End">
                     <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_MODIFY_ANIMAL_TYPES]">
-                        <FluentButton Disabled="isBusy" aria-label="Szerkesztés" OnClick="@(async ()=> await OpenEditAnimalBreedDialog(context))" IconStart="@(new Icons.Regular.Size16.Edit())" />
-                        <FluentButton Disabled="isBusy" aria-label="Kezelések megtekintése" OnClick="@(async ()=> await OpenEditAnimalBreedDialog(context))" IconStart="@(new Icons.Regular.Size16.Edit())" />
+                        <FluentButton Disabled="isBusy" aria-label="Szerkesztés" OnClick="@(async ()=> await OpenEditAnimalDialog(context))" IconStart="@(new Icons.Regular.Size16.Edit())" />
+                        <FluentButton Disabled="isBusy" aria-label="Kezelések megtekintése" OnClick="@(async ()=> await OpenEditAnimalDialog(context))" IconStart="@(new Icons.Regular.Size16.Edit())" />
                     </PermissionWrapper>
 
                 </TemplateColumn>
@@ -136,7 +136,7 @@
 
         DeleteAnimalBreedClientCommand command = new DeleteAnimalBreedClientCommand()
             {
-                BreedIds = selectedAnimals.Select(u => u.Id).ToList()
+                Ids = selectedAnimals.Select(u => u.Id).ToList()
             };
 
         if (!canceled)
@@ -191,7 +191,7 @@
         isBusy = false;
     }
 
-    private async Task OpenEditAnimalBreedDialog(AnimalDto animalBreed)
+    private async Task OpenEditAnimalDialog(AnimalDto animalBreed)
     {
         isBusy = true;
         int id = animalBreed.Id;

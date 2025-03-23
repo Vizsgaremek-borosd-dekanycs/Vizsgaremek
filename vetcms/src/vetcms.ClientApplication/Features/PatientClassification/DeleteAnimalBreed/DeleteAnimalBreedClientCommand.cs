@@ -9,6 +9,6 @@ namespace vetcms.ClientApplication.Features.PatientClassification.DeleteAnimalBr
 {
     public class DeleteAnimalBreedClientCommand : IClientCommand<bool>
     {
-        public List<int> BreedIds { get; set; }
+        public List<int> Ids { get; set; }
     }
 }
