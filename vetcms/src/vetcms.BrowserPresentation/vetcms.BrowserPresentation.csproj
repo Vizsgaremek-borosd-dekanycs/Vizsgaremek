@@ -19,4 +19,10 @@
     <ProjectReference Include="..\vetcms.ClientApplication\vetcms.ClientApplication.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Pages\Features\PatientManagement\PatientTreatmentManagement.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
+
 </Project>
