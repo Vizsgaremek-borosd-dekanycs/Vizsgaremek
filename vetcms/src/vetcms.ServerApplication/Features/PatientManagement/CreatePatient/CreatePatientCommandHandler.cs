@@ -27,7 +27,7 @@ namespace vetcms.ServerApplication.Features.PatientManagement.CreatePatient
             }
 
             Patient newPatient = mapper.Map<Patient>(request.NewPatient);
-            await patientRepository.AddAsync(newPatient);
+            _ = await patientRepository.AddAsync(newPatient);
             return await Task.FromResult(new CreatePatientApiCommandResponse(true));
         }
     }
