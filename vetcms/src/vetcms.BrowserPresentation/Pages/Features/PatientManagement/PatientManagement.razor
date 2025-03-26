@@ -15,6 +15,7 @@
 @inject IDialogService DialogService
 @inject IToastService ToastService;
 @inject MediatR.IMediator Mediator
+@inject NavigationManager Navigation
 
 <FluentCard style="overflow:auto;">
     <FluentGrid>
@@ -54,9 +55,9 @@
                 <TemplateColumn Title="Művelet" Align="@Align.End">
                     <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_MODIFY_ANIMAL_TYPES]">
                         <FluentButton Disabled="isBusy" aria-label="Szerkesztés" OnClick="@(async ()=> await OpenEditAnimalDialog(context))" IconStart="@(new Icons.Regular.Size16.Edit())" />
-                        <FluentAnchor Href="/patient-management/patients/1/treatments" title="Anchor tooltip">Anchor</FluentAnchor>
-@*                             <FluentButton Disabled="isBusy" aria-label="Kezelések megtekintése" OnClick="@(async ()=> await OpenEditAnimalDialog(context))" IconStart="@(new Icons.Regular.Size16.CalendarEdit())" />
- *@                    </PermissionWrapper>
+@*                         <FluentAnchor Href="/patient-management/patients/1/treatments" title="Anchor tooltip">Anchor</FluentAnchor>
+                        *@ <FluentButton Disabled="isBusy" aria-label="Kezelések megtekintése" OnClick="@(()=> Navigation.NavigateTo($"/patient-management/patients/{context.Id}/treatments"))" IconStart="@(new Icons.Regular.Size16.CalendarEdit())" />
+                    </PermissionWrapper>
                 </TemplateColumn>
             </FluentDataGrid>
         </FluentGridItem>

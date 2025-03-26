@@ -1,7 +1,9 @@
-﻿@page "/patient-management/patients/{PatientId}/treatments"
+﻿@page "/patient-management/patients/{strPatientId}/treatments"
 @using vetcms.BrowserPresentation.Components
 @using vetcms.BrowserPresentation.Utility
 @using vetcms.ClientApplication.Common.Abstract.CommandAbstraction
+@using vetcms.ClientApplication.Common.IAM.Commands.AuthenticationStatus
+@using vetcms.ClientApplication.Features.IAM.GetUser
 @using vetcms.ClientApplication.Features.PatientClassification.ListAnimalBreed
 @using vetcms.ClientApplication.Features.PatientClassification.CreateAnimalBreed
 @using vetcms.ClientApplication.Features.PatientClassification.DeleteAnimalBreed
@@ -18,16 +20,16 @@
 
 <FluentCard style="overflow:auto;">
     <h1>Pid: @{
-            @PatientId;
+            @strPatientId;
         }</h1>
     <FluentGrid>
         <FluentGridItem xs="12">
             <FluentToolbar id="toolbar-fluent-components" style="width:100%">
                 <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_ADD_ANIMAL_BREED]">
-                    <FluentButton Disabled="isBusy" @onclick="@OpenCreateAnimalDialog" style="padding-bottom: 5px;" IconStart="@(new Icons.Regular.Size16.PersonAdd())" Appearance="Appearance.Accent">Új állat</FluentButton>
+                    <FluentButton Disabled="isBusy" @onclick="@OpenCreateTreatmentDialog" style="padding-bottom: 5px;" IconStart="@(new Icons.Regular.Size16.PersonAdd())" Appearance="Appearance.Accent">Új állat</FluentButton>
                 </PermissionWrapper>
                 <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_DELETE_ANIMAL_BREED]">
-                    <FluentButton Disabled="isBusy" @onclick="@DeleteAnimal" style="padding-bottom: 5px;" IconStart="@(new Icons.Regular.Size16.PersonDelete())" Appearance="Appearance.Accent">Törlés</FluentButton>
+                    <FluentButton Disabled="isBusy" @onclick="@DeleteTreatment" style="padding-bottom: 5px;" IconStart="@(new Icons.Regular.Size16.PersonDelete())" Appearance="Appearance.Accent">Törlés</FluentButton>
                 </PermissionWrapper>
                 <div slot="end">
                     <FluentSearch Disabled="isBusy" @bind-Value="searchValue" Immediate="true" ImmediateDelay="300" @bind-Value:after="SearchValueChanged" AutoComplete="off" />
@@ -36,28 +38,26 @@
         </FluentGridItem>
         <FluentGridItem xs="12">
             <FluentDataGrid Virtualize="true"
-                            ItemsProvider="animalProvider"
+                            ItemsProvider="treatmentProvider"
                             GenerateHeader="GenerateHeaderOption.Sticky"
                             Style="min-width: max-content;"
                             Pagination="@pagination"
                             @ref="dataGrid">
-                <SelectColumn TGridItem="SelectableAnimalDto"
+                <SelectColumn TGridItem="SelectableTreatmentDto"
                               SelectMode="DataGridSelectMode.Multiple"
                               SelectFromEntireRow="false"
                               OnSelect="@(e => e.Item.Selected = e.Selected)"
                               SelectAllDisabled="true"
-                              @bind-SelectedItems="selectedAnimals" />
+                              @bind-SelectedItems="selectedTreatments" />
                 <PropertyColumn Title="Azonosító" Property="@(p => p.Id)" Sortable="true" />
-                <PropertyColumn Title="Tulajdonos" Property="@(p => p.OwnerId)" Sortable="true" />
-                <PropertyColumn Title="Faj" Property="@(p => p.TypeId)" Sortable="true" />
-                <PropertyColumn Title="Fajta" Property="@(p => p.BreedId)" Sortable="true" />
-                <PropertyColumn Title="Név" Property="@(p => p.Name)" Sortable="true" />
-                <PropertyColumn Title="Microchip szám" Property="@(p => p.MicrochipNumber)" Sortable="true" />
+                <PropertyColumn Title="Dátum" Property="@(p => p.DateOfTreatment)" Sortable="true" />
+                <PropertyColumn Title="Kezelés típusa" Property="@(p => p.Type)" Sortable="true" />
+                <PropertyColumn Title="Tűnetek" Property="@(p => p.Symptoms)" Sortable="true" />
+                <PropertyColumn Title="Control vizsgálat" Property="@(p => p.FollowUpDate)" Sortable="true" />
 
                 <TemplateColumn Title="Művelet" Align="@Align.End">
                     <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_MODIFY_ANIMAL_TYPES]">
-                        <FluentButton Disabled="isBusy" aria-label="Szerkesztés" OnClick="@(async ()=> await OpenEditAnimalDialog(context))" IconStart="@(new Icons.Regular.Size16.Edit())" />
-                        <FluentButton Disabled="isBusy" aria-label="Kezelések megtekintése" OnClick="@(async ()=> await OpenEditAnimalDialog(context))" IconStart="@(new Icons.Regular.Size16.CalendarEdit())" />
+                        <FluentButton Disabled="isBusy" aria-label="Szerkesztés" OnClick="@(async ()=> await OpenEditTreatmentDialog(context))" IconStart="@(new Icons.Regular.Size16.Edit())" />
                     </PermissionWrapper>
                 </TemplateColumn>
             </FluentDataGrid>
@@ -69,26 +69,30 @@
 </FluentCard>
 
 @code {
+
+
+
     [Parameter]
-    public int PatientId { get; set; }
+    public string strPatientId { get; set; }
+    public int PatientId { get => int.Parse(strPatientId); }
 
 
     private string searchValue = "";
-    GridItemsProvider<SelectableAnimalDto> animalProvider = default!;
+    GridItemsProvider<SelectableTreatmentDto> treatmentProvider = default!;
     bool isBusy = false;
     PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
-    IEnumerable<SelectableAnimalDto>? selectedAnimals = new List<SelectableAnimalDto>();
-    private FluentDataGrid<SelectableAnimalDto> dataGrid;
+    IEnumerable<SelectableTreatmentDto>? selectedTreatments = new List<SelectableTreatmentDto>();
+    private FluentDataGrid<SelectableTreatmentDto> dataGrid;
 
-    private class SelectableAnimalDto : AnimalDto
+
+    private class SelectableTreatmentDto : TreatmentDto
     {
         public bool Selected { get; set; } = false;
-
     }
 
     protected override async Task OnInitializedAsync()
     {
-        animalProvider = gridItemsProviderResult;
+        treatmentProvider = gridItemsProviderResult;
     }
 
     private async Task SearchValueChanged()
@@ -96,66 +100,75 @@
         await dataGrid.RefreshDataAsync();
     }
 
-    private async ValueTask<GridItemsProviderResult<SelectableAnimalDto>> gridItemsProviderResult(GridItemsProviderRequest<SelectableAnimalDto> req)
+    private async ValueTask<GridItemsProviderResult<SelectableTreatmentDto>> gridItemsProviderResult(GridItemsProviderRequest<SelectableTreatmentDto> req)
     {
-        var query = new AnimalListClientQuery()
+        var query = new GetTreatmentByPatientsClientQuery()
             {
-                SearchTerm = searchValue,
-                Skip = req.StartIndex,
-                Take = req.Count.HasValue ? req.Count.Value : 10
+                PatientId = PatientId,
             };
 
-        var data = await ToastService.ShowIndeterminateProgressToast(Mediator.Send(query), "Kérjük várjon...", "Állatok betöltése folyamatban...");
+        var data = await ToastService.ShowIndeterminateProgressToast(Mediator.Send(query), "Kérjük várjon...", "Kezelések betöltése folyamatban...");
 
         if (data == null)
         {
-            data = new AnimalListClientQueryResponse();
+
+            data = new GetTreatmentByPatientsClientQueryResponse();
+
         }
 
-        List<SelectableAnimalDto> animalBreeds = data.Animals.Select(u => new SelectableAnimalDto
+        List<SelectableTreatmentDto> treatments = data.Treatments.Select(u => new SelectableTreatmentDto
             {
                 Id = u.Id,
-                TypeId = u.TypeId,
-                MicrochipNumber = u.MicrochipNumber,
-                Name = u.Name,
-                OwnerId = u.OwnerId,
-                BreedId = u.BreedId,
+                PatientId = u.PatientId,
+                DoctorId = u.DoctorId,
+                DateOfTreatment = u.DateOfTreatment,
+                Type = u.Type,
+                Symptoms = u.Symptoms,
+                FollowUpDate = u.FollowUpDate,
+                Diagnosis = u.Diagnosis,
+                Medications = u.Medications,
+                Procedure = u.Procedure,
+                Description = u.Description,
             }).ToList();
 
-        selectedAnimals = new List<SelectableAnimalDto>();
+        selectedTreatments = new List<SelectableTreatmentDto>();
 
         return GridItemsProviderResult.From(
-            items: animalBreeds,
-            totalItemCount: data.ResultCount);
+            items: treatments,
+
+            totalItemCount: treatments.Count);
+
     }
 
-    public async Task DeleteAnimal()
+    public async Task DeleteTreatment()
     {
-        if (!selectedAnimals.Any())
+        if (!selectedTreatments.Any())
         {
             DialogService.ShowError("Nincsenek elemek kijelölve!");
             return;
         }
         isBusy = true;
-        var dialog = await DialogService.ShowConfirmationAsync("Biztosan el szeretnéd távolítani az Állato(ka)t?");
+        var dialog = await DialogService.ShowConfirmationAsync("Biztosan el szeretnéd távolítani az Kezeléseket?");
         var result = await dialog.Result;
         bool canceled = result.Cancelled;
 
-        DeletePatientClientCommand command = new DeletePatientClientCommand()
+
+
+        DeletePatientTreatmentClientCommand command = new DeletePatientTreatmentClientCommand()
             {
-                AnimalIds = selectedAnimals.Select(u => u.Id).ToList()
+                TreatmentIds = selectedTreatments.Select(u => u.Id).ToList()
             };
 
         if (!canceled)
         {
-            await ToastService.ShowIndeterminateProgressToast(Mediator.Send(command), "Kérjük várjon...", "Állatok törlése folyamatban...");
+            await ToastService.ShowIndeterminateProgressToast(Mediator.Send(command), "Kérjük várjon...", "Kezelések törlése folyamatban...");
         }
 
         await dataGrid.RefreshDataAsync();
         isBusy = false;
     }
 
-    private async Task<DialogResult?> ShowAnimalEditDialog(string title, AnimalDto animal)
+    private async Task<DialogResult?> ShowTreatmentEditDialog(string title, TreatmentDto treatment)
     {
         DialogParameters parameters = new()
             {
@@ -168,27 +181,32 @@
                 Modal = true,
                 PreventScroll = true
             };
-        IDialogReference dialog = await DialogService.ShowDialogAsync<EditPatientDialog>(animal, parameters);
+        IDialogReference dialog = await DialogService.ShowDialogAsync<EditTreatmentDialog>(treatment, parameters);
         DialogResult? result = await dialog.Result;
         return result;
     }
 
-    private async Task OpenCreateAnimalDialog()
+    private async Task OpenCreateTreatmentDialog()
     {
         isBusy = true;
-        Console.WriteLine($"Open dialog create animal");
+        Console.WriteLine($"Open dialog create treatment");
 
-        AnimalDto simpleAnimalBreed = new AnimalDto();
+        AuthenticatedStatusQuery currentUserQuery = new();
+        var currentUserQueryResponse = await Mediator.Send(currentUserQuery);
 
-        var result = await ShowAnimalEditDialog("Új Állat létrehozása", simpleAnimalBreed);
+        TreatmentDto treatment = new TreatmentDto();
+        treatment.PatientId = PatientId;
+        treatment.DoctorId = currentUserQueryResponse.CurrentUser.Id;
+
+        var result = await ShowTreatmentEditDialog("Új kezelés létrehozása", treatment);
 
         if (result.Data is not null)
         {
-            AnimalDto? animalData = result.Data as AnimalDto;
-            Console.WriteLine($"create animal Dialog closed by {animalData?.Name} - Canceled: {result.Cancelled}");
+            TreatmentDto? treatmentData = result.Data as TreatmentDto;
+            Console.WriteLine($"create animal Dialog closed by {treatmentData?.Medications} - Canceled: {result.Cancelled}");
             if (!result.Cancelled)
             {
-                await ToastService.ShowIndeterminateProgressToast(SubmitNewAnimalData(animalData), "Kérjük várjon...", "Állat adatainak mentése");
+                await ToastService.ShowIndeterminateProgressToast(SubmitNewTreatmentData(treatmentData), "Kérjük várjon...", "Állat adatainak mentése");
             }
         }
         else
@@ -198,64 +216,61 @@
         isBusy = false;
     }
 
-    private async Task OpenEditAnimalDialog(AnimalDto animalBreed)
+    private async Task OpenEditTreatmentDialog(TreatmentDto treatment)
     {
         isBusy = true;
-        int id = animalBreed.Id;
-        Console.WriteLine($"Open dialog edit animal breed");
-        var simpleAnimalBreed = await ToastService.ShowIndeterminateProgressToast(LoadAnimalData(id), "Kérjük várjon...", "Állat adatainak betöltése");
+        int id = treatment.Id;
+        Console.WriteLine($"Open dialog edit treatment");
+        var simpleAnimalBreed = await ToastService.ShowIndeterminateProgressToast(LoadTreatmentData(id), "Kérjük várjon...", "Kezelés adatainak betöltése");
 
-        var result = await ShowAnimalEditDialog("Állat szerkesztése", simpleAnimalBreed);
+        var result = await ShowTreatmentEditDialog("Kezelés szerkesztése", simpleAnimalBreed);
 
         if (result.Data is not null)
         {
-            AnimalDto? editResult = result.Data as AnimalDto;
-            Console.WriteLine($"Edit animal breed Dialog closed by {editResult?.Name} - Canceled: {result.Cancelled}");
+            TreatmentDto? editResult = result.Data as TreatmentDto;
+            Console.WriteLine($"Edit treatment Dialog closed by {editResult?.Procedure} - Canceled: {result.Cancelled}");
             if (!result.Cancelled)
             {
-                await ToastService.ShowIndeterminateProgressToast(SubmitEditAnimalData(editResult), "Kérjük várjon...", "Állat adatainak mentése");
+                await ToastService.ShowIndeterminateProgressToast(SubmitEditTreatmentData(editResult), "Kérjük várjon...", "Kezelés adatainak mentése");
             }
         }
         else
         {
-            Console.WriteLine($"Edit animal breed Dialog closed - Canceled: {result.Cancelled}");
+            Console.WriteLine($"Edit treatment Dialog closed - Canceled: {result.Cancelled}");
         }
 
         isBusy = false;
     }
 
-    private async Task<AnimalDto> LoadAnimalData(int id)
+    private async Task<TreatmentDto> LoadTreatmentData(int id)
     {
-        var query = new GetPatientClientQuery()
+        var query = new GetTreatmentByIdClientQuery()
             {
-                PatientId = id
+                TreatmentId = id
             };
 
         var data = await Mediator.Send(query);
 
-        return data.PatientModel;
+        return data.TreatmentModel;
     }
 
-    private async Task SubmitNewAnimalData(AnimalDto newAnimalDto)
+    private async Task SubmitNewTreatmentData(TreatmentDto editedTreatmentData)
     {
-        await Task.Delay(10);
-        CreatePatientCommand createNewAnimalCommand = new CreatePatientCommand()
+        CreatePatientTreatmentClientCommand createNewTreatmentCommand = new CreatePatientTreatmentClientCommand()
             {
-                NewAnimalModel = newAnimalDto
+                Treatmentmodel = editedTreatmentData
             };
-        await Mediator.Send(createNewAnimalCommand);
+        await Mediator.Send(createNewTreatmentCommand);
         await dataGrid.RefreshDataAsync();
     }
 
-    private async Task SubmitEditAnimalData(AnimalDto editedAnimalBreed)
+    private async Task SubmitEditTreatmentData(TreatmentDto editTreatmentData)
     {
-        // ModifyAnimalBreedClientCommand command = new ModifyAnimalBreedClientCommand()
-        //     {
-        //         Id = editedAnimalBreed.Id,
-        //         AnimalBreedModel = editedAnimalBreed
-        //     };
-
-        // await Mediator.Send(command);
-        // await dataGrid.RefreshDataAsync();
+        CreatePatientTreatmentClientCommand createNewTreatmentCommand = new CreatePatientTreatmentClientCommand()
+            {
+                Treatmentmodel = editTreatmentData
+            };
+        await Mediator.Send(createNewTreatmentCommand);
+        await dataGrid.RefreshDataAsync();
     }
 }

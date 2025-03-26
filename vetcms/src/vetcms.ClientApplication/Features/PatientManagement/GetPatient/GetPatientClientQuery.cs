@@ -10,5 +10,15 @@ namespace vetcms.ClientApplication.Features.PatientManagement.GetPatient
     public class GetPatientClientQuery : IClientCommand<GetPatientClientQueryResponse>
     {
         public int PatientId { get; set; } = 0;
+
+        public GetPatientClientQuery(int patientId)
+        {
+            PatientId = patientId;
+        }
+
+        public GetPatientClientQuery()
+        {
+            
+        }
     }
 }

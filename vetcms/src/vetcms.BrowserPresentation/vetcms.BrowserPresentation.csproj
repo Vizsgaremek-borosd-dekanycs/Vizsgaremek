@@ -20,6 +20,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="Components\EditTreatmentDialog.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
     <Content Update="Pages\Features\PatientManagement\PatientTreatmentManagement.razor">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>

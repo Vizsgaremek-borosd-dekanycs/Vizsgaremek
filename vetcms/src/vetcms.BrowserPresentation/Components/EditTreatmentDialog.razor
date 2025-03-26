@@ -1,0 +1,80 @@
+﻿@using System.Globalization
+@using vetcms.BrowserPresentation.Utility
+@using vetcms.ClientApplication.Common.Abstract.CommandAbstraction;
+@using vetcms.ClientApplication.Features.IAM.GetUser
+@using vetcms.ClientApplication.Features.PatientClassification.ListAnimalType
+@using vetcms.ClientApplication.Features.PatientManagement.GetPatient
+@using vetcms.ClientApplication.Features.PatientManagement.ListPatients
+@using vetcms.SharedModels.Common.Dto
+@using vetcms.SharedModels.Common.IAM.Authorization;
+@inject MediatR.IMediator Mediator
+@inject IToastService ToastService
+@implements IDialogContentComponent<TreatmentDto>
+
+<FluentGrid>
+    <FluentGridItem xs="12" md="12">
+        <FluentGrid>
+            <FluentGridItem xs="12" sm="12">
+                <FluentNumberField Disabled="true" Style="width: 100%" @bind-Value="Content.Id" Label="Azonosító" />
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="12">
+                <FluentTextField Disabled="true" Style="width: 100%" Value="Patient.MicrochipNumber" Label="Microchip szám:" />
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="12">
+                <FluentDatePicker Disabled="true" Style="width: 100%"  Value="Content.DateOfTreatment" ValueChanged="(date) => Content.DateOfTreatment = date.Value" Label="#" />
+            </FluentGridItem>
+
+            <FluentGridItem xs="12" sm="12">
+                <FluentTextArea ReadOnly="true" Style="width: 100%" @bind-Value="Doctor.VisibleName" Label="Kezelő orvos"/>
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="12">
+                <FluentTextArea Style="width: 100%" @bind-Value="Content.Type" Label="Kezelés típusa" />
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="12">
+                <FluentTextArea Style="width: 100%" @bind-Value="Content.Symptoms" Label="Tűnetek" />
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="12">
+                <FluentTextArea Style="width: 100%" @bind-Value="Content.Diagnosis" Label="Diagnózis" />
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="12">
+                <FluentTextArea Style="width: 100%" @bind-Value="Content.Medications" Label="Alkalmazott gyógyszerek" />
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="12">
+                <FluentTextArea Style="width: 100%" @bind-Value="Content.Procedure" Label="Beavatkozás" />
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="12">
+                <FluentTextArea Style="width: 100%" @bind-Value="Content.Description" Label="Egyéb információ" />
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="12">
+                <FluentDatePicker Style="width: 100%" Value="Content.FollowUpDate" ValueChanged="(date) => Content.FollowUpDate = date.Value" Label="#" />
+            </FluentGridItem>
+        </FluentGrid>
+    </FluentGridItem>
+</FluentGrid>
+
+@code {
+    [Parameter]
+    public TreatmentDto Content { get; set; } = new();
+
+    public AnimalDto Patient { get; set; } = new();
+    public UserDto Doctor { get; set; } = new();
+
+    [CascadingParameter]
+    public FluentDialog? Dialog { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await Mediator.Send(new GetPatientClientQuery(Content.PatientId));
+        if (result != null && result.PatientModel != null)
+        {
+            Patient = result.PatientModel;
+        }
+
+        var userQuery = await Mediator.Send(new GetUserClientQuery(Content.DoctorId));
+        if (userQuery != null && userQuery.User != null)
+        {
+            Doctor = userQuery.User;
+        }
+    }
+}
