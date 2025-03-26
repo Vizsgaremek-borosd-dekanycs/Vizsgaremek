@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using vetcms.ServerApplication.Common.Abstractions.Data;
 using vetcms.ServerApplication.Domain.Entity;
 using vetcms.ServerApplication.Domain.Entity.MedicalPillManagement;
+using vetcms.ServerApplication.Domain.Entity.PatientManagement;
 
 //Migration: WebApi appból kell indítani.
 //    PM > add - migration PrepareUserModelToComplyWithSRS -Project vetcms.ServerApplication
@@ -22,6 +23,8 @@ namespace vetcms.ServerApplication.Infrastructure.Presistence
         DbSet<MedicalPillUsageLog> MedicalPillUsageLogs { get; set; }
         DbSet<FirstTimeAuthenticationCode> FirstTimeAuthenticationCodes { get; set; }
         DbSet<SentEmail> SentEmails { get; set; }
+        DbSet<Patient> Patients { get; set; }
+        DbSet<Treatment> Treatments { get; set; }
 
         public ApplicationDbContext()
         {
