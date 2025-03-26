@@ -14,9 +14,9 @@ using vetcms.SharedModels.Features.PatientClassification;
 
 namespace vetcms.ClientApplication.Features.PatientManagement.ModifyPatient
 {
-    internal class ModifyPatientTreatmentClientCommandHandler(IMediator mediator, IMapper mapper, IDialogService dialogService) : IRequestHandler<ModifyPatientTreatmentClientCommand, bool>
+    internal class ModifyPatientTreatmentClientCommandHandler(IMediator mediator, IMapper mapper, IDialogService dialogService) : IRequestHandler<ModifyPatientClientCommand, bool>
     {
-        public async Task<bool> Handle(ModifyPatientTreatmentClientCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(ModifyPatientClientCommand request, CancellationToken cancellationToken)
         {
             if(true)
             {

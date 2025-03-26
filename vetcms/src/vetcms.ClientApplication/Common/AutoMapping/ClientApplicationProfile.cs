@@ -15,9 +15,12 @@ using vetcms.ClientApplication.Features.PatientClassification.ListAnimalBreedByT
 using vetcms.ClientApplication.Features.PatientClassification.ListAnimalType;
 using vetcms.ClientApplication.Features.PatientClassification.ModifyAnimalBreed;
 using vetcms.ClientApplication.Features.PatientClassification.ModifyAnimalType;
+using vetcms.ClientApplication.Features.PatientManagement.GetPatient;
 using vetcms.ClientApplication.Features.PatientManagement.ListPatients;
+using vetcms.ClientApplication.Features.PatientManagement.ModifyPatient;
 using vetcms.SharedModels.Features.IAM;
 using vetcms.SharedModels.Features.PatientClassification;
+using vetcms.SharedModels.Features.PatientManagement;
 
 namespace vetcms.ClientApplication.Common.AutoMapping
 {
@@ -42,6 +45,23 @@ namespace vetcms.ClientApplication.Common.AutoMapping
 
             CreateMap<GetAnimalBreedClientQuery, GetAnimalBreedByIdApiQuery>();
             CreateMap<GetAnimalBreedByIdApiQueryResponse, GetAnimalBreedClientQueryResponse>();
+
+            CreateMap<GetPatientClientQuery, GetPatientApiQuery>();
+            CreateMap<GetPatientApiQueryResponse, GetPatientClientQueryResponse>();
+
+            CreateMap<AnimalListClientQuery, ListPatientApiQuery>();
+            CreateMap<ListPatientApiQueryResponse, AnimalListClientQueryResponse>();
+
+            CreateMap<GetTreatmentByIdClientQuery, GetPatientTreatmentsByPatientIdApiQuery>();
+            CreateMap<GetPatientTreatmentsByPatientIdApiQueryResponse, GetTreatmentByIdClientQueryResponse>();
+
+            CreateMap<GetTreatmentByPatientsClientQuery, GetPatientTreatmentsByPatientIdApiQuery>();
+            CreateMap<GetPatientTreatmentsByPatientIdApiQueryResponse, GetTreatmentByPatientsClientQueryResponse>();
+
+            CreateMap<ListPatientTreatmentClientQuery, ListPatientTreatmentApiQuery>();
+            CreateMap<ListPatientTreatmentApiQueryResponse, ListPatientTreatmentClientQueryResponse>();
+
+
         }
     }
 }

@@ -11,6 +11,7 @@
 @using vetcms.ClientApplication.Features.PatientManagement.DeletePatient
 @using vetcms.ClientApplication.Features.PatientManagement.GetPatient
 @using vetcms.ClientApplication.Features.PatientManagement.ListPatients
+@using vetcms.ClientApplication.Features.PatientManagement.ModifyPatient
 @using vetcms.SharedModels.Common.Dto
 @inject IDialogService DialogService
 @inject IToastService ToastService;
@@ -74,7 +75,7 @@
     IEnumerable<SelectableAnimalDto>? selectedAnimals = new List<SelectableAnimalDto>();
     private FluentDataGrid<SelectableAnimalDto> dataGrid;
 
-    private class SelectableAnimalDto : AnimalDto
+    private class SelectableAnimalDto : PatientDto
     {
         public bool Selected { get; set; } = false;
 
@@ -149,7 +150,7 @@
         isBusy = false;
     }
 
-    private async Task<DialogResult?> ShowAnimalEditDialog(string title, AnimalDto animal)
+    private async Task<DialogResult?> ShowAnimalEditDialog(string title, PatientDto animal)
     {
         DialogParameters parameters = new()
             {
@@ -172,13 +173,13 @@
         isBusy = true;
         Console.WriteLine($"Open dialog create animal");
 
-        AnimalDto simpleAnimalBreed = new AnimalDto();
+        PatientDto simpleAnimalBreed = new PatientDto();
 
         var result = await ShowAnimalEditDialog("Új Állat létrehozása", simpleAnimalBreed);
 
         if (result.Data is not null)
         {
-            AnimalDto? animalData = result.Data as AnimalDto;
+            PatientDto? animalData = result.Data as PatientDto;
             Console.WriteLine($"create animal Dialog closed by {animalData?.Name} - Canceled: {result.Cancelled}");
             if (!result.Cancelled)
             {
@@ -192,7 +193,7 @@
         isBusy = false;
     }
 
-    private async Task OpenEditAnimalDialog(AnimalDto animalBreed)
+    private async Task OpenEditAnimalDialog(PatientDto animalBreed)
     {
         isBusy = true;
         int id = animalBreed.Id;
@@ -203,7 +204,7 @@
 
         if (result.Data is not null)
         {
-            AnimalDto? editResult = result.Data as AnimalDto;
+            PatientDto? editResult = result.Data as PatientDto;
             Console.WriteLine($"Edit animal breed Dialog closed by {editResult?.Name} - Canceled: {result.Cancelled}");
             if (!result.Cancelled)
             {
@@ -218,7 +219,7 @@
         isBusy = false;
     }
 
-    private async Task<AnimalDto> LoadAnimalData(int id)
+    private async Task<PatientDto> LoadAnimalData(int id)
     {
         var query = new GetPatientClientQuery()
             {
@@ -230,7 +231,7 @@
         return data.PatientModel;
     }
 
-    private async Task SubmitNewAnimalData(AnimalDto newAnimalDto)
+    private async Task SubmitNewAnimalData(PatientDto newAnimalDto)
     {
         await Task.Delay(10);
         CreatePatientCommand createNewAnimalCommand = new CreatePatientCommand()
@@ -241,15 +242,15 @@
         await dataGrid.RefreshDataAsync();
     }
 
-    private async Task SubmitEditAnimalData(AnimalDto editedAnimalBreed)
+    private async Task SubmitEditAnimalData(PatientDto editedAnimalBreed)
     {
-        // ModifyAnimalBreedClientCommand command = new ModifyAnimalBreedClientCommand()
-        //     {
-        //         Id = editedAnimalBreed.Id,
-        //         AnimalBreedModel = editedAnimalBreed
-        //     };
+        ModifyPatientClientCommand command = new ModifyPatientClientCommand()
+        {
+            Id = editedAnimalBreed.Id,
+            PatientModel = editedAnimalBreed
+        };
 
-        // await Mediator.Send(command);
-        // await dataGrid.RefreshDataAsync();
+        await Mediator.Send(command);
+        await dataGrid.RefreshDataAsync();
     }
 }

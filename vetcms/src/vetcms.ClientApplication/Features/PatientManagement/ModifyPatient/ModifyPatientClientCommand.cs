@@ -12,6 +12,6 @@ namespace vetcms.ClientApplication.Features.PatientManagement.ModifyPatient
     public class ModifyAnimalClientCommand : IClientCommand<bool>
     {
         public int Id { get; set; }
-        public AnimalDto AnimalModel { get; set; }
+        public PatientDto AnimalModel { get; set; }
     }
 }

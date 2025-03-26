@@ -13,6 +13,7 @@ using vetcms.ClientApplication.Features.PatientClassification.ListAnimalBreed;
 using vetcms.ClientApplication.Features.PatientManagement.ListPatients;
 using vetcms.SharedModels.Common.Dto;
 using vetcms.SharedModels.Features.PatientClassification;
+using vetcms.SharedModels.Features.PatientManagement;
 
 namespace vetcms.ClientApplication.Features.PatientManagement.GetPatient
 {
@@ -21,22 +22,23 @@ namespace vetcms.ClientApplication.Features.PatientManagement.GetPatient
     {
         public async Task<GetTreatmentByPatientsClientQueryResponse> Handle(GetTreatmentByPatientsClientQuery request, CancellationToken cancellationToken)
         {
-            GetTreatmentByPatientsClientQueryResponse getTreatmentsResponse = new GetTreatmentByPatientsClientQueryResponse();
-            getTreatmentsResponse.Treatments = ListPatientTreatmentClientQueryHandler.treatments.Where(x => x.PatientId == request.PatientId).ToList();
-            if (getTreatmentsResponse.Treatments == null)
+            GetPatientTreatmentsByPatientIdApiQuery query = mapper.Map<GetPatientTreatmentsByPatientIdApiQuery>(request);
+            GetPatientTreatmentsByPatientIdApiQueryResponse response = await mediator.Send(query);
+            GetTreatmentByPatientsClientQueryResponse result = mapper.Map<GetTreatmentByPatientsClientQueryResponse>(response);
+            if (result.Treatments == null)
             {
                 dialogService.ShowError("Patient not found.");
-                return getTreatmentsResponse;
+                return result;
             }
-            return await Task.FromResult(getTreatmentsResponse);
+            return await Task.FromResult(result);
         }
     }
 
-    //internal class GetPatientByIdApiQueryHandler : GenericApiCommandHandler<GetAnimalBreedByIdApiQuery, GetAnimalBreedByIdApiQueryResponse>
-    //{
-    //    public GetPatientByIdApiQueryHandler(IServiceScopeFactory serviceScopeFactory)
-    //        : base(serviceScopeFactory)
-    //    {
-    //    }
-    //}
+    internal class GetPatientTreatmentsByPatientIdApiQueryHandler : GenericApiCommandHandler<GetPatientTreatmentsByPatientIdApiQuery, GetPatientTreatmentsByPatientIdApiQueryResponse>
+    {
+        public GetPatientTreatmentsByPatientIdApiQueryHandler(IServiceScopeFactory serviceScopeFactory)
+            : base(serviceScopeFactory)
+        {
+        }
+    }
 }

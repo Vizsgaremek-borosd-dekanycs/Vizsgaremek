@@ -13,6 +13,7 @@ using vetcms.ClientApplication.Features.PatientClassification.ListAnimalBreed;
 using vetcms.ClientApplication.Features.PatientManagement.ListPatients;
 using vetcms.SharedModels.Common.Dto;
 using vetcms.SharedModels.Features.PatientClassification;
+using vetcms.SharedModels.Features.PatientManagement;
 
 namespace vetcms.ClientApplication.Features.PatientManagement.GetPatient
 {
@@ -20,22 +21,26 @@ namespace vetcms.ClientApplication.Features.PatientManagement.GetPatient
     {
         public async Task<GetPatientClientQueryResponse> Handle(GetPatientClientQuery request, CancellationToken cancellationToken)
         {
-            GetPatientClientQueryResponse getPatientClientQueryResponse = new GetPatientClientQueryResponse();
-            getPatientClientQueryResponse.PatientModel = AnimalListClientQueryHandler.animals.FirstOrDefault(x => x.Id == request.PatientId);
-            if (getPatientClientQueryResponse.PatientModel == null)
+            GetPatientApiQuery query = mapper.Map<GetPatientApiQuery>(request);
+            GetPatientApiQueryResponse response = await mediator.Send(query);
+
+            if(response.Success)
             {
-                dialogService.ShowError("Patient not found.");
-                return getPatientClientQueryResponse;
+                return mapper.Map<GetPatientClientQueryResponse>(response);
             }
-            return await Task.FromResult(getPatientClientQueryResponse);
+            else
+            {
+                dialogService.ShowError(response.Message, "Hiba");
+                return new GetPatientClientQueryResponse();
+            }
         }
     }
 
-    //internal class GetPatientByIdApiQueryHandler : GenericApiCommandHandler<GetAnimalBreedByIdApiQuery, GetAnimalBreedByIdApiQueryResponse>
-    //{
-    //    public GetPatientByIdApiQueryHandler(IServiceScopeFactory serviceScopeFactory)
-    //        : base(serviceScopeFactory)
-    //    {
-    //    }
-    //}
+    internal class GetPatientByIdApiQueryHandler : GenericApiCommandHandler<GetPatientsByUserIdApiQuery, GetPatientsByUserIdApiQueryResponse>
+    {
+        public GetPatientByIdApiQueryHandler(IServiceScopeFactory serviceScopeFactory)
+            : base(serviceScopeFactory)
+        {
+        }
+    }
 }
