@@ -12,7 +12,7 @@ using vetcms.ClientApplication.Features.IAM.UserList;
 using vetcms.SharedModels.Common.Dto;
 using vetcms.SharedModels.Features.PatientClassification;
 
-namespace vetcms.ClientApplication.Features.PatientClassification.AnimalBreedList
+namespace vetcms.ClientApplication.Features.PatientClassification.ListAnimalBreed
 {
     internal class AnimalBreedListClientQueryHandler(IMediator mediator, IDialogService dialogService, IMapper mapper) : IRequestHandler<AnimalBreedListClientQuery, AnimalBreedListClientQueryResponse>
     {

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using vetcms.ClientApplication.Common.Abstract;
-using vetcms.ClientApplication.Features.PatientClassification.AnimalBreedList;
+using vetcms.ClientApplication.Features.PatientClassification.ListAnimalBreed;
 using vetcms.ClientApplication.Features.PatientClassification.GetAnimalBreed;
 using vetcms.ClientApplication.Features.PatientClassification.ListAnimalType;
 using vetcms.SharedModels.Common.Dto;

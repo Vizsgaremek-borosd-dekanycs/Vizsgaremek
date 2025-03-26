@@ -13,7 +13,7 @@ using vetcms.SharedModels.Common.Dto;
 using vetcms.SharedModels.Features.IAM;
 using vetcms.SharedModels.Features.PatientClassification;
 
-namespace vetcms.ServerApplication.Features.PatientClassification.ListAnimalType
+namespace vetcms.ServerApplication.Features.PatientClassification.GetAnimalTypeById
 {
     internal class GetAnimalTypeByIdQueryHandler(IMapper mapper, IAnimalTypeRepository animalTypeRepository) : IRequestHandler<GetAnimalTypeByIdApiQuery, GetAnimalTypeByIdApiQueryResponse>
     {

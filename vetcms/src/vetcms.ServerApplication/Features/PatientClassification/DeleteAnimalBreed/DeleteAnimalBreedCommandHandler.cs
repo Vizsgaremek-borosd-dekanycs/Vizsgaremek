@@ -11,7 +11,7 @@ using vetcms.SharedModels.Common.Dto;
 using vetcms.SharedModels.Features.IAM;
 using vetcms.SharedModels.Features.PatientClassification;
 
-namespace vetcms.ServerApplication.Features.PatientClassification.DeleteAnimalType
+namespace vetcms.ServerApplication.Features.PatientClassification.DeleteAnimalBreed
 {
     internal class DeleteAnimalBreedCommandHandler(IAnimalBreedRepository animalBreedRepository) : IRequestHandler<DeleteAnimalBreedApiCommand, DeleteAnimalBreedApiCommandResult>
     {

@@ -11,7 +11,7 @@ using vetcms.ClientApplication.Common.Abstract;
 using vetcms.SharedModels.Features.IAM;
 using vetcms.SharedModels.Features.PatientClassification;
 
-namespace vetcms.ClientApplication.Features.PatientClassification.CreateNewAnimalBreed
+namespace vetcms.ClientApplication.Features.PatientClassification.CreateAnimalBreed
 {
     internal class CreateNewAnimalBreedClientCommandHandler(IMediator mediator, IDialogService dialogService) : IRequestHandler<CreateNewAnimalBreedClientCommand, bool>
     {

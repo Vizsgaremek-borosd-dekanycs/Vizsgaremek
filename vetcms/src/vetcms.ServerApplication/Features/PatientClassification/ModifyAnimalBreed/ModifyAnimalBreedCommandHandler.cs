@@ -12,7 +12,7 @@ using vetcms.SharedModels.Common.Dto;
 using vetcms.SharedModels.Features.IAM;
 using vetcms.SharedModels.Features.PatientClassification;
 
-namespace vetcms.ServerApplication.Features.PatientClassification.CreatePatientType
+namespace vetcms.ServerApplication.Features.PatientClassification.ModifyAnimalBreed
 {
     internal class ModifyAnimalBreedCommandHandler(IMapper mapper, IAnimalBreedRepository animalBreedRepository, IAnimalTypeRepository animalTypeRepository) : IRequestHandler<ModifyAnimalBreedApiCommand, ModifyAnimalBreedApiCommandResult>
     {

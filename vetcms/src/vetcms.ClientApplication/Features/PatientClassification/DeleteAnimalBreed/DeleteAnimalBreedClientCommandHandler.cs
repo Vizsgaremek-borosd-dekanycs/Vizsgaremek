@@ -8,7 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using vetcms.ClientApplication.Common.Abstract;
-using vetcms.ClientApplication.Features.PatientClassification.AnimalBreedList;
 using vetcms.SharedModels.Features.PatientClassification;
 
 namespace vetcms.ClientApplication.Features.PatientClassification.DeleteAnimalBreed
@@ -21,7 +20,7 @@ namespace vetcms.ClientApplication.Features.PatientClassification.DeleteAnimalBr
             DeleteAnimalBreedApiCommandResult response = await mediator.Send(command);
             if (response.Success)
             {
-                _ = await (await dialogService.ShowErrorAsync(response.Message, "Hiba")).Result;
+                _ = await (await dialogService.ShowSuccessAsync(response.Message, "Siker")).Result;
                 return true;
             }
             else

@@ -6,15 +6,16 @@ using System.Text;
 using System.Threading.Tasks;
 using vetcms.ClientApplication.Features.IAM.GetUser;
 using vetcms.ClientApplication.Features.IAM.UserList;
-using vetcms.ClientApplication.Features.PatientClassification.AnimalBreedList;
 using vetcms.ClientApplication.Features.PatientClassification.DeleteAnimalBreed;
 using vetcms.ClientApplication.Features.PatientClassification.DeleteAnimalType;
 using vetcms.ClientApplication.Features.PatientClassification.GetAnimalBreed;
 using vetcms.ClientApplication.Features.PatientClassification.GetAnimalType;
+using vetcms.ClientApplication.Features.PatientClassification.ListAnimalBreed;
 using vetcms.ClientApplication.Features.PatientClassification.ListAnimalBreedByType;
 using vetcms.ClientApplication.Features.PatientClassification.ListAnimalType;
 using vetcms.ClientApplication.Features.PatientClassification.ModifyAnimalBreed;
 using vetcms.ClientApplication.Features.PatientClassification.ModifyAnimalType;
+using vetcms.ClientApplication.Features.PatientManagement.ListPatients;
 using vetcms.SharedModels.Features.IAM;
 using vetcms.SharedModels.Features.PatientClassification;
 
