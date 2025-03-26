@@ -15,7 +15,9 @@ using vetcms.SharedModels.Features.PatientManagement;
 
 namespace vetcms.ServerApplication.Features.PatientManagement.CreatePatient
 {
-    internal class CreatePatientCommandHandler(IMapper mapper, IPatientRepository patientRepository) : IRequestHandler<CreatePatientApiCommand, CreatePatientApiCommandResponse>
+    internal class CreatePatientCommandHandler(IMapper mapper, IPatientRepository patientRepository, IAnimalTypeRepository animalTypeRepository,
+        IAnimalBreedRepository animalBreedRepository, IUserRepository userRepository)
+        : IRequestHandler<CreatePatientApiCommand, CreatePatientApiCommandResponse>
     {
         public async Task<CreatePatientApiCommandResponse> Handle(CreatePatientApiCommand request, CancellationToken cancellationToken)
         {
@@ -27,6 +29,10 @@ namespace vetcms.ServerApplication.Features.PatientManagement.CreatePatient
             }
 
             Patient newPatient = mapper.Map<Patient>(request.NewPatient);
+            newPatient.Type = await animalTypeRepository.GetByIdAsync(request.NewPatient.TypeId);
+            newPatient.Breed = await animalBreedRepository.GetByIdAsync(request.NewPatient.BreedId);
+            newPatient.Owner = await userRepository.GetByIdAsync(request.NewPatient.OwnerId);
+
             _ = await patientRepository.AddAsync(newPatient);
             return await Task.FromResult(new CreatePatientApiCommandResponse(true));
         }

@@ -12,7 +12,8 @@ using vetcms.SharedModels.Features.PatientManagement;
 
 namespace vetcms.ServerApplication.Features.PatientManagement.ModifyTreatment
 {
-    internal class ModifyPatientTreatmentCommandHandler(IMapper mapper, ITreatmentRepository treatmentRepository) : IRequestHandler<ModifyPatientTreatmentApiCommand, ModifyPatientTreatmentApiCommandResponse>
+    internal class ModifyPatientTreatmentCommandHandler(IMapper mapper, ITreatmentRepository treatmentRepository, IUserRepository userRepository,
+        IPatientRepository patientRepository) : IRequestHandler<ModifyPatientTreatmentApiCommand, ModifyPatientTreatmentApiCommandResponse>
     {
         public async Task<ModifyPatientTreatmentApiCommandResponse> Handle(ModifyPatientTreatmentApiCommand request, CancellationToken cancellationToken)
         {
@@ -26,7 +27,11 @@ namespace vetcms.ServerApplication.Features.PatientManagement.ModifyTreatment
             }
 
             Treatment updatedTreatment = mapper.Map<Treatment>(request.TreatmentModel);
+
+            updatedTreatment.Patient = await patientRepository.GetByIdAsync(request.TreatmentModel.PatientId);
+            updatedTreatment.Doctor = await userRepository.GetByIdAsync(request.TreatmentModel.DoctorId);
             updatedTreatment.Id = request.Id;
+
             await treatmentRepository.UpdateAsync(updatedTreatment);
 
             return new ModifyPatientTreatmentApiCommandResponse(true);
