@@ -18,8 +18,7 @@ namespace vetcms.ServerApplication.Common.AutoMapper
                 .ForMember(dest => dest.OwnerId, opt => opt.MapFrom(src => src.Owner.Id))
                 .ForMember(dest => dest.BreedId, opt => opt.MapFrom(src => src.Breed.Id));
 
-            CreateMap<PatientDto, Patient>()
-                .ReverseMap();
+            CreateMap<PatientDto, Patient>();
         }
     }
 }
