@@ -1,6 +1,7 @@
 ﻿@using System.Globalization
 @using vetcms.BrowserPresentation.Utility
 @using vetcms.ClientApplication.Common.Abstract.CommandAbstraction;
+@using vetcms.ClientApplication.Features.IAM.UserList
 @using vetcms.ClientApplication.Features.PatientClassification.ListAnimalBreedByType
 @using vetcms.ClientApplication.Features.PatientClassification.ListAnimalType
 @using vetcms.ClientApplication.Features.PatientManagement.ListPatients
@@ -8,7 +9,7 @@
 @using vetcms.SharedModels.Common.IAM.Authorization;
 @inject MediatR.IMediator Mediator
 @inject IToastService ToastService
-@implements IDialogContentComponent<AnimalDto>
+@implements IDialogContentComponent<PatientDto>
 
 <FluentGrid>
     <FluentGridItem xs="12" md="12">
@@ -41,7 +42,7 @@
                     OptionValue="@(p => p.Id.ToString())"
                     OptionText="@(p => p.TypeName)"
                     @bind-SelectedOption="SelectedType"
-                                  @bind-SelectedOption:after="AnimalTypeSelectionChanged" />
+                    @bind-SelectedOption:after="AnimalTypeSelectionChanged" />
                 </FluentGridItem>
             </PermissionWrapper>
             <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_VIEW_ANIMAL_BREED]">
@@ -55,16 +56,42 @@
                     @bind-SelectedOption:after="AnimalBreedSelectionChanged" />
                 </FluentGridItem>
             </PermissionWrapper>
+            <FluentGridItem xs="12" md="12">
+                <FluentSearch 
+                Label="Tulajdonos"
+                @ref=userSearch
+                              Immediate="true" ImmediateDelay="300"
+                              @bind-Value="searchValue"
+                              @bind-Value:after="SearchQueryChanged"
+                Placeholder="Tulajdonos keresése..." />
+                <FluentListbox Width="25%" aria-label="search results" Items=@searchResults TOption="Option<int>" OptionText="@(i => i.Text)"
+                OptionValue="@(i => i.Value.ToString())" @bind-SelectedOption="selectedOption" @bind-SelectedOption:after="OwnerSelectionChanged" />
+            </FluentGridItem>
+
+
         </FluentGrid>
     </FluentGridItem>
 </FluentGrid>
 
 @code {
+
+
+
     [Parameter]
-    public AnimalDto Content { get; set; } = new();
+    public PatientDto Content { get; set; } = new();
 
     [CascadingParameter]
     public FluentDialog? Dialog { get; set; }
+
+    private FluentSearch? userSearch;
+    private List<Option<int>> searchResults = defaultSearchResults();
+    private Option<int>? selectedOption;
+    private const string defaultSearchText = "Nincs találat.";
+    private string? searchValue = string.Empty;
+    private static List<Option<int>> defaultSearchResults()
+    {
+        return new List<Option<int>> { new Option<int> { Value = 0, Text = defaultSearchText } };
+    }
 
     private AnimalTypeDto SelectedType { get; set; } = new();
     private AnimalBreedDto SelectedBreed { get; set; } = new();
@@ -74,11 +101,42 @@
     private List<AnimalTypeDto> animalTypes = new();
     private List<AnimalBreedDto> animalBreeds = new();
 
+    private void OwnerSelectionChanged()
+    {
+        if (selectedOption == null)
+        {
+            return;
+        }
+        Content.OwnerId = selectedOption.Value;
+    }
 
     protected override async Task OnInitializedAsync()
     {
         animalTypes = await GetAnimalTypes();
     }
+
+    private async Task SearchQueryChanged()
+    {
+        if (string.IsNullOrWhiteSpace(searchValue))
+            return;
+
+        var query = new UserListClientQuery()
+            {
+                SearchTerm = searchValue,
+                Take = 5
+            };
+        UserListClientQueryResponse result = await Mediator.Send(query);
+
+        if (result == null)
+        {
+            ToastService.ShowError("Sikertelen adatlekérés.");
+            return;
+        }
+        searchResults = result.Users.ConvertAll(x => new Option<int> { Value = x.Id, Text = $"{x.LastName} {x.FirstName} ({x.DateOfBirth})" });
+
+        StateHasChanged();
+    }
+
 
     private async Task AnimalTypeSelectionChanged()
     {

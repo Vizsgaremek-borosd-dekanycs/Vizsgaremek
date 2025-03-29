@@ -13,6 +13,7 @@
 @using vetcms.ClientApplication.Features.PatientManagement.DeletePatient
 @using vetcms.ClientApplication.Features.PatientManagement.GetPatient
 @using vetcms.ClientApplication.Features.PatientManagement.ListPatients
+@using vetcms.ClientApplication.Features.PatientManagement.ModifyPatient
 @using vetcms.SharedModels.Common.Dto
 @inject IDialogService DialogService
 @inject IToastService ToastService;
@@ -24,7 +25,7 @@
         <FluentGridItem xs="12">
             <FluentToolbar id="toolbar-fluent-components" style="width:100%">
                 <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_ADD_ANIMAL_BREED]">
-                    <FluentButton Disabled="isBusy" @onclick="@OpenCreateTreatmentDialog" style="padding-bottom: 5px;" IconStart="@(new Icons.Regular.Size16.PersonAdd())" Appearance="Appearance.Accent">Új állat</FluentButton>
+                    <FluentButton Disabled="isBusy" @onclick="@OpenCreateTreatmentDialog" style="padding-bottom: 5px;" IconStart="@(new Icons.Regular.Size16.PersonAdd())" Appearance="Appearance.Accent">Új kezelés felvétele</FluentButton>
                 </PermissionWrapper>
                 <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_DELETE_ANIMAL_BREED]">
                     <FluentButton Disabled="isBusy" @onclick="@DeleteTreatment" style="padding-bottom: 5px;" IconStart="@(new Icons.Regular.Size16.PersonDelete())" Appearance="Appearance.Accent">Törlés</FluentButton>
@@ -36,17 +37,17 @@
         </FluentGridItem>
         <FluentGridItem xs="12">
             <FluentDataGrid Virtualize="true"
-                            ItemsProvider="treatmentProvider"
-                            GenerateHeader="GenerateHeaderOption.Sticky"
-                            Style="min-width: max-content;"
-                            Pagination="@pagination"
-                            @ref="dataGrid">
+            ItemsProvider="treatmentProvider"
+            GenerateHeader="GenerateHeaderOption.Sticky"
+            Style="min-width: max-content;"
+            Pagination="@pagination"
+            @ref="dataGrid">
                 <SelectColumn TGridItem="SelectableTreatmentDto"
-                              SelectMode="DataGridSelectMode.Multiple"
-                              SelectFromEntireRow="false"
-                              OnSelect="@(e => e.Item.Selected = e.Selected)"
-                              SelectAllDisabled="true"
-                              @bind-SelectedItems="selectedTreatments" />
+                SelectMode="DataGridSelectMode.Multiple"
+                SelectFromEntireRow="false"
+                OnSelect="@(e => e.Item.Selected = e.Selected)"
+                SelectAllDisabled="true"
+                @bind-SelectedItems="selectedTreatments" />
                 <PropertyColumn Title="Azonosító" Property="@(p => p.Id)" Sortable="true" />
                 <PropertyColumn Title="Dátum" Property="@(p => p.DateOfTreatment)" Sortable="true" />
                 <PropertyColumn Title="Kezelés típusa" Property="@(p => p.Type)" Sortable="true" />
@@ -70,10 +71,15 @@
 
 
 
+
+
+
+
     [Parameter]
     public string strPatientId { get; set; }
     public int PatientId { get => int.Parse(strPatientId); }
-    public AnimalDto PatientData { get; set; }
+
+    public PatientDto PatientData { get; set; } = new();
 
 
     private string searchValue = "";
@@ -156,7 +162,7 @@
 
         DeletePatientTreatmentClientCommand command = new DeletePatientTreatmentClientCommand()
             {
-                TreatmentIds = selectedTreatments.Select(u => u.Id).ToList()
+                Ids = selectedTreatments.Select(u => u.Id).ToList()
             };
 
         if (!canceled)
@@ -266,21 +272,22 @@
 
     private async Task SubmitEditTreatmentData(TreatmentDto editTreatmentData)
     {
-        CreatePatientTreatmentClientCommand createNewTreatmentCommand = new CreatePatientTreatmentClientCommand()
+        ModifyPatientTreatmentClientCommand createNewTreatmentCommand = new ModifyPatientTreatmentClientCommand()
             {
-                Treatmentmodel = editTreatmentData
+                Id = editTreatmentData.Id,
+                TreatmentModel = editTreatmentData
             };
         await Mediator.Send(createNewTreatmentCommand);
         await dataGrid.RefreshDataAsync();
     }
 
-    private async Task<AnimalDto> LoadAnimalData(int id)
+    private async Task<PatientDto> LoadAnimalData(int id)
     {
         var result = await Mediator.Send(new GetPatientClientQuery(id));
         if (result != null && result.PatientModel != null)
         {
             return result.PatientModel;
         }
-        return new AnimalDto();
+        return new PatientDto();
     }
 }

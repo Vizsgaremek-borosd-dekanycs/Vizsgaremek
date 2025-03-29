@@ -36,7 +36,7 @@ namespace vetcms.ClientApplication.Features.PatientManagement.GetPatient
         }
     }
 
-    internal class GetPatientByIdApiQueryHandler : GenericApiCommandHandler<GetPatientsByUserIdApiQuery, GetPatientsByUserIdApiQueryResponse>
+    internal class GetPatientByIdApiQueryHandler : GenericApiCommandHandler<GetPatientApiQuery, GetPatientApiQueryResponse>
     {
         public GetPatientByIdApiQueryHandler(IServiceScopeFactory serviceScopeFactory)
             : base(serviceScopeFactory)

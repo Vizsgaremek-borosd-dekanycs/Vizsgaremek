@@ -9,6 +9,6 @@ namespace vetcms.ClientApplication.Features.PatientManagement.DeletePatient
 {
     public class DeletePatientTreatmentClientCommand : IClientCommand<bool>
     {
-        public List<int> TreatmentIds { get; set; }
+        public List<int> Ids { get; set; }
     }
 }

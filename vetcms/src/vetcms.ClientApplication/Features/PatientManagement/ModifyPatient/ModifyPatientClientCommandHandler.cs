@@ -15,7 +15,7 @@ using vetcms.SharedModels.Features.PatientManagement;
 
 namespace vetcms.ClientApplication.Features.PatientManagement.ModifyPatient
 {
-    internal class ModifyAnimalClientCommandHandler(IMediator mediator, IMapper mapper, IDialogService dialogService) : IRequestHandler<ModifyPatientClientCommand, bool>
+    internal class ModifyPatientClientCommandHandler(IMediator mediator, IMapper mapper, IDialogService dialogService) : IRequestHandler<ModifyPatientClientCommand, bool>
     {
         public async Task<bool> Handle(ModifyPatientClientCommand request, CancellationToken cancellationToken)
         {

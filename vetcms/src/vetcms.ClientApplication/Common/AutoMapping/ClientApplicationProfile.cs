@@ -15,6 +15,7 @@ using vetcms.ClientApplication.Features.PatientClassification.ListAnimalBreedByT
 using vetcms.ClientApplication.Features.PatientClassification.ListAnimalType;
 using vetcms.ClientApplication.Features.PatientClassification.ModifyAnimalBreed;
 using vetcms.ClientApplication.Features.PatientClassification.ModifyAnimalType;
+using vetcms.ClientApplication.Features.PatientManagement.DeletePatient;
 using vetcms.ClientApplication.Features.PatientManagement.GetPatient;
 using vetcms.ClientApplication.Features.PatientManagement.ListPatients;
 using vetcms.ClientApplication.Features.PatientManagement.ModifyPatient;
@@ -60,6 +61,13 @@ namespace vetcms.ClientApplication.Common.AutoMapping
 
             CreateMap<ListPatientTreatmentClientQuery, ListPatientTreatmentApiQuery>();
             CreateMap<ListPatientTreatmentApiQueryResponse, ListPatientTreatmentClientQueryResponse>();
+
+            CreateMap<GetTreatmentByIdClientQuery, GetPaitentTreatmentApiQuery>();
+            CreateMap<GetPaitentTreatmentApiQueryResponse, GetTreatmentByIdClientQueryResponse>();
+
+            CreateMap<ModifyPatientTreatmentClientCommand, ModifyPatientTreatmentApiCommand>();
+
+            CreateMap<DeletePatientTreatmentClientCommand, DeletePatientTreatmentApiCommand>();
 
 
         }

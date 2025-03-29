@@ -56,8 +56,7 @@
                 <TemplateColumn Title="Művelet" Align="@Align.End">
                     <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_MODIFY_ANIMAL_TYPES]">
                         <FluentButton Disabled="isBusy" aria-label="Szerkesztés" OnClick="@(async ()=> await OpenEditAnimalDialog(context))" IconStart="@(new Icons.Regular.Size16.Edit())" />
-@*                         <FluentAnchor Href="/patient-management/patients/1/treatments" title="Anchor tooltip">Anchor</FluentAnchor>
-                        *@ <FluentButton Disabled="isBusy" aria-label="Kezelések megtekintése" OnClick="@(()=> Navigation.NavigateTo($"/patient-management/patients/{context.Id}/treatments"))" IconStart="@(new Icons.Regular.Size16.CalendarEdit())" />
+                        <FluentButton Disabled="isBusy" aria-label="Kezelések megtekintése" OnClick="@(()=> Navigation.NavigateTo($"/patient-management/patients/{context.Id}/treatments"))" IconStart="@(new Icons.Regular.Size16.CalendarEdit())" />
                     </PermissionWrapper>
                 </TemplateColumn>
             </FluentDataGrid>
@@ -108,7 +107,7 @@
             data = new AnimalListClientQueryResponse();
         }
 
-        List<SelectableAnimalDto> animalBreeds = data.Animals.Select(u => new SelectableAnimalDto
+        List<SelectableAnimalDto> animalBreeds = data.Patients.Select(u => new SelectableAnimalDto
             {
                 Id = u.Id,
                 TypeId = u.TypeId,
@@ -122,7 +121,7 @@
 
         return GridItemsProviderResult.From(
             items: animalBreeds,
-            totalItemCount: data.ResultCount);
+            totalItemCount: data.ResoultCount);
     }
 
     public async Task DeleteAnimal()
@@ -248,7 +247,7 @@
         ModifyPatientClientCommand command = new ModifyPatientClientCommand()
         {
             Id = editedAnimalBreed.Id,
-            PatientModel = editedAnimalBreed
+            PartientModel = editedAnimalBreed
         };
 
         await Mediator.Send(command);
