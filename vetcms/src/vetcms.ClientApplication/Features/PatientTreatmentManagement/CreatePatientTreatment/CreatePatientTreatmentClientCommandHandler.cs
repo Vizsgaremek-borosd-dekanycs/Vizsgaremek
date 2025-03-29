@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using vetcms.ClientApplication.Common.Abstract;
 using vetcms.SharedModels.Features.IAM;
 using vetcms.SharedModels.Features.PatientClassification;
+using vetcms.SharedModels.Features.PatientManagement;
 
 namespace vetcms.ClientApplication.Features.PatientManagement.CreatePatient
 {
@@ -17,24 +18,30 @@ namespace vetcms.ClientApplication.Features.PatientManagement.CreatePatient
     {
         public async Task<bool> Handle(CreatePatientTreatmentClientCommand request, CancellationToken cancellationToken)
         {
-            if (true)
+            CreatePatientTreatmentApiCommand createPatientTreatmentApiCommand = new CreatePatientTreatmentApiCommand
             {
-                await dialogService.ShowSuccessAsync($"Sikeres létrehozás", "Siker");
+                NewTreatment = request.Treatmentmodel
+            };
+            var response = await mediator.Send(createPatientTreatmentApiCommand);
+
+            if (response.Success)
+            {
+                await dialogService.ShowSuccessAsync($"{response.Message}", "Siker");
                 return true;
             }
             else
             {
-                //dialogService.ShowError(response.Message, "Hiba");
+                dialogService.ShowError(response.Message, "Hiba");
                 return false;
             }
         }
     }
 
-    //internal class CreateAnimalBreedApiCommandHandler : GenericApiCommandHandler<CreateAnimalBreedApiCommand, CreateAnimalBreedApiCommandResponse>
-    //{
-    //    public CreateAnimalBreedApiCommandHandler(IServiceScopeFactory serviceScopeFactory)
-    //        : base(serviceScopeFactory)
-    //    {
-    //    }
-    //}
-}
+        internal class CreatePatientTreatmentApiCommandHandler : GenericApiCommandHandler<CreatePatientTreatmentApiCommand, CreatePatientTreatmentApiCommandResponse>
+        {
+            public CreatePatientTreatmentApiCommandHandler(IServiceScopeFactory serviceScopeFactory)
+                : base(serviceScopeFactory)
+            {
+            }
+        }
+    }

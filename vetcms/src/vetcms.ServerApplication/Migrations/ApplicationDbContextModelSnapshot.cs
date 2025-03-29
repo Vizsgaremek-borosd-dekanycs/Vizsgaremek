@@ -15,7 +15,7 @@ namespace vetcms.Application.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.2");
 
             modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.AnimalBreed", b =>
                 {
@@ -285,6 +285,132 @@ namespace vetcms.Application.Migrations
                     b.ToTable("PasswordReset");
                 });
 
+            modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.PatientManagement.Patient", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("BreedId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ChronicDiseases")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CreatedByUserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<char>("Gender")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsSterilised")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("LastModifiedByUserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("MicrochipNumber")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("OwnerId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TypeId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<double>("Weight")
+                        .HasColumnType("REAL");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BreedId");
+
+                    b.HasIndex("OwnerId");
+
+                    b.HasIndex("TypeId");
+
+                    b.ToTable("Patients");
+                });
+
+            modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.PatientManagement.Treatment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CreatedByUserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("DateOfTreatment")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Diagnosis")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("DoctorId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("FollowUpDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("LastModifiedByUserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Medications")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PatientId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Procedure")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Symptoms")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DoctorId");
+
+                    b.HasIndex("PatientId");
+
+                    b.ToTable("Treatments");
+                });
+
             modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.SentEmail", b =>
                 {
                     b.Property<int>("Id")
@@ -458,6 +584,52 @@ namespace vetcms.Application.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.PatientManagement.Patient", b =>
+                {
+                    b.HasOne("vetcms.ServerApplication.Domain.Entity.AnimalBreed", "Breed")
+                        .WithMany()
+                        .HasForeignKey("BreedId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("vetcms.ServerApplication.Domain.Entity.User", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("vetcms.ServerApplication.Domain.Entity.AnimalType", "Type")
+                        .WithMany()
+                        .HasForeignKey("TypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Breed");
+
+                    b.Navigation("Owner");
+
+                    b.Navigation("Type");
+                });
+
+            modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.PatientManagement.Treatment", b =>
+                {
+                    b.HasOne("vetcms.ServerApplication.Domain.Entity.User", "Doctor")
+                        .WithMany()
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("vetcms.ServerApplication.Domain.Entity.PatientManagement.Patient", "Patient")
+                        .WithMany()
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Doctor");
+
+                    b.Navigation("Patient");
                 });
 
             modelBuilder.Entity("vetcms.ServerApplication.Domain.Entity.MedicalPillManagement.MedicalPill", b =>
