@@ -19,9 +19,7 @@
 @inject MediatR.IMediator Mediator
 
 <FluentCard style="overflow:auto;">
-    <h1>Pid: @{
-            @strPatientId;
-        }</h1>
+    <h1>@PatientData.Name - @PatientData.MicrochipNumber</h1>
     <FluentGrid>
         <FluentGridItem xs="12">
             <FluentToolbar id="toolbar-fluent-components" style="width:100%">
@@ -75,6 +73,7 @@
     [Parameter]
     public string strPatientId { get; set; }
     public int PatientId { get => int.Parse(strPatientId); }
+    public AnimalDto PatientData { get; set; }
 
 
     private string searchValue = "";
@@ -93,6 +92,7 @@
     protected override async Task OnInitializedAsync()
     {
         treatmentProvider = gridItemsProviderResult;
+        PatientData = await LoadAnimalData(PatientId);
     }
 
     private async Task SearchValueChanged()
@@ -272,5 +272,15 @@
             };
         await Mediator.Send(createNewTreatmentCommand);
         await dataGrid.RefreshDataAsync();
+    }
+
+    private async Task<AnimalDto> LoadAnimalData(int id)
+    {
+        var result = await Mediator.Send(new GetPatientClientQuery(id));
+        if (result != null && result.PatientModel != null)
+        {
+            return result.PatientModel;
+        }
+        return new AnimalDto();
     }
 }

@@ -18,10 +18,10 @@
                 <FluentNumberField Disabled="true" Style="width: 100%" @bind-Value="Content.Id" Label="Azonosító" />
             </FluentGridItem>
             <FluentGridItem xs="12" sm="12">
-                <FluentTextField Disabled="true" Style="width: 100%" Value="Patient.MicrochipNumber" Label="Microchip szám:" />
+                <FluentTextField Disabled="true" Style="width: 100%" @bind-Value="Patient.MicrochipNumber" Label="Microchip szám:" />
             </FluentGridItem>
             <FluentGridItem xs="12" sm="12">
-                <FluentDatePicker Disabled="true" Style="width: 100%"  Value="Content.DateOfTreatment" ValueChanged="(date) => Content.DateOfTreatment = date.Value" Label="#" />
+                <FluentDatePicker Disabled="true" Style="width: 100%"  Value="Content.DateOfTreatment" ValueChanged="(date) => Content.DateOfTreatment = date.Value" Label="Kezelés dátuma" />
             </FluentGridItem>
 
             <FluentGridItem xs="12" sm="12">
@@ -46,7 +46,7 @@
                 <FluentTextArea Style="width: 100%" @bind-Value="Content.Description" Label="Egyéb információ" />
             </FluentGridItem>
             <FluentGridItem xs="12" sm="12">
-                <FluentDatePicker Style="width: 100%" Value="Content.FollowUpDate" ValueChanged="(date) => Content.FollowUpDate = date.Value" Label="#" />
+                <FluentDatePicker Style="width: 100%" Value="Content.FollowUpDate" ValueChanged="(date) => Content.FollowUpDate = date.Value" Label="Controll időpont" />
             </FluentGridItem>
         </FluentGrid>
     </FluentGridItem>
