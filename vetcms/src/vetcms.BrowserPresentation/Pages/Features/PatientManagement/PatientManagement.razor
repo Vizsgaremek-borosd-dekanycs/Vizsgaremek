@@ -1,7 +1,12 @@
 ﻿@page "/patient-management/animal-management"
+@page "/patient-management/animal-management/user/{strUserId}"
+
+<PageTitle>Páciensek kezelése</PageTitle>
+
 @using vetcms.BrowserPresentation.Components
 @using vetcms.BrowserPresentation.Utility
 @using vetcms.ClientApplication.Common.Abstract.CommandAbstraction
+@using vetcms.ClientApplication.Features.IAM.GetUser
 @using vetcms.ClientApplication.Features.PatientClassification.ListAnimalBreed
 @using vetcms.ClientApplication.Features.PatientClassification.CreateAnimalBreed
 @using vetcms.ClientApplication.Features.PatientClassification.DeleteAnimalBreed
@@ -19,37 +24,44 @@
 @inject NavigationManager Navigation
 
 <FluentCard style="overflow:auto;">
+    @if (IsUserAnimalLookup)
+    {
+        <h1>Állatok megtekintése: @Username</h1>
+    }
     <FluentGrid>
         <FluentGridItem xs="12">
             <FluentToolbar id="toolbar-fluent-components" style="width:100%">
                 <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_ADD_ANIMAL_BREED]">
-                    <FluentButton Disabled="isBusy" @onclick="@OpenCreateAnimalDialog" style="padding-bottom: 5px;" IconStart="@(new Icons.Regular.Size16.PersonAdd())" Appearance="Appearance.Accent">Új állat</FluentButton>
+                    <FluentButton Disabled="isBusy" @onclick="@OpenCreateAnimalDialog" style="padding-bottom: 5px;" IconStart="@(new Icons.Regular.Size16.AddCircle())" Appearance="Appearance.Accent">Új állat</FluentButton>
                 </PermissionWrapper>
                 <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_DELETE_ANIMAL_BREED]">
-                    <FluentButton Disabled="isBusy" @onclick="@DeleteAnimal" style="padding-bottom: 5px;" IconStart="@(new Icons.Regular.Size16.PersonDelete())" Appearance="Appearance.Accent">Törlés</FluentButton>
+                    <FluentButton Disabled="isBusy" @onclick="@DeleteAnimal" style="padding-bottom: 5px;" IconStart="@(new Icons.Regular.Size16.DismissCircle())" Appearance="Appearance.Accent">Törlés</FluentButton>
                 </PermissionWrapper>
-                <div slot="end">
-                    <FluentSearch Disabled="isBusy" @bind-Value="searchValue" Immediate="true" ImmediateDelay="300" @bind-Value:after="SearchValueChanged" AutoComplete="off" />
-                </div>
+                @if(!IsUserAnimalLookup)
+                {
+                    <div slot="end">
+                        <FluentSearch Disabled="isBusy" @bind-Value="searchValue" Immediate="true" ImmediateDelay="300" @bind-Value:after="SearchValueChanged" AutoComplete="off" />
+                    </div>
+                }
             </FluentToolbar>
         </FluentGridItem>
         <FluentGridItem xs="12">
             <FluentDataGrid Virtualize="true"
-                            ItemsProvider="animalProvider"
-                            GenerateHeader="GenerateHeaderOption.Sticky"
-                            Style="min-width: max-content;"
-                            Pagination="@pagination"
-                            @ref="dataGrid">
+            ItemsProvider="animalProvider"
+            GenerateHeader="GenerateHeaderOption.Sticky"
+            Style="min-width: max-content;"
+            Pagination="@pagination"
+            @ref="dataGrid">
                 <SelectColumn TGridItem="SelectableAnimalDto"
-                              SelectMode="DataGridSelectMode.Multiple"
-                              SelectFromEntireRow="false"
-                              OnSelect="@(e => e.Item.Selected = e.Selected)"
-                              SelectAllDisabled="true"
-                              @bind-SelectedItems="selectedAnimals" />
+                SelectMode="DataGridSelectMode.Multiple"
+                SelectFromEntireRow="false"
+                OnSelect="@(e => e.Item.Selected = e.Selected)"
+                SelectAllDisabled="true"
+                @bind-SelectedItems="selectedAnimals" />
                 <PropertyColumn Title="Azonosító" Property="@(p => p.Id)" Sortable="true" />
                 <PropertyColumn Title="Tulajdonos" Property="@(p => p.OwnerId)" Sortable="true" />
-                <PropertyColumn Title="Faj" Property="@(p => p.TypeId)" Sortable="true" />
-                <PropertyColumn Title="Fajta" Property="@(p => p.BreedId)" Sortable="true" />
+                <PropertyColumn Title="Születési dátum" Property="@(p => p.DateOfBirth)" Sortable="true" />
+                <PropertyColumn Title="Súly (KG)" Property="@(p => p.Weight)" Sortable="true" />
                 <PropertyColumn Title="Név" Property="@(p => p.Name)" Sortable="true" />
                 <PropertyColumn Title="Microchip szám" Property="@(p => p.MicrochipNumber)" Sortable="true" />
 
@@ -68,12 +80,18 @@
 </FluentCard>
 
 @code {
+    [Parameter]
+    public string strUserId { get; set; }
+    public bool IsUserAnimalLookup { get => !string.IsNullOrEmpty(strUserId);}
+
     private string searchValue = "";
     GridItemsProvider<SelectableAnimalDto> animalProvider = default!;
     bool isBusy = false;
     PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
     IEnumerable<SelectableAnimalDto>? selectedAnimals = new List<SelectableAnimalDto>();
     private FluentDataGrid<SelectableAnimalDto> dataGrid;
+
+    public string Username { get; set; }
 
     private class SelectableAnimalDto : PatientDto
     {
@@ -84,6 +102,14 @@
     protected override async Task OnInitializedAsync()
     {
         animalProvider = gridItemsProviderResult;
+        if (IsUserAnimalLookup)
+        {
+            if (int.TryParse(strUserId, out int userId))
+            {
+                UserDto user = await GetUserById(userId);
+                Username = $"{user.LastName} {user.FirstName} ({user.DateOfBirth})";
+            }
+        }
     }
 
     private async Task SearchValueChanged()
@@ -93,12 +119,20 @@
 
     private async ValueTask<GridItemsProviderResult<SelectableAnimalDto>> gridItemsProviderResult(GridItemsProviderRequest<SelectableAnimalDto> req)
     {
+        List<PatientDto> patients = new List<PatientDto>();
         var query = new AnimalListClientQuery()
             {
                 SearchTerm = searchValue,
                 Skip = req.StartIndex,
                 Take = req.Count.HasValue ? req.Count.Value : 10
             };
+        if (IsUserAnimalLookup)
+        {
+            if (int.TryParse(strUserId, out int userId))
+            {
+                query.OwnerId = userId;
+            }
+        }
 
         var data = await ToastService.ShowIndeterminateProgressToast(Mediator.Send(query), "Kérjük várjon...", "Állatok betöltése folyamatban...");
 
@@ -148,6 +182,16 @@
 
         await dataGrid.RefreshDataAsync();
         isBusy = false;
+    }
+
+    private async Task<UserDto> GetUserById(int id)
+    {
+        var userQuery = await Mediator.Send(new GetUserClientQuery(id));
+        if (userQuery != null && userQuery.User != null)
+        {
+            return userQuery.User;
+        }
+        return new UserDto();
     }
 
     private async Task<DialogResult?> ShowAnimalEditDialog(string title, PatientDto animal)

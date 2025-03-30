@@ -1,6 +1,7 @@
 ﻿@using System.Globalization
 @using vetcms.BrowserPresentation.Utility
 @using vetcms.ClientApplication.Common.Abstract.CommandAbstraction;
+@using vetcms.ClientApplication.Features.IAM.GetUser
 @using vetcms.ClientApplication.Features.IAM.UserList
 @using vetcms.ClientApplication.Features.PatientClassification.ListAnimalBreedByType
 @using vetcms.ClientApplication.Features.PatientClassification.ListAnimalType
@@ -60,9 +61,9 @@
                 <FluentSearch 
                 Label="Tulajdonos"
                 @ref=userSearch
-                              Immediate="true" ImmediateDelay="300"
-                              @bind-Value="searchValue"
-                              @bind-Value:after="SearchQueryChanged"
+                Immediate="true" ImmediateDelay="300"
+                @bind-Value="searchValue"
+                @bind-Value:after="SearchQueryChanged"
                 Placeholder="Tulajdonos keresése..." />
                 <FluentListbox Width="25%" aria-label="search results" Items=@searchResults TOption="Option<int>" OptionText="@(i => i.Text)"
                 OptionValue="@(i => i.Value.ToString())" @bind-SelectedOption="selectedOption" @bind-SelectedOption:after="OwnerSelectionChanged" />
@@ -74,9 +75,6 @@
 </FluentGrid>
 
 @code {
-
-
-
     [Parameter]
     public PatientDto Content { get; set; } = new();
 
@@ -84,14 +82,11 @@
     public FluentDialog? Dialog { get; set; }
 
     private FluentSearch? userSearch;
-    private List<Option<int>> searchResults = defaultSearchResults();
+    private List<Option<int>> searchResults = new List<Option<int>>();
     private Option<int>? selectedOption;
     private const string defaultSearchText = "Nincs találat.";
     private string? searchValue = string.Empty;
-    private static List<Option<int>> defaultSearchResults()
-    {
-        return new List<Option<int>> { new Option<int> { Value = 0, Text = defaultSearchText } };
-    }
+
 
     private AnimalTypeDto SelectedType { get; set; } = new();
     private AnimalBreedDto SelectedBreed { get; set; } = new();
@@ -110,9 +105,32 @@
         Content.OwnerId = selectedOption.Value;
     }
 
+    private async Task<List<Option<int>>> defaultSearchResults()
+    {
+        if (Content.OwnerId != null && Content.OwnerId > 0)
+        {
+            UserDto user = await GetUserById(Content.OwnerId);
+            var option = new Option<int> { Value = Content.OwnerId, Text = $"{user.LastName} {user.FirstName} ({user.DateOfBirth})" };
+            selectedOption = option;
+            return new List<Option<int>> { option };
+        }
+        return new List<Option<int>> { new Option<int> { Value = 0, Text = defaultSearchText } };
+    }
+
     protected override async Task OnInitializedAsync()
     {
         animalTypes = await GetAnimalTypes();
+        searchResults = await defaultSearchResults();
+    }
+
+    private async Task<UserDto> GetUserById(int id)
+    {
+        var userQuery = await Mediator.Send(new GetUserClientQuery(id));
+        if (userQuery != null && userQuery.User != null)
+        {
+            return userQuery.User;
+        }
+        return new UserDto();
     }
 
     private async Task SearchQueryChanged()

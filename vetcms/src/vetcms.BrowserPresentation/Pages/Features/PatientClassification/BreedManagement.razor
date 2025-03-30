@@ -1,4 +1,7 @@
 ﻿@page "/patient-classification/breed-management"
+
+<PageTitle>Állatfajták kezelése</PageTitle>
+
 @using vetcms.BrowserPresentation.Components
 @using vetcms.BrowserPresentation.Utility
 @using vetcms.ClientApplication.Common.Abstract.CommandAbstraction
@@ -17,10 +20,10 @@
         <FluentGridItem xs="12">
             <FluentToolbar id="toolbar-fluent-components" style="width:100%">
                 <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_ADD_ANIMAL_BREED]">
-                    <FluentButton Disabled="isBusy" @onclick="@OpenCreateAnimalBreedDialog" style="padding-bottom: 5px;" IconStart="@(new Icons.Regular.Size16.PersonAdd())" Appearance="Appearance.Accent">Új állatfaj</FluentButton>
+                    <FluentButton Disabled="isBusy" @onclick="@OpenCreateAnimalBreedDialog" style="padding-bottom: 5px;" IconStart="@(new Icons.Regular.Size16.AddCircle())" Appearance="Appearance.Accent">Új állatfaj</FluentButton>
                 </PermissionWrapper>
                 <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_DELETE_ANIMAL_BREED]">
-                    <FluentButton Disabled="isBusy" @onclick="@DeleteAnimalBreeds" style="padding-bottom: 5px;" IconStart="@(new Icons.Regular.Size16.PersonDelete())" Appearance="Appearance.Accent">Törlés</FluentButton>
+                    <FluentButton Disabled="isBusy" @onclick="@DeleteAnimalBreeds" style="padding-bottom: 5px;" IconStart="@(new Icons.Regular.Size16.DismissCircle())" Appearance="Appearance.Accent">Törlés</FluentButton>
                 </PermissionWrapper>
                 <div slot="end">
                     <FluentSearch Disabled="isBusy" @bind-Value="searchValue" Immediate="true" ImmediateDelay="300" @bind-Value:after="SearchValueChanged" AutoComplete="off" />

@@ -15,7 +15,7 @@ namespace vetcms.ServerApplication.Features.PatientManagement.ListPatient
     public partial class PatientManagementController : ApiV1ControllerBase
     {
         [HttpGet("animals")]
-        public async Task<ListPatientApiQueryResponse> GetPatients([FromQuery(Name = "skip")] int skip = 0, [FromQuery(Name = "take")] int take = 10, [FromQuery(Name = "query")] string searchTerm = "")
+        public async Task<ListPatientApiQueryResponse> GetPatients([FromQuery(Name = "skip")] int skip = 0, [FromQuery(Name = "take")] int take = 10, [FromQuery(Name = "query")] string searchTerm = "", [FromQuery(Name = "ownerid")] string ownerId = "")
         {
             ListPatientApiQuery command = new ListPatientApiQuery
             {
@@ -23,6 +23,10 @@ namespace vetcms.ServerApplication.Features.PatientManagement.ListPatient
                 Take = take,
                 SearchTerm = searchTerm
             };
+            if(int.TryParse(ownerId, out int ownerIdInt))
+            {
+                command.OwnerId = ownerIdInt;
+            }
             command.Prepare(Request);
             return await Mediator.Send(command);
         }
