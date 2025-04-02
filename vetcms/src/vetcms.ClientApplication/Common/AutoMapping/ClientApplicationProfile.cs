@@ -68,6 +68,7 @@ namespace vetcms.ClientApplication.Common.AutoMapping
             CreateMap<ModifyPatientTreatmentClientCommand, ModifyPatientTreatmentApiCommand>();
 
             CreateMap<DeletePatientTreatmentClientCommand, DeletePatientTreatmentApiCommand>();
+            CreateMap<ModifyPatientClientCommand, ModifyPatientApiCommand>();
 
 
         }
