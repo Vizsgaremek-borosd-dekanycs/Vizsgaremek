@@ -291,7 +291,7 @@
         ModifyPatientClientCommand command = new ModifyPatientClientCommand()
         {
             Id = editedAnimalBreed.Id,
-            PartientModel = editedAnimalBreed
+            PatientModel = editedAnimalBreed
         };
 
         await Mediator.Send(command);

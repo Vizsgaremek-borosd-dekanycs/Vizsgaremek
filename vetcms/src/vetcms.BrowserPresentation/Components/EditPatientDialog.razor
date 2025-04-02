@@ -68,8 +68,6 @@
                 <FluentListbox Width="25%" aria-label="search results" Items=@searchResults TOption="Option<int>" OptionText="@(i => i.Text)"
                 OptionValue="@(i => i.Value.ToString())" @bind-SelectedOption="selectedOption" @bind-SelectedOption:after="OwnerSelectionChanged" />
             </FluentGridItem>
-
-
         </FluentGrid>
     </FluentGridItem>
 </FluentGrid>
