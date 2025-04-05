@@ -21,7 +21,7 @@ namespace vetcms.ServerApplication.Features.PatientManagement.CreateTreatment
             newTreatment.Doctor = await userRepository.GetByIdAsync(request.NewTreatment.DoctorId);
 
             await treatmentRepository.AddAsync(newTreatment);
-            return await Task.FromResult(new CreatePatientTreatmentApiCommandResponse(true));
+            return await Task.FromResult(new CreatePatientTreatmentApiCommandResponse(true,"Új kezelés sikeresen mentve!"));
         }
     }
 }

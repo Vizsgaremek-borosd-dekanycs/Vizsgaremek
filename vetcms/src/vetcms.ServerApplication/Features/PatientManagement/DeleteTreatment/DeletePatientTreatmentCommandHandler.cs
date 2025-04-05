@@ -39,7 +39,8 @@ namespace vetcms.ServerApplication.Features.PatientManagement.DeleteTreatment
 
             return new DeletePatientTreatmentApiCommandResponse()
             {
-                Success = true
+                Success = true,
+                Message = "Kezelés(ek) sikeresen törölve!"
             };
         }
     }

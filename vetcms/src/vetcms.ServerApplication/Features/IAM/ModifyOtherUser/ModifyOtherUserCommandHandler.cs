@@ -83,7 +83,7 @@ namespace vetcms.ServerApplication.Features.IAM.ModifyOtherUser
             }
             if (targetUser.DateOfBirth != userDto.DateOfBirth)
             {
-                targetUser.DateOfBirth = userDto.DateOfBirth ?? DateTime.MinValue;
+                targetUser.DateOfBirth = userDto.DateOfBirth ?? DateTime.Now;
             }
             if (targetUser.FirstName != userDto.FirstName)
             {

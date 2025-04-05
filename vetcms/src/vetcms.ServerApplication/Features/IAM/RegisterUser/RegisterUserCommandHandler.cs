@@ -22,6 +22,7 @@ namespace vetcms.ServerApplication.Features.IAM.RegisterUser
             newUser.Email = request.Email;
             newUser.Password = PasswordUtility.CreateUserPassword(newUser, request.Password);
             newUser.VisibleName = request.Name;
+            newUser.DateOfBirth = DateTime.Now;
 
             if(userRepository.HasUserByEmail(newUser.Email))
             {

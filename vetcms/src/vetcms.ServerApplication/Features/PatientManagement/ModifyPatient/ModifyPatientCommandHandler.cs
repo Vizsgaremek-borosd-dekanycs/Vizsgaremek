@@ -38,7 +38,11 @@ namespace vetcms.ServerApplication.Features.PatientManagement.ModifyPatient
             updatedPatient.Id = request.Id;
             await patientRepository.UpdateAsync(updatedPatient);
 
-            return new ModifyPatientApiCommandResponse(true);
+            return new ModifyPatientApiCommandResponse()
+            {
+                Success = true,
+                Message = "Módosítások elmentve!"
+            };
         }
     }
 }

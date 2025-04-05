@@ -40,7 +40,8 @@ namespace vetcms.ServerApplication.Features.PatientManagement.DeletePatient
 
             return new DeletePatientApiCommandResponse()
             {
-                Success = true
+                Success = true,
+                Message = "Páciens(ek) sikeresen törölve!"
             };
         }
     }

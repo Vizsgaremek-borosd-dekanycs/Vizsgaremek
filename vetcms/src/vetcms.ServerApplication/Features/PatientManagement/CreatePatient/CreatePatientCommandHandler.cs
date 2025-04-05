@@ -34,7 +34,7 @@ namespace vetcms.ServerApplication.Features.PatientManagement.CreatePatient
             newPatient.Owner = await userRepository.GetByIdAsync(request.NewPatient.OwnerId);
 
             _ = await patientRepository.AddAsync(newPatient);
-            return await Task.FromResult(new CreatePatientApiCommandResponse(true));
+            return await Task.FromResult(new CreatePatientApiCommandResponse(true,"Új páciens sikeresen mentve!"));
         }
     }
 }

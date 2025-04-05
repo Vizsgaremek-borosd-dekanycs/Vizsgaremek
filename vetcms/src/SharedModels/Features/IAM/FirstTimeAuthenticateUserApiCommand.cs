@@ -24,7 +24,7 @@ namespace vetcms.SharedModels.Features.IAM
         }
     }
 
-    public class FirtTimeAuthenticateUserApiCommandValidator : AbstractValidator<RegisterUserApiCommand>
+    public class FirtTimeAuthenticateUserApiCommandValidator : AbstractValidator<FirstTimeAuthenticateUserApiCommand>
     {
         public FirtTimeAuthenticateUserApiCommandValidator()
         {
