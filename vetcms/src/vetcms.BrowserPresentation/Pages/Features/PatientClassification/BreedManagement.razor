@@ -48,7 +48,7 @@
                 <PropertyColumn Title="Jellemzők" Property="@(p => p.Charachteristics)" Sortable="true" />
 
                 <TemplateColumn Title="Művelet" Align="@Align.End">
-                     <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_MODIFY_ANIMAL_TYPES]">
+                     <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_MODIFY_ANIMAL_BREED]">
                         <FluentButton Disabled="isBusy" aria-label="Szerkesztés" OnClick="@(async ()=> await OpenEditAnimalBreedDialog(context))" IconStart="@(new Icons.Regular.Size16.Edit())" />
                     </PermissionWrapper> 
 
