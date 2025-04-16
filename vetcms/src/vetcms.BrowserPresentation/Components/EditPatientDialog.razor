@@ -19,6 +19,15 @@
                 <FluentTextField Style="width: 100%" @bind-Value="Content.Name" Label="Név" TextFieldType="TextFieldType.Text" />
             </FluentGridItem>
             <FluentGridItem xs="12" sm="12">
+                <FluentSelect Items="@genderOptions"
+                              Label="Nem"
+                              Multiple="false"
+                              OptionText="@(i => i.Text)"
+                              OptionValue="@(i => i.Value.ToString())"
+                              @bind-SelectedOption="SelectedGender"
+                              @bind-SelectedOption:after="GenderSelectionChanged" />
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="12">
                 <FluentNumberField Style="width: 100%" @bind-Value="Content.Weight" Label="Súly" />
             </FluentGridItem>
             <FluentGridItem xs="12" sm="12">
@@ -38,7 +47,7 @@
                 <FluentGridItem xs="12" md="12">
                     <FluentSelect TOption="AnimalTypeDto"
                     Multiple="false"
-                    Label="Állat fajta"
+                    Label="Állattípus"
                     Items="@animalTypes"
                     OptionValue="@(p => p.Id.ToString())"
                     OptionText="@(p => p.TypeName)"
@@ -49,7 +58,7 @@
             <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_VIEW_ANIMAL_BREED]">
                 <FluentGridItem xs="12" md="12">
                     <FluentSelect TOption="AnimalBreedDto"
-                    Label="Állat faj"
+                    Label="Állatfaj"
                     Items="@animalBreeds"
                     OptionValue="@(p => p.Id.ToString())"
                     OptionText="@(p => p.BreedName)"
@@ -84,6 +93,13 @@
     private Option<int>? selectedOption;
     private const string defaultSearchText = "Nincs találat.";
     private string? searchValue = string.Empty;
+    private List<Option<char>> genderOptions = new List<Option<char>>()
+    {
+        new Option<char> { Value = 'H', Text = "Hím" },
+        new Option<char> { Value = 'N', Text = "Nőstény" },
+    };
+    private Option<char> SelectedGender { get; set; } = new();
+
 
 
     private AnimalTypeDto SelectedType { get; set; } = new();
@@ -94,6 +110,7 @@
     private List<AnimalTypeDto> animalTypes = new();
     private List<AnimalBreedDto> animalBreeds = new();
 
+
     private void OwnerSelectionChanged()
     {
         if (selectedOption == null)
@@ -101,6 +118,14 @@
             return;
         }
         Content.OwnerId = selectedOption.Value;
+    }
+
+    private void GenderSelectionChanged()
+    {
+        if (SelectedGender != null)
+        {
+            Content.Gender = SelectedGender.Value;
+        }        
     }
 
     private async Task<List<Option<int>>> defaultSearchResults()
@@ -119,6 +144,12 @@
     {
         animalTypes = await GetAnimalTypes();
         searchResults = await defaultSearchResults();
+
+        if (Content.Gender == default(char))
+        {
+            SelectedGender = genderOptions.First();
+            GenderSelectionChanged();
+        }
     }
 
     private async Task<UserDto> GetUserById(int id)
@@ -164,6 +195,7 @@
             Content.TypeId = animalTypeDto.Id;
 
             animalBreeds = await GetAnimalTypeRelatedBreeds(SelectedType.Id);
+            Console.WriteLine(animalBreeds[0].BreedName);
             SelectedBreed = animalBreeds.FirstOrDefault();
             AnimalBreedSelectionChanged();
         }

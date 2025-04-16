@@ -43,6 +43,10 @@ namespace vetcms.SharedModels.Features.PatientManagement
                 .GreaterThan(0).WithMessage("A súly nem lehet nulla vagy annál kisebb");
             RuleFor(x => x.NewPatient.MicrochipNumber)
                 .NotEmpty().WithMessage("A mikrocsip száma nem lehet üres");
+            RuleFor(x => x.NewPatient.Gender)
+                .NotEmpty().WithMessage("Az állat neme nem lehet üres");
+            RuleFor(x => x.NewPatient.Gender)
+                .Must(x => x == 'N' || x == 'H').WithMessage("Az állat neme csak N (Nőstény) vagy H (Hím) lehet");
             RuleFor(x => x.NewPatient.ChronicDiseases)
                 .NotEmpty().WithMessage("A krónikus betegségek nem lehetnek üresek");
             RuleFor(x => x.NewPatient.OwnerId)
