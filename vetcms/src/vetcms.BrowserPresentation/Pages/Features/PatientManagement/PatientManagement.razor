@@ -63,11 +63,14 @@
                 <PropertyColumn Title="Születési dátum" Property="@(p => p.DateOfBirth)" Sortable="true" />
                 <PropertyColumn Title="Súly (KG)" Property="@(p => p.Weight)" Sortable="true" />
                 <PropertyColumn Title="Név" Property="@(p => p.Name)" Sortable="true" />
+                <PropertyColumn Title="Nem" Property="@(p => p.Gender)" Sortable="true" />
                 <PropertyColumn Title="Microchip szám" Property="@(p => p.MicrochipNumber)" Sortable="true" />
 
                 <TemplateColumn Title="Művelet" Align="@Align.End">
                     <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_MODIFY_PATIENT]">
                         <FluentButton Disabled="isBusy" aria-label="Szerkesztés" OnClick="@(async ()=> await OpenEditAnimalDialog(context))" IconStart="@(new Icons.Regular.Size16.Edit())" />
+                    </PermissionWrapper>
+                    <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_VIEW_PATIENT_TREATMENTS]">
                         <FluentButton Disabled="isBusy" aria-label="Kezelések megtekintése" OnClick="@(()=> Navigation.NavigateTo($"/patient-management/patients/{context.Id}/treatments"))" IconStart="@(new Icons.Regular.Size16.CalendarEdit())" />
                     </PermissionWrapper>
                 </TemplateColumn>
@@ -146,6 +149,8 @@
                 Id = u.Id,
                 TypeId = u.TypeId,
                 MicrochipNumber = u.MicrochipNumber,
+                Weight = u.Weight,
+                Gender = u.Gender,
                 Name = u.Name,
                 OwnerId = u.OwnerId,
                 BreedId = u.BreedId,
