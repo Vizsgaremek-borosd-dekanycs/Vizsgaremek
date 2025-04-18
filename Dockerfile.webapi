@@ -1,0 +1,60 @@
+# Use the official ASP.NET Core runtime as a parent image
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+WORKDIR /app
+EXPOSE 5042 443 80
+
+# Set environment variables
+ENV ASPNETCORE_URLS=http://+:5042
+
+# Use the official .NET SDK as a build image
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG configuration=Release
+WORKDIR /src
+
+# Install dotnet ef tools to run migrations & update the database schema in the container
+RUN dotnet tool install --global dotnet-ef
+ENV PATH="$PATH:/root/.dotnet/tools"
+
+# Copy the project files and restore dependencies
+COPY ["../vetcms/src/vetcms.WebApi", "vetcms.WebApi/"]
+COPY ["../vetcms/src/SharedModels", "SharedModels/"]
+COPY ../vetcms/src/vetcms.ServerApplication vetcms.ServerApplication/
+RUN dotnet restore "vetcms.WebApi/vetcms.WebApi.csproj"
+
+# Copy the rest of the application code
+COPY . .
+
+# Build the application
+WORKDIR "/src/vetcms.WebApi"
+RUN dotnet build vetcms.WebApi.csproj -c $configuration -o /app/build
+
+
+# Publish the application
+FROM build AS publish
+ARG configuration=Release
+RUN pwd
+RUN dotnet publish "vetcms.WebApi.csproj" -c $configuration -o /app/publish /p:UseAppHost=false
+COPY ../vetcms/src/vetcms.WebApi/template.appsettings.json /app/publish/appsettings.json
+COPY ../vetcms/src/vetcms.WebApi/template.appsettings.json appsettings.json
+
+RUN dotnet ef database update --startup-project vetcms.WebApi.csproj --project ../vetcms.ServerApplication/vetcms.ServerApplication.csproj
+
+# Create the final image
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+COPY --from=publish /src/vetcms.WebApi/db/vetcms.db ./db_scheme/vetcms.db
+RUN apt update -y && apt install nginx -y
+
+COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
+COPY ./certstore /certstore
+COPY ./entrypoint.sh /entrypoint.sh
+
+# Change ownership to user 1001
+RUN chown -R 1001:1001 /app /var/lib/nginx /var/log/nginx ./db_scheme/vetcms.db /entrypoint.sh
+# Set permissions to read, write, and execute for user 1001
+RUN chmod -R 700 /app ./db_scheme/vetcms.db /var/lib/nginx /var/log/nginx /entrypoint.sh
+
+USER 1001
+
+ENTRYPOINT ["sh", "/entrypoint.sh"]

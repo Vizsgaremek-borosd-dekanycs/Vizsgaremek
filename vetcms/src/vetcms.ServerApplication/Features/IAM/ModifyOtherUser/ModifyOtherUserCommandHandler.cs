@@ -57,8 +57,6 @@ namespace vetcms.ServerApplication.Features.IAM.ModifyOtherUser
         private User ModifyUser(ModifyOtherUserApiCommand request, User targetUser, User executorUser)
         {
             UserDto userDto = request.ModifiedUser;
-            Console.WriteLine(JsonSerializer.Serialize(userDto));
-            Console.WriteLine(JsonSerializer.Serialize(targetUser));
 
             if (targetUser.PhoneNumber != userDto.PhoneNumber)
             {

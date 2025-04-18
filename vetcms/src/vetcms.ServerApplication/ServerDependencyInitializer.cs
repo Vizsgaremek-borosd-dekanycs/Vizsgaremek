@@ -159,7 +159,7 @@ namespace vetcms.ServerApplication
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite(
-                    "Data Source=vetcms.db",
+                    "Data Source=./db/vetcms.db",
                     b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)
 
                 )
