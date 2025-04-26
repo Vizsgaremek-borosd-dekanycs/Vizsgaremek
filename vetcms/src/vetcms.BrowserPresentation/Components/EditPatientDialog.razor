@@ -9,7 +9,8 @@
 @using vetcms.SharedModels.Common.Dto
 @using vetcms.SharedModels.Common.IAM.Authorization;
 @inject MediatR.IMediator Mediator
-@inject IToastService ToastService
+@inject IToastService toastService
+@inject IDialogService dialogService
 @implements IDialogContentComponent<PatientDto>
 
 <FluentGrid>
@@ -20,12 +21,12 @@
             </FluentGridItem>
             <FluentGridItem xs="12" sm="12">
                 <FluentSelect Items="@genderOptions"
-                              Label="Nem"
-                              Multiple="false"
-                              OptionText="@(i => i.Text)"
-                              OptionValue="@(i => i.Value.ToString())"
-                              @bind-SelectedOption="SelectedGender"
-                              @bind-SelectedOption:after="GenderSelectionChanged" />
+                Label="Nem"
+                Multiple="false"
+                OptionText="@(i => i.Text)"
+                OptionValue="@(i => i.Value.ToString())"
+                @bind-SelectedOption="SelectedGender"
+                @bind-SelectedOption:after="GenderSelectionChanged" />
             </FluentGridItem>
             <FluentGridItem xs="12" sm="12">
                 <FluentNumberField Style="width: 100%" @bind-Value="Content.Weight" Label="Súly" />
@@ -125,7 +126,7 @@
         if (SelectedGender != null)
         {
             Content.Gender = SelectedGender.Value;
-        }        
+        }       
     }
 
     private async Task<List<Option<int>>> defaultSearchResults()
@@ -145,10 +146,18 @@
         animalTypes = await GetAnimalTypes();
         searchResults = await defaultSearchResults();
 
+
         if (Content.Gender == default(char))
         {
             SelectedGender = genderOptions.First();
             GenderSelectionChanged();
+        }
+        else
+        {
+            if(genderOptions.Any((g) => g.Value == Content.Gender))
+            {
+                SelectedGender = genderOptions.First((g) => g.Value == Content.Gender);
+            }
         }
     }
 
@@ -176,7 +185,7 @@
 
         if (result == null)
         {
-            ToastService.ShowError("Sikertelen adatlekérés.");
+            toastService.ShowError("Sikertelen adatlekérés.");
             return;
         }
         searchResults = result.Users.ConvertAll(x => new Option<int> { Value = x.Id, Text = $"{x.LastName} {x.FirstName} ({x.DateOfBirth})" });
@@ -220,11 +229,11 @@
             Take = 100,
         };
 
-        var result = await ToastService.ShowIndeterminateProgressToast(Mediator.Send(query), "Kérjük várjon...", "Fajták betöltése folyamatban...");
+        var result = await toastService.ShowIndeterminateProgressToast(Mediator.Send(query), "Kérjük várjon...", "Fajták betöltése folyamatban...");
 
         if (result == null)
         {
-            ToastService.ShowError("Sikertelen adatlekérés.");
+            toastService.ShowError("Sikertelen adatlekérés.");
             return new List<AnimalTypeDto>();
         }
 
@@ -250,12 +259,24 @@
                 Take = 100,
             };
 
-        var result = await ToastService.ShowIndeterminateProgressToast(Mediator.Send(query), "Kérjük várjon...", "Fajták betöltése folyamatban...");
+        var result = await toastService.ShowIndeterminateProgressToast(Mediator.Send(query), "Kérjük várjon...", "Fajták betöltése folyamatban...");
 
         if (result == null)
         {
-            ToastService.ShowError("Sikertelen adatlekérés.");
+            toastService.ShowError("Sikertelen adatlekérés.");
             return new List<AnimalBreedDto>();
+        }
+
+        if (!result.AnimalBreeds.Any(x => x.TypeId == typeId))
+        {
+			// If the breed is not found, add a default "No result" option
+            dialogService.ShowError("A kiválasztott állattípushoz nem található fajta.", "Nincs találat");
+			result.AnimalBreeds.Add(new AnimalBreedDto()
+				{
+					Id = -1,
+					BreedName = "Nincs találat",
+					TypeId = typeId
+				});
         }
 
         SelectedBreed = result.AnimalBreeds.FirstOrDefault(x => x.Id == Content.BreedId, new("N/A"));
