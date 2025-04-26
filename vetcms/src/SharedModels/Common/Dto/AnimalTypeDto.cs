@@ -11,5 +11,15 @@ namespace vetcms.SharedModels.Common.Dto
         public int Id { get; set; }
         public string TypeName { get; set; } = "N/A";
         public string Description { get; set; } = "N/A";
+
+        public AnimalTypeDto()
+        {
+
+        }
+
+        public AnimalTypeDto(string name)
+        {
+            TypeName = name;
+        }
     }
 }

@@ -1,0 +1,147 @@
+﻿@using System.Globalization
+@using vetcms.BrowserPresentation.Utility
+@using vetcms.ClientApplication.Common.Abstract.CommandAbstraction;
+@using vetcms.ClientApplication.Features.IAM.GetUser
+@using vetcms.ClientApplication.Features.IAM.UserList
+@using vetcms.ClientApplication.Features.PatientClassification.ListAnimalType
+@using vetcms.ClientApplication.Features.PatientManagement.GetPatient
+@using vetcms.ClientApplication.Features.PatientManagement.ListPatients
+@using vetcms.SharedModels.Common.Dto
+@using vetcms.SharedModels.Common.IAM.Authorization;
+@inject MediatR.IMediator Mediator
+@inject IToastService ToastService
+@implements IDialogContentComponent<TreatmentDto>
+
+<FluentGrid>
+    <FluentGridItem xs="12" md="12">
+        <FluentGrid>
+            <FluentGridItem xs="12" sm="12">
+                <FluentNumberField Disabled="true" Style="width: 100%" @bind-Value="Content.Id" Label="Azonosító" />
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="12">
+                <FluentTextField Disabled="true" Style="width: 100%" @bind-Value="Patient.MicrochipNumber" Label="Microchip szám:" />
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="12">
+                <FluentDatePicker Disabled="true" Style="width: 100%"  Value="Content.DateOfTreatment" ValueChanged="(date) => Content.DateOfTreatment = date.Value" Label="Kezelés dátuma" />
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="12">
+                <FluentTextArea Style="width: 100%" @bind-Value="Content.Type" Label="Kezelés típusa" />
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="12">
+                <FluentTextArea Style="width: 100%" @bind-Value="Content.Symptoms" Label="Tűnetek" />
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="12">
+                <FluentTextArea Style="width: 100%" @bind-Value="Content.Diagnosis" Label="Diagnózis" />
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="12">
+                <FluentTextArea Style="width: 100%" @bind-Value="Content.Medications" Label="Alkalmazott gyógyszerek" />
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="12">
+                <FluentTextArea Style="width: 100%" @bind-Value="Content.Procedure" Label="Beavatkozás" />
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="12">
+                <FluentTextArea Style="width: 100%" @bind-Value="Content.Description" Label="Egyéb információ" />
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="12">
+                <FluentDatePicker Style="width: 100%" Value="Content.FollowUpDate" ValueChanged="(date) => Content.FollowUpDate = date.Value" Label="Controll időpont" />
+            </FluentGridItem>
+            <FluentGridItem xs="12" md="12">
+                <FluentSearch Label="Kezelő orvos"
+                              @ref=userSearch
+                              Immediate="true" ImmediateDelay="300"
+                              @bind-Value="searchValue"
+                              @bind-Value:after="SearchQueryChanged"
+                              Placeholder="Tulajdonos keresése..." />
+                <FluentListbox Width="25%" aria-label="search results" Items=@searchResults TOption="Option<int>" OptionText="@(i => i.Text)"
+                               OptionValue="@(i => i.Value.ToString())" @bind-SelectedOption="selectedOption" @bind-SelectedOption:after="OwnerSelectionChanged" />
+            </FluentGridItem>
+        </FluentGrid>
+    </FluentGridItem>
+</FluentGrid>
+
+@code {
+    [Parameter]
+    public TreatmentDto Content { get; set; } = new();
+
+    public PatientDto Patient { get; set; } = new();
+    public UserDto Doctor { get; set; } = new();
+
+    [CascadingParameter]
+    public FluentDialog? Dialog { get; set; }
+
+    private FluentSearch? userSearch;
+    private List<Option<int>> searchResults = new List<Option<int>>();
+    private Option<int>? selectedOption;
+    private const string defaultSearchText = "Nincs találat.";
+    private string? searchValue = string.Empty;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await Mediator.Send(new GetPatientClientQuery(Content.PatientId));
+        if (result != null && result.PatientModel != null)
+        {
+            Patient = result.PatientModel;
+        }
+
+        var userQuery = await Mediator.Send(new GetUserClientQuery(Content.DoctorId));
+        if (userQuery != null && userQuery.User != null)
+        {
+            Doctor = userQuery.User;
+        }
+        searchResults = await defaultSearchResults();
+    }
+
+    private async Task SearchQueryChanged()
+    {
+        if (string.IsNullOrWhiteSpace(searchValue))
+            return;
+
+        var query = new UserListClientQuery()
+            {
+                SearchTerm = searchValue,
+                Take = 5
+            };
+        UserListClientQueryResponse result = await Mediator.Send(query);
+
+        if (result == null)
+        {
+            ToastService.ShowError("Sikertelen adatlekérés.");
+            return;
+        }
+        searchResults = result.Users.ConvertAll(x => new Option<int> { Value = x.Id, Text = $"{x.LastName} {x.FirstName} ({x.DateOfBirth})" });
+
+        StateHasChanged();
+    }
+
+    private void OwnerSelectionChanged()
+    {
+        if (selectedOption == null)
+        {
+            return;
+        }
+        Content.DoctorId = selectedOption.Value;
+    }
+
+    private async Task<List<Option<int>>> defaultSearchResults()
+    {
+        if (Content.DoctorId != null && Content.DoctorId > 0)
+        {
+            UserDto user = await GetUserById(Content.DoctorId);
+            var option = new Option<int> { Value = Content.DoctorId, Text = $"{user.LastName} {user.FirstName} ({user.DateOfBirth})" };
+            selectedOption = option;
+            return new List<Option<int>> { option };
+        }
+        return new List<Option<int>> { new Option<int> { Value = 0, Text = defaultSearchText } };
+    }
+
+    private async Task<UserDto> GetUserById(int id)
+    {
+        var userQuery = await Mediator.Send(new GetUserClientQuery(id));
+        if (userQuery != null && userQuery.User != null)
+        {
+            return userQuery.User;
+        }
+        return new UserDto();
+    }
+}

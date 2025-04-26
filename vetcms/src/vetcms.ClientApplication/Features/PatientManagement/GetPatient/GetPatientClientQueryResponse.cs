@@ -10,6 +10,6 @@ namespace vetcms.ClientApplication.Features.PatientManagement.GetPatient
 {
     public class GetPatientClientQueryResponse
     {
-        public AnimalDto PatientModel { get; set; } = new();
+        public PatientDto PatientModel { get; set; } = new();
     }
 }

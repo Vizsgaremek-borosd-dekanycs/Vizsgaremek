@@ -26,7 +26,7 @@ namespace vetcms.ServerApplication.Features.PatientClassification.CreateAnimalTy
 
             AnimalType newAnimalType = mapper.Map<AnimalType>(request.AnimalTypeModel);
             newAnimalType = await animalTypeRepository.AddAsync(newAnimalType);
-            return new CreateAnimalTypeApiCommandResponse(true) { AnimalTypeData = mapper.Map<AnimalTypeDto>(newAnimalType) };
+            return new CreateAnimalTypeApiCommandResponse(true, "Állattípus sikeresen létrehozva!") { AnimalTypeData = mapper.Map<AnimalTypeDto>(newAnimalType) };
         }
     }
 }

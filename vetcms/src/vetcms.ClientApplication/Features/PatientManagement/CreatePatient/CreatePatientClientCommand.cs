@@ -11,7 +11,7 @@ namespace vetcms.ClientApplication.Features.PatientManagement.CreatePatient
 {
     public class CreatePatientCommand : IClientCommand<bool>
     {
-        public AnimalDto NewAnimalModel { get; set; }
+        public PatientDto NewAnimalModel { get; set; }
 
 
     }

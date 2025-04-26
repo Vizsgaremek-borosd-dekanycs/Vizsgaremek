@@ -9,9 +9,9 @@ using vetcms.SharedModels.Common.Dto;
 
 namespace vetcms.ClientApplication.Features.PatientManagement.ModifyPatient
 {
-    public class ModifyAnimalClientCommand : IClientCommand<bool>
+    public class ModifyPatientClientCommand : IClientCommand<bool>
     {
         public int Id { get; set; }
-        public AnimalDto AnimalModel { get; set; }
+        public PatientDto PatientModel { get; set; }
     }
 }

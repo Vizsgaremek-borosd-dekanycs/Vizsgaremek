@@ -26,7 +26,7 @@ namespace vetcms.ServerApplication.Features.IAM.DeleteUser
             {
                 return new DeleteUserApiCommandResponse(false)
                 {
-                    Message = $"Nem létező felhasználó ID(s): {string.Join(",", nonExistentIds)}"
+                    Message = $"Nem létező felhasználó(k) ID(s): {string.Join(",", nonExistentIds)}"
                 };
             }
 
@@ -37,7 +37,8 @@ namespace vetcms.ServerApplication.Features.IAM.DeleteUser
 
             return new DeleteUserApiCommandResponse()
             {
-                Success = true
+                Success = true,
+                Message = "Felhasználó sikeresen törölve!"
             };
 
         }

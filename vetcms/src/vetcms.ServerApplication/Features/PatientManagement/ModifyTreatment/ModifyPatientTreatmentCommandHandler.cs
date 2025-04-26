@@ -34,7 +34,11 @@ namespace vetcms.ServerApplication.Features.PatientManagement.ModifyTreatment
 
             await treatmentRepository.UpdateAsync(updatedTreatment);
 
-            return new ModifyPatientTreatmentApiCommandResponse(true);
+            return new ModifyPatientTreatmentApiCommandResponse()
+            {
+                Success = true,
+                Message = "Módosítások elmentve!"
+            };
         }
     }
 }

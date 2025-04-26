@@ -1,4 +1,5 @@
 ﻿@page "/iam/user-management"
+<PageTitle>Felhasználók kezelése</PageTitle>
 @using vetcms.BrowserPresentation.Components
 @using vetcms.BrowserPresentation.Utility
 @using vetcms.ClientApplication.Common.Abstract.CommandAbstraction
@@ -11,6 +12,7 @@
 @inject IDialogService DialogService
 @inject IToastService ToastService
 @inject MediatR.IMediator Mediator
+@inject NavigationManager Navigation
 
 <div>
     
@@ -58,7 +60,7 @@
                         <FluentButton Disabled="isBusy" aria-label="Szerkesztés" OnClick="@(async ()=> await OpenEditUserDialog(context))" IconStart="@(new Icons.Regular.Size16.Edit())" />
                     </PermissionWrapper>
                     <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_VIEW_OTHERS_ANIMALS]">
-                        <FluentButton Disabled="isBusy" OnClick="@(() => Console.WriteLine("Delete clicked"))" aria-label="Hozzárendelt páciensek megtekintése" IconStart="@(new Icons.Regular.Size16.AnimalCat())"/>
+                        <FluentButton Disabled="isBusy" OnClick="@(()=> Navigation.NavigateTo($"/patient-management/animal-management/user/{context.Id}"))" aria-label="Hozzárendelt páciensek megtekintése" IconStart="@(new Icons.Regular.Size16.AnimalCat())" />
                     </PermissionWrapper>
                 </TemplateColumn>
             </FluentDataGrid>

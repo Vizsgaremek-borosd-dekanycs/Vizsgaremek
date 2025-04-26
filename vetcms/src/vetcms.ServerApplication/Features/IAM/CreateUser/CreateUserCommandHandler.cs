@@ -51,7 +51,7 @@ namespace vetcms.ServerApplication.Features.IAM.CreateUser
             newUser.Address = request.NewUser.Address;
             if (request.NewUser.DateOfBirth == null) 
             {
-                newUser.DateOfBirth = DateTime.MinValue;
+                newUser.DateOfBirth = DateTime.Now;
             }
             else
             {

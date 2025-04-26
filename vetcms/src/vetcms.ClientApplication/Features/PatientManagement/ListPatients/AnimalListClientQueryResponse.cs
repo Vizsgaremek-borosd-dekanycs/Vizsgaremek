@@ -9,7 +9,7 @@ namespace vetcms.ClientApplication.Features.PatientManagement.ListPatients
 {
     public class AnimalListClientQueryResponse
     {
-        public List<AnimalDto> Animals { get; set; } = new();
-        public int ResultCount { get; set; } = 0;
+        public List<PatientDto> Patients { get; set; } = new();
+        public int ResoultCount { get; set; } = 0;
     }
 }

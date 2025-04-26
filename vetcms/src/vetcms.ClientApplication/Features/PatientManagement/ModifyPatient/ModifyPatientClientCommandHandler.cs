@@ -11,31 +11,34 @@ using vetcms.ClientApplication.Common.Abstract;
 using vetcms.ClientApplication.Features.IAM.ModifyUser;
 using vetcms.ClientApplication.Features.PatientClassification.ModifyAnimalBreed;
 using vetcms.SharedModels.Features.PatientClassification;
+using vetcms.SharedModels.Features.PatientManagement;
 
 namespace vetcms.ClientApplication.Features.PatientManagement.ModifyPatient
 {
-    internal class ModifyAnimalClientCommandHandler(IMediator mediator, IMapper mapper, IDialogService dialogService) : IRequestHandler<ModifyAnimalBreedClientCommand, bool>
+    internal class ModifyPatientClientCommandHandler(IMediator mediator, IMapper mapper, IDialogService dialogService) : IRequestHandler<ModifyPatientClientCommand, bool>
     {
-        public async Task<bool> Handle(ModifyAnimalBreedClientCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(ModifyPatientClientCommand request, CancellationToken cancellationToken)
         {
-            if(true)
+            ModifyPatientApiCommand command = mapper.Map<ModifyPatientApiCommand>(request);
+            ModifyPatientApiCommandResponse response = await mediator.Send(command);
+            if(response.Success)
             {
                 _ = await (await dialogService.ShowSuccessAsync("Sikeres módosítás", "Siker")).Result;
                 return true;
             }
             else
             {
-                //_ = await (await dialogService.ShowErrorAsync(response.Message, "Hiba")).Result;
-                //return false;
+                _ = await (await dialogService.ShowErrorAsync(response.Message, "Hiba")).Result;
+                return false;
             }
         }
     }
 
-    //internal class ModifyAnimalBreedApiCommandHandler : GenericApiCommandHandler<ModifyAnimalBreedApiCommand, ModifyAnimalBreedApiCommandResult>
-    //{
-    //    public ModifyAnimalBreedApiCommandHandler(IServiceScopeFactory serviceScopeFactory)
-    //        : base(serviceScopeFactory)
-    //    {
-    //    }
-    //}
+    internal class ModifyPatientApiCommandHandler : GenericApiCommandHandler<ModifyPatientApiCommand, ModifyPatientApiCommandResponse>
+    {
+        public ModifyPatientApiCommandHandler(IServiceScopeFactory serviceScopeFactory)
+            : base(serviceScopeFactory)
+        {
+        }
+    }
 }

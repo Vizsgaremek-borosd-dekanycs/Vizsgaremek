@@ -26,7 +26,7 @@
   },
   "Host": {
     "ApiBase": "http://localhost:5042",
-    "WebBase": "http://localhost:7140"
+    "WebBase": "https://localhost:7140"
 
   },
   "AllowedHosts": "*",

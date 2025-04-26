@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using vetcms.ClientApplication.Common.Abstract;
 using vetcms.SharedModels.Features.PatientClassification;
+using vetcms.SharedModels.Features.PatientManagement;
 
 namespace vetcms.ClientApplication.Features.PatientManagement.DeletePatient
 {
@@ -16,26 +17,31 @@ namespace vetcms.ClientApplication.Features.PatientManagement.DeletePatient
     {
         public async Task<bool> Handle(DeletePatientClientCommand request, CancellationToken cancellationToken)
         {
-            //DeleteAnimalBreedApiCommand command = mapper.Map<DeleteAnimalBreedApiCommand>(request);
-            //DeleteAnimalBreedApiCommandResult response = await mediator.Send(command);
-            if (true)
+            DeletePatientApiCommand deletePatientApiCommand = new DeletePatientApiCommand()
             {
-                _ = await (await dialogService.ShowSuccessAsync("Sikeres törlés", "Siker")).Result;
+                Ids = request.AnimalIds
+            };
+            DeletePatientApiCommandResponse response = await mediator.Send(deletePatientApiCommand);
+            if (response.Success)
+            {
+                _ = await (await dialogService.ShowSuccessAsync(response.Message, "Siker")).Result;
                 return true;
             }
             else
             {
-                //_ = await (await dialogService.ShowErrorAsync(response.Message, "Hiba")).Result;
+                _ = await (await dialogService.ShowErrorAsync(response.Message, "Hiba")).Result;
                 return false;
             }
+
+
         }
     }
 
-    //internal class DeleteAnimalBreedApiCommandHandler : GenericApiCommandHandler<DeleteAnimalBreedApiCommand, DeleteAnimalBreedApiCommandResult>
-    //{
-    //    public DeleteAnimalBreedApiCommandHandler(IServiceScopeFactory serviceScopeFactory)
-    //        : base(serviceScopeFactory)
-    //    {
-    //    }
-    //}
+    internal class DeletePatientApiCommandHandler : GenericApiCommandHandler<DeletePatientApiCommand, DeletePatientApiCommandResponse>
+    {
+        public DeletePatientApiCommandHandler(IServiceScopeFactory serviceScopeFactory)
+            : base(serviceScopeFactory)
+        {
+        }
+    }
 }

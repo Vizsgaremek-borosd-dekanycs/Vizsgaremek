@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <PublishTrimmed>False</PublishTrimmed>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,6 +18,15 @@
   <ItemGroup>
     <ProjectReference Include="..\SharedModels\vetcms.SharedModels.csproj" />
     <ProjectReference Include="..\vetcms.ClientApplication\vetcms.ClientApplication.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Components\EditTreatmentDialog.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+    <Content Update="Pages\Features\PatientManagement\PatientTreatmentManagement.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,5 @@
 {
-    "Host" : {
-        "ApiBase" : "https://localhost:5042"
+    "Host": {
+        "ApiBase": "https://localhost:7129"
     }
 }

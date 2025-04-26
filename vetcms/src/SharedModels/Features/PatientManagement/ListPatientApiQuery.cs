@@ -17,9 +17,10 @@ namespace vetcms.SharedModels.Features.PatientManagement
         public int Skip { get; set; } = 0;
         public int Take { get; set; } = 10;
         public string SearchTerm { get; set; } = string.Empty;
+        public int? OwnerId { get; set; }
         public override string GetApiEndpoint()
         {
-            return Path.Join(ApiBaseUrl, $"/api/v1/patient-management/animals?skip={Skip}&take={Take}&query={SearchTerm}");
+            return Path.Join(ApiBaseUrl, $"/api/v1/patient-management/animals?skip={Skip}&take={Take}&query={SearchTerm}&ownerid={OwnerId}");
         }
 
         public override HttpMethodEnum GetApiMethod()

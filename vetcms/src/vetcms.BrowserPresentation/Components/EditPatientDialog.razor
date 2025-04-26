@@ -1,20 +1,32 @@
 ﻿@using System.Globalization
 @using vetcms.BrowserPresentation.Utility
 @using vetcms.ClientApplication.Common.Abstract.CommandAbstraction;
+@using vetcms.ClientApplication.Features.IAM.GetUser
+@using vetcms.ClientApplication.Features.IAM.UserList
 @using vetcms.ClientApplication.Features.PatientClassification.ListAnimalBreedByType
 @using vetcms.ClientApplication.Features.PatientClassification.ListAnimalType
 @using vetcms.ClientApplication.Features.PatientManagement.ListPatients
 @using vetcms.SharedModels.Common.Dto
 @using vetcms.SharedModels.Common.IAM.Authorization;
 @inject MediatR.IMediator Mediator
-@inject IToastService ToastService
-@implements IDialogContentComponent<AnimalDto>
+@inject IToastService toastService
+@inject IDialogService dialogService
+@implements IDialogContentComponent<PatientDto>
 
 <FluentGrid>
     <FluentGridItem xs="12" md="12">
         <FluentGrid>
             <FluentGridItem xs="12" sm="12">
                 <FluentTextField Style="width: 100%" @bind-Value="Content.Name" Label="Név" TextFieldType="TextFieldType.Text" />
+            </FluentGridItem>
+            <FluentGridItem xs="12" sm="12">
+                <FluentSelect Items="@genderOptions"
+                Label="Nem"
+                Multiple="false"
+                OptionText="@(i => i.Text)"
+                OptionValue="@(i => i.Value.ToString())"
+                @bind-SelectedOption="SelectedGender"
+                @bind-SelectedOption:after="GenderSelectionChanged" />
             </FluentGridItem>
             <FluentGridItem xs="12" sm="12">
                 <FluentNumberField Style="width: 100%" @bind-Value="Content.Weight" Label="Súly" />
@@ -35,39 +47,61 @@
             <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_VIEW_ANIMAL_TYPES]">
                 <FluentGridItem xs="12" md="12">
                     <FluentSelect TOption="AnimalTypeDto"
-                    Label="Állat fajta"
+                    Multiple="false"
+                    Label="Állattípus"
                     Items="@animalTypes"
-                    Placeholder="@SelectedType?.TypeName"
-                    OptionValue="@(p => p?.Id.ToString())"
-                    OptionText="@(p => p?.TypeName)"
-                    SelectedOption="@SelectedType"
-                    SelectedOptionChanged="AnimalTypeSelectionChanged" />
+                    OptionValue="@(p => p.Id.ToString())"
+                    OptionText="@(p => p.TypeName)"
+                    @bind-SelectedOption="SelectedType"
+                    @bind-SelectedOption:after="AnimalTypeSelectionChanged" />
                 </FluentGridItem>
             </PermissionWrapper>
             <PermissionWrapper RequiredPermissions="[PermissionFlags.CAN_VIEW_ANIMAL_BREED]">
                 <FluentGridItem xs="12" md="12">
                     <FluentSelect TOption="AnimalBreedDto"
-                                  Label="Állat faj"
-                                  Items="@animalBreeds"
-                                  Placeholder="@SelectedBreed?.BreedName"
-                                  OptionValue="@(p => p?.Id.ToString())"
-                                  OptionText="@(p => p?.BreedName)"
-                                  SelectedOption="@SelectedBreed"
-                                  SelectedOptionChanged="AnimalBreedSelectionChanged" 
-                                  Value="SelectedBreedId" />
+                    Label="Állatfaj"
+                    Items="@animalBreeds"
+                    OptionValue="@(p => p.Id.ToString())"
+                    OptionText="@(p => p.BreedName)"
+                    @bind-SelectedOption="SelectedBreed"
+                    @bind-SelectedOption:after="AnimalBreedSelectionChanged" />
                 </FluentGridItem>
             </PermissionWrapper>
+            <FluentGridItem xs="12" md="12">
+                <FluentSearch 
+                Label="Tulajdonos"
+                @ref=userSearch
+                Immediate="true" ImmediateDelay="300"
+                @bind-Value="searchValue"
+                @bind-Value:after="SearchQueryChanged"
+                Placeholder="Tulajdonos keresése..." />
+                <FluentListbox Width="25%" aria-label="search results" Items=@searchResults TOption="Option<int>" OptionText="@(i => i.Text)"
+                OptionValue="@(i => i.Value.ToString())" @bind-SelectedOption="selectedOption" @bind-SelectedOption:after="OwnerSelectionChanged" />
+            </FluentGridItem>
         </FluentGrid>
     </FluentGridItem>
 </FluentGrid>
 
 @code {
-
     [Parameter]
-    public AnimalDto Content { get; set; } = new();
+    public PatientDto Content { get; set; } = new();
 
     [CascadingParameter]
     public FluentDialog? Dialog { get; set; }
+
+    private FluentSearch? userSearch;
+    private List<Option<int>> searchResults = new List<Option<int>>();
+    private Option<int>? selectedOption;
+    private const string defaultSearchText = "Nincs találat.";
+    private string? searchValue = string.Empty;
+    private List<Option<char>> genderOptions = new List<Option<char>>()
+    {
+        new Option<char> { Value = 'H', Text = "Hím" },
+        new Option<char> { Value = 'N', Text = "Nőstény" },
+    };
+    private Option<char> SelectedGender { get; set; } = new();
+
+
 
     private AnimalTypeDto SelectedType { get; set; } = new();
     private AnimalBreedDto SelectedBreed { get; set; } = new();
@@ -78,25 +112,107 @@
     private List<AnimalBreedDto> animalBreeds = new();
 
 
+    private void OwnerSelectionChanged()
+    {
+        if (selectedOption == null)
+        {
+            return;
+        }
+        Content.OwnerId = selectedOption.Value;
+    }
+
+    private void GenderSelectionChanged()
+    {
+        if (SelectedGender != null)
+        {
+            Content.Gender = SelectedGender.Value;
+        }       
+    }
+
+    private async Task<List<Option<int>>> defaultSearchResults()
+    {
+        if (Content.OwnerId != null && Content.OwnerId > 0)
+        {
+            UserDto user = await GetUserById(Content.OwnerId);
+            var option = new Option<int> { Value = Content.OwnerId, Text = $"{user.LastName} {user.FirstName} ({user.DateOfBirth})" };
+            selectedOption = option;
+            return new List<Option<int>> { option };
+        }
+        return new List<Option<int>> { new Option<int> { Value = 0, Text = defaultSearchText } };
+    }
+
     protected override async Task OnInitializedAsync()
     {
         animalTypes = await GetAnimalTypes();
-        animalBreeds = await GetAnimalTypeRelatedBreeds(SelectedType.Id);
+        searchResults = await defaultSearchResults();
+
+
+        if (Content.Gender == default(char))
+        {
+            SelectedGender = genderOptions.First();
+            GenderSelectionChanged();
+        }
+        else
+        {
+            if(genderOptions.Any((g) => g.Value == Content.Gender))
+            {
+                SelectedGender = genderOptions.First((g) => g.Value == Content.Gender);
+            }
+        }
     }
 
-    async Task AnimalTypeSelectionChanged(AnimalTypeDto? animalTypeDto)
+    private async Task<UserDto> GetUserById(int id)
     {
+        var userQuery = await Mediator.Send(new GetUserClientQuery(id));
+        if (userQuery != null && userQuery.User != null)
+        {
+            return userQuery.User;
+        }
+        return new UserDto();
+    }
+
+    private async Task SearchQueryChanged()
+    {
+        if (string.IsNullOrWhiteSpace(searchValue))
+            return;
+
+        var query = new UserListClientQuery()
+            {
+                SearchTerm = searchValue,
+                Take = 5
+            };
+        UserListClientQueryResponse result = await Mediator.Send(query);
+
+        if (result == null)
+        {
+            toastService.ShowError("Sikertelen adatlekérés.");
+            return;
+        }
+        searchResults = result.Users.ConvertAll(x => new Option<int> { Value = x.Id, Text = $"{x.LastName} {x.FirstName} ({x.DateOfBirth})" });
+
+        StateHasChanged();
+    }
+
+
+    private async Task AnimalTypeSelectionChanged()
+    {
+
+        AnimalTypeDto animalTypeDto = SelectedType;
         if(animalTypeDto != null)
         {
             SelectedType = animalTypeDto;
             Content.TypeId = animalTypeDto.Id;
 
             animalBreeds = await GetAnimalTypeRelatedBreeds(SelectedType.Id);
+            Console.WriteLine(animalBreeds[0].BreedName);
+            SelectedBreed = animalBreeds.FirstOrDefault();
+            AnimalBreedSelectionChanged();
         }
     }
 
-    void AnimalBreedSelectionChanged(AnimalBreedDto? animalBreedDto)
+    void AnimalBreedSelectionChanged()
     {
+        AnimalBreedDto? animalBreedDto = SelectedBreed;
         if (animalBreedDto != null)
         {
             SelectedBreed = animalBreedDto;
@@ -113,15 +229,25 @@
             Take = 100,
         };
 
-        var result = await ToastService.ShowIndeterminateProgressToast(Mediator.Send(query), "Kérjük várjon...", "Fajták betöltése folyamatban...");
+        var result = await toastService.ShowIndeterminateProgressToast(Mediator.Send(query), "Kérjük várjon...", "Fajták betöltése folyamatban...");
 
         if (result == null)
         {
-            ToastService.ShowError("Sikertelen adatlekérés.");
+            toastService.ShowError("Sikertelen adatlekérés.");
             return new List<AnimalTypeDto>();
         }
 
-        SelectedType = result.AnimalTypes.FirstOrDefault(x => x.Id == Content?.TypeId) ?? new AnimalTypeDto();
+        if (Content.TypeId < 1)
+        {
+            AnimalTypeDto animalTypeDto = result.AnimalTypes.FirstOrDefault(x => true, new());
+            SelectedType = animalTypeDto;
+            await AnimalTypeSelectionChanged();
+        }
+
+        SelectedType = result.AnimalTypes.FirstOrDefault(x => x.Id == Content.TypeId, new("N/A"));
+        animalBreeds = await GetAnimalTypeRelatedBreeds(SelectedType.Id);
+
+
         return result.AnimalTypes;
     }
 
@@ -133,16 +259,28 @@
                 Take = 100,
             };
 
-        var result = await ToastService.ShowIndeterminateProgressToast(Mediator.Send(query), "Kérjük várjon...", "Fajták betöltése folyamatban...");
+        var result = await toastService.ShowIndeterminateProgressToast(Mediator.Send(query), "Kérjük várjon...", "Fajták betöltése folyamatban...");
 
         if (result == null)
         {
-            ToastService.ShowError("Sikertelen adatlekérés.");
+            toastService.ShowError("Sikertelen adatlekérés.");
             return new List<AnimalBreedDto>();
         }
 
-        SelectedBreed = result.AnimalBreeds.FirstOrDefault(x => x.Id == Content?.BreedId);
-        SelectedBreedId = Content?.BreedId.ToString() ?? string.Empty;
+        if (!result.AnimalBreeds.Any(x => x.TypeId == typeId))
+        {
+			// If the breed is not found, add a default "No result" option
+            dialogService.ShowError("A kiválasztott állattípushoz nem található fajta.", "Nincs találat");
+			result.AnimalBreeds.Add(new AnimalBreedDto()
+				{
+					Id = -1,
+					BreedName = "Nincs találat",
+					TypeId = typeId
+				});
+        }
+
+        SelectedBreed = result.AnimalBreeds.FirstOrDefault(x => x.Id == Content.BreedId, new("N/A"));
+        SelectedBreedId = Content.BreedId.ToString();
         return result.AnimalBreeds;
     }
 
